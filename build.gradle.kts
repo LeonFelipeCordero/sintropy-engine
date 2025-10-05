@@ -26,6 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     implementation("org.postgresql:postgresql")
     jooqCodegen("org.postgresql:postgresql")
@@ -73,7 +74,6 @@ liquibase {
             "logLevel" to "info",
         )
     }
-
 }
 
 jooq {
@@ -108,7 +108,6 @@ jooq {
 tasks.named("compileKotlin") {
     dependsOn(tasks.named("jooqCodegen"))
 }
-
 
 tasks.named("jooqCodegen") {
     dependsOn(tasks.named("update"))

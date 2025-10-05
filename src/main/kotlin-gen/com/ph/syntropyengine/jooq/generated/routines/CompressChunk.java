@@ -62,12 +62,6 @@ public class CompressChunk extends AbstractRoutine<Object> {
     public static final Parameter<Boolean> RECOMPRESS = Internal.createParameter("recompress", SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("false"), SQLDataType.BOOLEAN)), true, false);
 
     /**
-     * The parameter
-     * <code>public.compress_chunk.hypercore_use_access_method</code>.
-     */
-    public static final Parameter<Boolean> HYPERCORE_USE_ACCESS_METHOD = Internal.createParameter("hypercore_use_access_method", SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("NULL::boolean"), SQLDataType.BOOLEAN)), true, false);
-
-    /**
      * Create a new routine call instance
      */
     public CompressChunk() {
@@ -77,7 +71,6 @@ public class CompressChunk extends AbstractRoutine<Object> {
         addInParameter(UNCOMPRESSED_CHUNK);
         addInParameter(IF_NOT_COMPRESSED);
         addInParameter(RECOMPRESS);
-        addInParameter(HYPERCORE_USE_ACCESS_METHOD);
     }
 
     /**
@@ -123,21 +116,5 @@ public class CompressChunk extends AbstractRoutine<Object> {
      */
     public void setRecompress(Field<Boolean> field) {
         setField(RECOMPRESS, field);
-    }
-
-    /**
-     * Set the <code>hypercore_use_access_method</code> parameter IN value to
-     * the routine
-     */
-    public void setHypercoreUseAccessMethod(Boolean value) {
-        setValue(HYPERCORE_USE_ACCESS_METHOD, value);
-    }
-
-    /**
-     * Set the <code>hypercore_use_access_method</code> parameter to the
-     * function to be used with a {@link org.jooq.Select} statement
-     */
-    public void setHypercoreUseAccessMethod(Field<Boolean> field) {
-        setField(HYPERCORE_USE_ACCESS_METHOD, field);
     }
 }

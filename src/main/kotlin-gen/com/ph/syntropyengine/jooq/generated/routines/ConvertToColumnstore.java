@@ -45,12 +45,6 @@ public class ConvertToColumnstore extends AbstractRoutine<java.lang.Void> {
     public static final Parameter<Boolean> RECOMPRESS = Internal.createParameter("recompress", SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("false"), SQLDataType.BOOLEAN)), true, false);
 
     /**
-     * The parameter
-     * <code>public.convert_to_columnstore.hypercore_use_access_method</code>.
-     */
-    public static final Parameter<Boolean> HYPERCORE_USE_ACCESS_METHOD = Internal.createParameter("hypercore_use_access_method", SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("NULL::boolean"), SQLDataType.BOOLEAN)), true, false);
-
-    /**
      * Create a new routine call instance
      */
     public ConvertToColumnstore() {
@@ -59,7 +53,6 @@ public class ConvertToColumnstore extends AbstractRoutine<java.lang.Void> {
         addInParameter(CHUNK);
         addInParameter(IF_NOT_COLUMNSTORE);
         addInParameter(RECOMPRESS);
-        addInParameter(HYPERCORE_USE_ACCESS_METHOD);
         setSQLUsable(false);
     }
 
@@ -82,13 +75,5 @@ public class ConvertToColumnstore extends AbstractRoutine<java.lang.Void> {
      */
     public void setRecompress(Boolean value) {
         setValue(RECOMPRESS, value);
-    }
-
-    /**
-     * Set the <code>hypercore_use_access_method</code> parameter IN value to
-     * the routine
-     */
-    public void setHypercoreUseAccessMethod(Boolean value) {
-        setValue(HYPERCORE_USE_ACCESS_METHOD, value);
     }
 }

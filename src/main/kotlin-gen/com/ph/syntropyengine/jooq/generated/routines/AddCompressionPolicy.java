@@ -81,12 +81,6 @@ public class AddCompressionPolicy extends AbstractRoutine<Integer> {
     public static final Parameter<YearToSecond> COMPRESS_CREATED_BEFORE = Internal.createParameter("compress_created_before", SQLDataType.INTERVAL.defaultValue(DSL.field(DSL.raw("NULL::interval"), SQLDataType.INTERVAL)), true, false);
 
     /**
-     * The parameter
-     * <code>public.add_compression_policy.hypercore_use_access_method</code>.
-     */
-    public static final Parameter<Boolean> HYPERCORE_USE_ACCESS_METHOD = Internal.createParameter("hypercore_use_access_method", SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("NULL::boolean"), SQLDataType.BOOLEAN)), true, false);
-
-    /**
      * Create a new routine call instance
      */
     public AddCompressionPolicy() {
@@ -100,7 +94,6 @@ public class AddCompressionPolicy extends AbstractRoutine<Integer> {
         addInParameter(INITIAL_START);
         addInParameter(TIMEZONE);
         addInParameter(COMPRESS_CREATED_BEFORE);
-        addInParameter(HYPERCORE_USE_ACCESS_METHOD);
     }
 
     /**
@@ -207,21 +200,5 @@ public class AddCompressionPolicy extends AbstractRoutine<Integer> {
      */
     public void setCompressCreatedBefore(Field<YearToSecond> field) {
         setField(COMPRESS_CREATED_BEFORE, field);
-    }
-
-    /**
-     * Set the <code>hypercore_use_access_method</code> parameter IN value to
-     * the routine
-     */
-    public void setHypercoreUseAccessMethod(Boolean value) {
-        setValue(HYPERCORE_USE_ACCESS_METHOD, value);
-    }
-
-    /**
-     * Set the <code>hypercore_use_access_method</code> parameter to the
-     * function to be used with a {@link org.jooq.Select} statement
-     */
-    public void setHypercoreUseAccessMethod(Field<Boolean> field) {
-        setField(HYPERCORE_USE_ACCESS_METHOD, field);
     }
 }

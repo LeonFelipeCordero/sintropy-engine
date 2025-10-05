@@ -74,12 +74,6 @@ public class AddColumnstorePolicy extends AbstractRoutine<java.lang.Void> {
     public static final Parameter<YearToSecond> CREATED_BEFORE = Internal.createParameter("created_before", SQLDataType.INTERVAL.defaultValue(DSL.field(DSL.raw("NULL::interval"), SQLDataType.INTERVAL)), true, false);
 
     /**
-     * The parameter
-     * <code>public.add_columnstore_policy.hypercore_use_access_method</code>.
-     */
-    public static final Parameter<Boolean> HYPERCORE_USE_ACCESS_METHOD = Internal.createParameter("hypercore_use_access_method", SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("NULL::boolean"), SQLDataType.BOOLEAN)), true, false);
-
-    /**
      * Create a new routine call instance
      */
     public AddColumnstorePolicy() {
@@ -92,7 +86,6 @@ public class AddColumnstorePolicy extends AbstractRoutine<java.lang.Void> {
         addInParameter(INITIAL_START);
         addInParameter(TIMEZONE);
         addInParameter(CREATED_BEFORE);
-        addInParameter(HYPERCORE_USE_ACCESS_METHOD);
         setSQLUsable(false);
     }
 
@@ -143,13 +136,5 @@ public class AddColumnstorePolicy extends AbstractRoutine<java.lang.Void> {
      */
     public void setCreatedBefore(YearToSecond value) {
         setValue(CREATED_BEFORE, value);
-    }
-
-    /**
-     * Set the <code>hypercore_use_access_method</code> parameter IN value to
-     * the routine
-     */
-    public void setHypercoreUseAccessMethod(Boolean value) {
-        setValue(HYPERCORE_USE_ACCESS_METHOD, value);
     }
 }

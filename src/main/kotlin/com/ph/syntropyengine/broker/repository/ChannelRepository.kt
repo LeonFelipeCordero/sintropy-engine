@@ -24,6 +24,7 @@ class ChannelRepository(
             .returning()
             .fetchOne()
 
+        // TODO: ths can be solved with context.batch([...items])
         var routingKeysInsertStatement =
             context.insertInto(ROUTING_KEY, ROUTING_KEY.ROUTING_KEY_, ROUTING_KEY.CHANNEL_ID)
         channel.routingKeys

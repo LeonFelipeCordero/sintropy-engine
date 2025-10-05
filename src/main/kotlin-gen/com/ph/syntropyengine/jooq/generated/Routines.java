@@ -431,6 +431,7 @@ import com.ph.syntropyengine.jooq.generated.routines.FirstTime3;
 import com.ph.syntropyengine.jooq.generated.routines.FirstVal1;
 import com.ph.syntropyengine.jooq.generated.routines.FirstVal2;
 import com.ph.syntropyengine.jooq.generated.routines.FirstVal3;
+import com.ph.syntropyengine.jooq.generated.routines.GenerateUuidv7;
 import com.ph.syntropyengine.jooq.generated.routines.GetTelemetryReport;
 import com.ph.syntropyengine.jooq.generated.routines.HeartbeatAgg;
 import com.ph.syntropyengine.jooq.generated.routines.HeartbeatFinal;
@@ -881,6 +882,8 @@ import com.ph.syntropyengine.jooq.generated.routines.Timeweightinterpolatedinteg
 import com.ph.syntropyengine.jooq.generated.routines.TimeweightsummaryIn;
 import com.ph.syntropyengine.jooq.generated.routines.TimeweightsummaryOut;
 import com.ph.syntropyengine.jooq.generated.routines.ToEpoch;
+import com.ph.syntropyengine.jooq.generated.routines.ToUuidv7;
+import com.ph.syntropyengine.jooq.generated.routines.ToUuidv7Boundary;
 import com.ph.syntropyengine.jooq.generated.routines.Topn1;
 import com.ph.syntropyengine.jooq.generated.routines.Topn2;
 import com.ph.syntropyengine.jooq.generated.routines.Total1;
@@ -899,6 +902,9 @@ import com.ph.syntropyengine.jooq.generated.routines.UddsketchTrans;
 import com.ph.syntropyengine.jooq.generated.routines.Unnest;
 import com.ph.syntropyengine.jooq.generated.routines.Uptime1;
 import com.ph.syntropyengine.jooq.generated.routines.Uptime2;
+import com.ph.syntropyengine.jooq.generated.routines.UuidTimestamp;
+import com.ph.syntropyengine.jooq.generated.routines.UuidTimestampMicros;
+import com.ph.syntropyengine.jooq.generated.routines.UuidVersion;
 import com.ph.syntropyengine.jooq.generated.routines.Variance1;
 import com.ph.syntropyengine.jooq.generated.routines.Variance2;
 import com.ph.syntropyengine.jooq.generated.routines.VarianceX1;
@@ -1014,6 +1020,7 @@ import com.ph.syntropyengine.jooq.generated.tables.records.UnnestRecord;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.jooq.AggregateFunction;
 import org.jooq.Configuration;
@@ -11352,7 +11359,6 @@ public class Routines {
         , OffsetDateTime initialStart
         , String timezone
         , YearToSecond createdBefore
-        , Boolean hypercoreUseAccessMethod
     ) {
         AddColumnstorePolicy p = new AddColumnstorePolicy();
         p.setHypertable(hypertable);
@@ -11362,7 +11368,6 @@ public class Routines {
         p.setInitialStart(initialStart);
         p.setTimezone(timezone);
         p.setCreatedBefore(createdBefore);
-        p.setHypercoreUseAccessMethod(hypercoreUseAccessMethod);
 
         p.execute(configuration);
     }
@@ -11385,7 +11390,6 @@ public class Routines {
         , OffsetDateTime initialStart
         , String timezone
         , YearToSecond compressCreatedBefore
-        , Boolean hypercoreUseAccessMethod
     ) {
         AddCompressionPolicy f = new AddCompressionPolicy();
         f.setHypertable(hypertable);
@@ -11395,7 +11399,6 @@ public class Routines {
         f.setInitialStart(initialStart);
         f.setTimezone(timezone);
         f.setCompressCreatedBefore(compressCreatedBefore);
-        f.setHypercoreUseAccessMethod(hypercoreUseAccessMethod);
 
         f.execute(configuration);
         return f.getReturnValue();
@@ -11418,7 +11421,6 @@ public class Routines {
         , OffsetDateTime initialStart
         , String timezone
         , YearToSecond compressCreatedBefore
-        , Boolean hypercoreUseAccessMethod
     ) {
         AddCompressionPolicy f = new AddCompressionPolicy();
         f.setHypertable(hypertable);
@@ -11428,7 +11430,6 @@ public class Routines {
         f.setInitialStart(initialStart);
         f.setTimezone(timezone);
         f.setCompressCreatedBefore(compressCreatedBefore);
-        f.setHypercoreUseAccessMethod(hypercoreUseAccessMethod);
 
         return f.asField();
     }
@@ -11450,7 +11451,6 @@ public class Routines {
         , Field<OffsetDateTime> initialStart
         , Field<String> timezone
         , Field<YearToSecond> compressCreatedBefore
-        , Field<Boolean> hypercoreUseAccessMethod
     ) {
         AddCompressionPolicy f = new AddCompressionPolicy();
         f.setHypertable(hypertable);
@@ -11460,7 +11460,6 @@ public class Routines {
         f.setInitialStart(initialStart);
         f.setTimezone(timezone);
         f.setCompressCreatedBefore(compressCreatedBefore);
-        f.setHypercoreUseAccessMethod(hypercoreUseAccessMethod);
 
         return f.asField();
     }
@@ -22178,13 +22177,11 @@ public class Routines {
         , Object uncompressedChunk
         , Boolean ifNotCompressed
         , Boolean recompress
-        , Boolean hypercoreUseAccessMethod
     ) {
         CompressChunk f = new CompressChunk();
         f.setUncompressedChunk(uncompressedChunk);
         f.setIfNotCompressed(ifNotCompressed);
         f.setRecompress(recompress);
-        f.setHypercoreUseAccessMethod(hypercoreUseAccessMethod);
 
         f.execute(configuration);
         return f.getReturnValue();
@@ -22203,13 +22200,11 @@ public class Routines {
           Object uncompressedChunk
         , Boolean ifNotCompressed
         , Boolean recompress
-        , Boolean hypercoreUseAccessMethod
     ) {
         CompressChunk f = new CompressChunk();
         f.setUncompressedChunk(uncompressedChunk);
         f.setIfNotCompressed(ifNotCompressed);
         f.setRecompress(recompress);
-        f.setHypercoreUseAccessMethod(hypercoreUseAccessMethod);
 
         return f.asField();
     }
@@ -22227,13 +22222,11 @@ public class Routines {
           Field<Object> uncompressedChunk
         , Field<Boolean> ifNotCompressed
         , Field<Boolean> recompress
-        , Field<Boolean> hypercoreUseAccessMethod
     ) {
         CompressChunk f = new CompressChunk();
         f.setUncompressedChunk(uncompressedChunk);
         f.setIfNotCompressed(ifNotCompressed);
         f.setRecompress(recompress);
-        f.setHypercoreUseAccessMethod(hypercoreUseAccessMethod);
 
         return f.asField();
     }
@@ -22252,13 +22245,11 @@ public class Routines {
         , Object chunk
         , Boolean ifNotColumnstore
         , Boolean recompress
-        , Boolean hypercoreUseAccessMethod
     ) {
         ConvertToColumnstore p = new ConvertToColumnstore();
         p.setChunk(chunk);
         p.setIfNotColumnstore(ifNotColumnstore);
         p.setRecompress(recompress);
-        p.setHypercoreUseAccessMethod(hypercoreUseAccessMethod);
 
         p.execute(configuration);
     }
@@ -25498,6 +25489,27 @@ public class Routines {
     ) {
         FirstVal3 f = new FirstVal3();
         f.setSummary(summary);
+
+        return f.asField();
+    }
+
+    /**
+     * Call <code>public.generate_uuidv7</code>
+     */
+    public static UUID generateUuidv7(
+          Configuration configuration
+    ) {
+        GenerateUuidv7 f = new GenerateUuidv7();
+
+        f.execute(configuration);
+        return f.getReturnValue();
+    }
+
+    /**
+     * Get <code>public.generate_uuidv7</code> as a field.
+     */
+    public static Field<UUID> generateUuidv7() {
+        GenerateUuidv7 f = new GenerateUuidv7();
 
         return f.asField();
     }
@@ -49274,6 +49286,82 @@ public class Routines {
     }
 
     /**
+     * Call <code>public.to_uuidv7</code>
+     */
+    public static UUID toUuidv7(
+          Configuration configuration
+        , OffsetDateTime ts
+    ) {
+        ToUuidv7 f = new ToUuidv7();
+        f.setTs(ts);
+
+        f.execute(configuration);
+        return f.getReturnValue();
+    }
+
+    /**
+     * Get <code>public.to_uuidv7</code> as a field.
+     */
+    public static Field<UUID> toUuidv7(
+          OffsetDateTime ts
+    ) {
+        ToUuidv7 f = new ToUuidv7();
+        f.setTs(ts);
+
+        return f.asField();
+    }
+
+    /**
+     * Get <code>public.to_uuidv7</code> as a field.
+     */
+    public static Field<UUID> toUuidv7(
+          Field<OffsetDateTime> ts
+    ) {
+        ToUuidv7 f = new ToUuidv7();
+        f.setTs(ts);
+
+        return f.asField();
+    }
+
+    /**
+     * Call <code>public.to_uuidv7_boundary</code>
+     */
+    public static UUID toUuidv7Boundary(
+          Configuration configuration
+        , OffsetDateTime ts
+    ) {
+        ToUuidv7Boundary f = new ToUuidv7Boundary();
+        f.setTs(ts);
+
+        f.execute(configuration);
+        return f.getReturnValue();
+    }
+
+    /**
+     * Get <code>public.to_uuidv7_boundary</code> as a field.
+     */
+    public static Field<UUID> toUuidv7Boundary(
+          OffsetDateTime ts
+    ) {
+        ToUuidv7Boundary f = new ToUuidv7Boundary();
+        f.setTs(ts);
+
+        return f.asField();
+    }
+
+    /**
+     * Get <code>public.to_uuidv7_boundary</code> as a field.
+     */
+    public static Field<UUID> toUuidv7Boundary(
+          Field<OffsetDateTime> ts
+    ) {
+        ToUuidv7Boundary f = new ToUuidv7Boundary();
+        f.setTs(ts);
+
+        return f.asField();
+    }
+
+    /**
      * @deprecated Unknown data type. If this is a qualified, user-defined type,
      * it may have been excluded from code generation. If this is a built-in
      * type, you can define an explicit {@link org.jooq.Binding} to specify how
@@ -50250,6 +50338,120 @@ public class Routines {
     ) {
         Uptime2 f = new Uptime2();
         f.setAgg(agg);
+
+        return f.asField();
+    }
+
+    /**
+     * Call <code>public.uuid_timestamp</code>
+     */
+    public static OffsetDateTime uuidTimestamp(
+          Configuration configuration
+        , UUID uuid
+    ) {
+        UuidTimestamp f = new UuidTimestamp();
+        f.setUuid(uuid);
+
+        f.execute(configuration);
+        return f.getReturnValue();
+    }
+
+    /**
+     * Get <code>public.uuid_timestamp</code> as a field.
+     */
+    public static Field<OffsetDateTime> uuidTimestamp(
+          UUID uuid
+    ) {
+        UuidTimestamp f = new UuidTimestamp();
+        f.setUuid(uuid);
+
+        return f.asField();
+    }
+
+    /**
+     * Get <code>public.uuid_timestamp</code> as a field.
+     */
+    public static Field<OffsetDateTime> uuidTimestamp(
+          Field<UUID> uuid
+    ) {
+        UuidTimestamp f = new UuidTimestamp();
+        f.setUuid(uuid);
+
+        return f.asField();
+    }
+
+    /**
+     * Call <code>public.uuid_timestamp_micros</code>
+     */
+    public static OffsetDateTime uuidTimestampMicros(
+          Configuration configuration
+        , UUID uuid
+    ) {
+        UuidTimestampMicros f = new UuidTimestampMicros();
+        f.setUuid(uuid);
+
+        f.execute(configuration);
+        return f.getReturnValue();
+    }
+
+    /**
+     * Get <code>public.uuid_timestamp_micros</code> as a field.
+     */
+    public static Field<OffsetDateTime> uuidTimestampMicros(
+          UUID uuid
+    ) {
+        UuidTimestampMicros f = new UuidTimestampMicros();
+        f.setUuid(uuid);
+
+        return f.asField();
+    }
+
+    /**
+     * Get <code>public.uuid_timestamp_micros</code> as a field.
+     */
+    public static Field<OffsetDateTime> uuidTimestampMicros(
+          Field<UUID> uuid
+    ) {
+        UuidTimestampMicros f = new UuidTimestampMicros();
+        f.setUuid(uuid);
+
+        return f.asField();
+    }
+
+    /**
+     * Call <code>public.uuid_version</code>
+     */
+    public static Integer uuidVersion(
+          Configuration configuration
+        , UUID uuid
+    ) {
+        UuidVersion f = new UuidVersion();
+        f.setUuid(uuid);
+
+        f.execute(configuration);
+        return f.getReturnValue();
+    }
+
+    /**
+     * Get <code>public.uuid_version</code> as a field.
+     */
+    public static Field<Integer> uuidVersion(
+          UUID uuid
+    ) {
+        UuidVersion f = new UuidVersion();
+        f.setUuid(uuid);
+
+        return f.asField();
+    }
+
+    /**
+     * Get <code>public.uuid_version</code> as a field.
+     */
+    public static Field<Integer> uuidVersion(
+          Field<UUID> uuid
+    ) {
+        UuidVersion f = new UuidVersion();
+        f.setUuid(uuid);
 
         return f.asField();
     }

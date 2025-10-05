@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: timescale/timescaledb-ha:pg17
+    restart: always
+    networks:
+      - app
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres:$HOME/postgres/pgdata/data
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  postgres:
