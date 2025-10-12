@@ -170,7 +170,7 @@ public class Messages extends TableImpl<MessagesRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.MESSAGES_PRODUCER_ID_IDX, Indexes.MESSAGES_TIMESTAMP_IDX);
+        return Arrays.asList(Indexes.MESSAGES_PRODUCER_ID_IDX);
     }
 
     @Override

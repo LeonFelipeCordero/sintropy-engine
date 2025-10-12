@@ -11,11 +11,13 @@ object Fixtures {
 
     const val DEFAULT_ROUTING_KEY = "test.1"
     const val DEFAULT_PRODUCER_NAME = "test_producer"
+    const val DEFAULT_CHANNEL_NAME = "test_channel"
+    const val DEFAULT_MESSAGE = "test_message"
 
     fun createChannel(): Channel {
         return Channel(
             channelId = null,
-            name = "test_name",
+            name = DEFAULT_CHANNEL_NAME,
             consumers = emptyList(),
             routingKeys = mutableListOf(DEFAULT_ROUTING_KEY)
         )
@@ -42,7 +44,7 @@ object Fixtures {
             channelId = channelId,
             producerId = producerId,
             routingKey = routingKye,
-            message = "test_message",
+            message = DEFAULT_MESSAGE,
         )
     }
 }

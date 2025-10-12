@@ -11,6 +11,8 @@ create table channels
     updated_at timestamptz  not null default now()
 );
 
+create unique index channels_name_idx on channels(name);
+
 create table routing_key
 (
     routing_key varchar(128) not null,

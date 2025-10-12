@@ -22,33 +22,27 @@ class ConsumerRepository(
             ?: throw IllegalStateException("Something went wrong creating a new consumer")
     }
 
-    fun findById(id: UUID): Consumer? {
-        return context.selectFrom(CONSUMERS)
+    fun findById(id: UUID): Consumer? =
+        context.selectFrom(CONSUMERS)
             .where(CONSUMERS.CONSUMER_ID.eq(id))
             .fetchOneInto(Consumer::class.java)
-    }
 
-    fun findByChannel(channelName: String): List<Consumer> {
-        return context.select(CONSUMERS.asterisk())
+    fun findByChannel(channelName: String): List<Consumer> =
+        context.select(CONSUMERS.asterisk())
             .from(CONSUMERS)
             .leftJoin(CHANNELS).on(CONSUMERS.CHANNEL_ID.eq(CHANNELS.CHANNEL_ID))
             .where(CHANNELS.NAME.eq(channelName))
             .fetchInto(Consumer::class.java)
-    }
 
-    fun findAll(): List<Consumer> {
-        return context.selectFrom(CONSUMERS).fetchInto(Consumer::class.java)
-    }
+    fun findAll(): List<Consumer> =
+        context.selectFrom(CONSUMERS).fetchInto(Consumer::class.java)
 
-    fun delete(id: UUID) {
+    fun delete(id: UUID) =
         context.deleteFrom(CONSUMERS)
             .where(CONSUMERS.CONSUMER_ID.eq(id))
             .execute()
-    }
 
-    fun deleteAll() {
-        context.deleteFrom(CONSUMERS).execute()
-    }
+    fun deleteAll() = context.deleteFrom(CONSUMERS).execute()
 
     // TODO: leaving here to in case more complex mapping from POJOS to domain objects is needed
 //    private fun recordToDto(record: Record): Consumer {

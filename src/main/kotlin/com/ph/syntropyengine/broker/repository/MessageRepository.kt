@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository
 class MessageRepository(
     private val context: DSLContext
 ) {
-    fun save(message: Message): Message {
-        return context.insertInto(
+    fun save(message: Message): Message =
+        context.insertInto(
             MESSAGES,
             MESSAGES.MESSAGE_ID,
             MESSAGES.TIMESTAMP,
@@ -28,19 +28,13 @@ class MessageRepository(
             message.message
         ).returning().fetchOneInto(Message::class.java)
             ?: throw IllegalStateException("Something went wrong persisting the message")
-    }
 
-    fun findById(id: UUID): Message? {
-        return context.selectFrom(MESSAGES)
+    fun findById(id: UUID): Message? =
+        context.selectFrom(MESSAGES)
             .where(MESSAGES.MESSAGE_ID.eq(id))
             .fetchOneInto(Message::class.java)
-    }
 
-    fun findAll(): List<Message> {
-        return context.selectFrom(MESSAGES).fetchInto(Message::class.java)
-    }
+    fun findAll(): List<Message> = context.selectFrom(MESSAGES).fetchInto(Message::class.java)
 
-    fun deleteAll() {
-        context.delete(MESSAGES).execute()
-    }
+    fun deleteAll() = context.delete(MESSAGES).execute()
 }

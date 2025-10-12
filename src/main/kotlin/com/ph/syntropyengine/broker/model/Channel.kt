@@ -12,7 +12,5 @@ data class Channel(
     constructor(channelId: UUID, name: String, routingKeys: MutableList<String>) :
             this(channelId, name, emptyList(), routingKeys)
 
-    fun containsRoutingKey(routingKey: String): Boolean {
-        return routingKeys.contains(routingKey)
-    }
+    fun containsRoutingKey(routingKey: String): Boolean = routingKeys.contains(routingKey)
 }

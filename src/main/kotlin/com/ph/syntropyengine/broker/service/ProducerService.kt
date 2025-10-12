@@ -21,21 +21,17 @@ class ProducerService(
         return producerRepository.save(producer)
     }
 
-    fun findById(consumerId: UUID): Producer? {
-        return producerRepository.findById(consumerId)
-    }
+    fun findById(consumerId: UUID): Producer? = producerRepository.findById(consumerId)
 
-    fun findByChannel(channelName: String): List<Producer> {
-        return channelService.findByIdName(channelName)?.let {
+    fun findByChannel(channelName: String): List<Producer> =
+        channelService.findByIdName(channelName)?.let {
             producerRepository.findByChannel(channelName)
         } ?: throw IllegalStateException("Channel $channelName not found")
-    }
 
-    fun deleteProducer(producerId: UUID) {
+    fun deleteProducer(producerId: UUID) =
         producerRepository.findById(producerId)?.let {
             producerRepository.delete(producerId)
         } ?: throw IllegalStateException("Consumer $producerId not found")
-    }
 
     fun publishMessage(message: Message): Message {
         val channel = channelService.findById(message.channelId)

@@ -17,8 +17,8 @@ create table messages
     constraint messages_message_id_timestamp_ok primary key (message_id, timestamp, channel_id)
 );
 
-select create_hypertable('messages', by_range('timestamp'));
-select *
-from add_dimension('messages', by_hash('channel_id', 3));
+-- select create_hypertable('messages', by_range('timestamp'));
+-- select *
+-- from add_dimension('messages', by_hash('channel_id', 3));
 
 create index messages_producer_id_idx on messages(producer_id);

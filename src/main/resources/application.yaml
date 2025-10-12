@@ -16,3 +16,7 @@ spring:
     user: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+
+syen:
+  feature-flags:
+    with-full-replication: true

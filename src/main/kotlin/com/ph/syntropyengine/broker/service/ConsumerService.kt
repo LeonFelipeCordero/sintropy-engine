@@ -23,19 +23,16 @@ class ConsumerService(
         return consumerRepository.save(consumer)
     }
 
-    fun findById(consumerId: UUID): Consumer? {
-        return consumerRepository.findById(consumerId)
-    }
+    fun findById(consumerId: UUID): Consumer? = consumerRepository.findById(consumerId)
 
-    fun findByChannel(channelName: String): List<Consumer> {
-        return channelService.findByIdName(channelName)?.let {
+    fun findByChannel(channelName: String): List<Consumer> =
+        channelService.findByIdName(channelName)?.let {
             consumerRepository.findByChannel(channelName)
         } ?: throw IllegalStateException("Channel $channelName not found")
-    }
 
-    fun deleteConsumer(consumerId: UUID) {
+    fun deleteConsumer(consumerId: UUID) =
         consumerRepository.findById(consumerId)?.let {
             consumerRepository.delete(consumerId)
         } ?: throw IllegalStateException("Consumer $consumerId not found")
-    }
+
 }

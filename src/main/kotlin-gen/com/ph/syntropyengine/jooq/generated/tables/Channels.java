@@ -4,6 +4,7 @@
 package com.ph.syntropyengine.jooq.generated.tables;
 
 
+import com.ph.syntropyengine.jooq.generated.Indexes;
 import com.ph.syntropyengine.jooq.generated.Keys;
 import com.ph.syntropyengine.jooq.generated.Public;
 import com.ph.syntropyengine.jooq.generated.tables.Consumers.ConsumersPath;
@@ -13,12 +14,15 @@ import com.ph.syntropyengine.jooq.generated.tables.RoutingKey.RoutingKeyPath;
 import com.ph.syntropyengine.jooq.generated.tables.records.ChannelsRecord;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.Name;
 import org.jooq.Path;
@@ -144,6 +148,11 @@ public class Channels extends TableImpl<ChannelsRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
+    }
+
+    @Override
+    public List<Index> getIndexes() {
+        return Arrays.asList(Indexes.CHANNELS_NAME_IDX);
     }
 
     @Override

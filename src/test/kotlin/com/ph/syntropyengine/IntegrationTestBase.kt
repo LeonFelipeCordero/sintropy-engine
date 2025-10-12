@@ -7,17 +7,22 @@ import com.ph.syntropyengine.broker.repository.ChannelRepository
 import com.ph.syntropyengine.broker.repository.ConsumerRepository
 import com.ph.syntropyengine.broker.repository.MessageRepository
 import com.ph.syntropyengine.broker.repository.ProducerRepository
+import java.io.File
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.images.builder.ImageFromDockerfile
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.utility.DockerImageName
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = ["syen.feature-flags.with-full-replication=false"]
+)
 abstract class IntegrationTestBase {
 
     @Autowired
@@ -61,17 +66,38 @@ abstract class IntegrationTestBase {
         const val DB_PASSWORD = "postgres"
         const val DB_NAME = "postgres"
 
-        val timescaleImage: DockerImageName = DockerImageName
-            .parse("timescale/timescaledb-ha:pg17")
-            .asCompatibleSubstituteFor("postgres");
+        val customerImage: ImageFromDockerfile = ImageFromDockerfile("development-postgres")
+            .withDockerfile(File("development/postgres17-wal2json/Dockerfile").toPath())
 
         @Container
         val container: PostgreSQLContainer<*> =
-            PostgreSQLContainer(timescaleImage)
+            PostgreSQLContainer(
+                DockerImageName.parse(customerImage.get())
+                    .asCompatibleSubstituteFor("postgres")
+            )
+                // TODO the image is not taking default configurations from docker image
+                // try in the future to push to a container registry and pull from there
+                .withCreateContainerCmdModifier {
+                    it.withCmd(
+                        *it.cmd,
+                        "-c",
+                        "wal_level=logical",
+                        "-c",
+                        "max_wal_senders=1",
+                        "-c",
+                        "max_replication_slots=2",
+                        "-c",
+                        "max_logical_replication_workers=1",
+                        "-c",
+                        "max_worker_processes=2",
+                        "-c",
+                        "hba_file=/etc/postgresql/pg_hba.conf"
+                    )
+                }
+                .withReuse(true)
                 .withUsername(DB_USER)
                 .withPassword(DB_PASSWORD)
                 .withDatabaseName(DB_NAME)
-                .withReuse(true)
                 .apply { start() }
 
         @DynamicPropertySource

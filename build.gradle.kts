@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.1.20"
     kotlin("plugin.spring") version "1.9.25"
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
@@ -22,13 +22,18 @@ repositories {
     mavenCentral()
 }
 
+val coroutinesVersion = "1.10.2"
+val jacksonVersion = "2.20.0"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}")
+
     implementation("org.postgresql:postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     jooqCodegen("org.postgresql:postgresql")
     implementation("org.liquibase:liquibase-core")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
@@ -38,6 +43,8 @@ dependencies {
     liquibaseRuntime("org.springframework.boot:spring-boot-starter-data-jpa")
     liquibaseRuntime("info.picocli:picocli:4.7.5")
 
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 
     testImplementation("io.rest-assured:kotlin-extensions")
     testImplementation("org.testcontainers:junit-jupiter")
@@ -45,6 +52,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${coroutinesVersion}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
