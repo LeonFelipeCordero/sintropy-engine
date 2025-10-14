@@ -7,13 +7,15 @@ import com.ph.syntropyengine.broker.repository.ChannelRepository
 import com.ph.syntropyengine.broker.repository.MessageRepository
 import java.util.UUID
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ChannelService(
     private val channelRepository: ChannelRepository,
-    private val messageRepository: MessageRepository
+//    private val messageRepository: MessageRepository
 ) {
 
+    @Transactional
     fun createChannel(name: String, routingKeys: List<String>): Channel {
         require(routingKeys.isNotEmpty()) { "At least one routing key must be provided" }
 
@@ -28,12 +30,14 @@ class ChannelService(
 
     fun findByIdName(name: String): Channel? = channelRepository.findByName(name)
 
+    @Transactional
     fun deleteChannel(id: UUID) {
         channelRepository.findById(id) ?: throw IllegalStateException("Channel with id $id not found")
 
         channelRepository.delete(id)
     }
 
+    @Transactional
     fun addRoutingKey(id: UUID, routingKey: String) {
         val channel = channelRepository.findById(id) ?: throw IllegalStateException("Channel with id $id not found")
 
@@ -44,18 +48,15 @@ class ChannelService(
         channelRepository.addRoutingKey(channel.channelId!!, routingKey)
     }
 
-    fun publish(message: Message): Message {
-        val channel = findById(message.channelId)
-            ?: throw IllegalStateException("Channel ${message.channelId} not found")
-
-        if (!channel.containsRoutingKey(message.routingKey)) {
-            throw IllegalArgumentException("Channel doesn't have routing-key ${message.routingKey}")
-        }
-
-        return messageRepository.save(message)
-    }
-
-    fun consume(consumer: Consumer, routingKey: String) {
-
-    }
+//    @Transactional
+//    fun publish(message: Message): Message {
+//        val channel = findById(message.channelId)
+//            ?: throw IllegalStateException("Channel ${message.channelId} not found")
+//
+//        if (!channel.containsRoutingKey(message.routingKey)) {
+//            throw IllegalArgumentException("Channel doesn't have routing-key ${message.routingKey}")
+//        }
+//
+//        return messageRepository.save(message)
+//    }
 }

@@ -6,6 +6,7 @@ package com.ph.syntropyengine.jooq.generated;
 
 import com.ph.syntropyengine.jooq.generated.tables.Channels;
 import com.ph.syntropyengine.jooq.generated.tables.Consumers;
+import com.ph.syntropyengine.jooq.generated.tables.EventLog;
 import com.ph.syntropyengine.jooq.generated.tables.Messages;
 import com.ph.syntropyengine.jooq.generated.tables.Producers;
 import com.ph.syntropyengine.jooq.generated.tables.RoutingKey;
@@ -26,6 +27,11 @@ public class Tables {
      * The table <code>public.consumers</code>.
      */
     public static final Consumers CONSUMERS = Consumers.CONSUMERS;
+
+    /**
+     * The table <code>public.event_log</code>.
+     */
+    public static final EventLog EVENT_LOG = EventLog.EVENT_LOG;
 
     /**
      * The table <code>public.messages</code>.

@@ -8,6 +8,7 @@ import com.ph.syntropyengine.jooq.generated.Indexes;
 import com.ph.syntropyengine.jooq.generated.Keys;
 import com.ph.syntropyengine.jooq.generated.Public;
 import com.ph.syntropyengine.jooq.generated.tables.Channels.ChannelsPath;
+import com.ph.syntropyengine.jooq.generated.tables.EventLog.EventLogPath;
 import com.ph.syntropyengine.jooq.generated.tables.Messages.MessagesPath;
 import com.ph.syntropyengine.jooq.generated.tables.records.ProducersRecord;
 
@@ -178,6 +179,19 @@ public class Producers extends TableImpl<ProducersRecord> {
             _channels = new ChannelsPath(this, Keys.PRODUCERS__PRODUCERS_CHANNEL_ID_FKEY, null);
 
         return _channels;
+    }
+
+    private transient EventLogPath _eventLog;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.event_log</code>
+     * table
+     */
+    public EventLogPath eventLog() {
+        if (_eventLog == null)
+            _eventLog = new EventLogPath(this, null, Keys.EVENT_LOG__EVENT_LOG_PRODUCER_ID_FKEY.getInverseKey());
+
+        return _eventLog;
     }
 
     private transient MessagesPath _messages;

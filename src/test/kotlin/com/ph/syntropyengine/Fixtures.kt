@@ -1,6 +1,7 @@
 package com.ph.syntropyengine
 
 import com.ph.syntropyengine.broker.model.Channel
+import com.ph.syntropyengine.broker.model.ConnectionType
 import com.ph.syntropyengine.broker.model.Consumer
 import com.ph.syntropyengine.broker.model.Message
 import com.ph.syntropyengine.broker.model.Producer
@@ -14,36 +15,55 @@ object Fixtures {
     const val DEFAULT_CHANNEL_NAME = "test_channel"
     const val DEFAULT_MESSAGE = "test_message"
 
-    fun createChannel(): Channel {
+    fun createChannel(
+        channelId: UUID? = null,
+        routingKeys: MutableList<String> = mutableListOf(DEFAULT_ROUTING_KEY)
+    ): Channel {
         return Channel(
-            channelId = null,
-            name = DEFAULT_CHANNEL_NAME,
+            channelId = channelId,
+            name = UUID.randomUUID().toString(),
             consumers = emptyList(),
-            routingKeys = mutableListOf(DEFAULT_ROUTING_KEY)
+            routingKeys = routingKeys
         )
     }
 
-    fun createConsumer(channelId: UUID): Consumer {
+    fun createConsumer(
+        channelId: UUID,
+        routingKey: String = DEFAULT_ROUTING_KEY,
+        consumerId: UUID? = null,
+        connectionType: ConnectionType = ConnectionType.POLLING
+    ): Consumer {
         return Consumer(
+            consumerId = consumerId,
             channelId = channelId,
-            routingKey = DEFAULT_ROUTING_KEY,
+            routingKey = routingKey,
+            connectionType = connectionType
         )
     }
 
-    fun createProducer(channelId: UUID): Producer {
+    fun createProducer(
+        channelId: UUID,
+        producerId: UUID? = null
+    ): Producer {
         return Producer(
-            name = DEFAULT_PRODUCER_NAME,
+            producerId = producerId,
+            name = UUID.randomUUID().toString(),
             channelId = channelId,
         )
     }
 
-    fun createMessage(channelId: UUID, producerId: UUID, routingKye: String = DEFAULT_ROUTING_KEY): Message {
+    fun createMessage(
+        channelId: UUID,
+        producerId: UUID,
+        routingKey: String = DEFAULT_ROUTING_KEY,
+        timestamp: OffsetDateTime = OffsetDateTime.now().minusSeconds(1)
+    ): Message {
         return Message(
             messageId = UUID.randomUUID(),
-            timestamp = OffsetDateTime.now().minusMinutes(1),
+            timestamp = timestamp,
             channelId = channelId,
             producerId = producerId,
-            routingKey = routingKye,
+            routingKey = routingKey,
             message = DEFAULT_MESSAGE,
         )
     }

@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired
 // * Create 3 consumers, 2 to one key 1 to another one
 // * Every message broadcasted through the database is handler by the consumer
  */
+// TODO: Connection with coroutines is flaky and causing issues in this test
 class ReplicationTest : IntegrationTestBase() {
 
     private lateinit var pgReplicationConsumer: PGReplicationConsumer
@@ -44,7 +45,7 @@ class ReplicationTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `A series of messages are published and captured on the other side`() = runTest {
+    fun `A series of messages are published and captured on the other side`() = runTest(timeout = 15.seconds) {
         val (channel, producer) = createChannelWithProducer()
 
         backgroundScope.launch { pgReplicationConsumer.startConsuming() }

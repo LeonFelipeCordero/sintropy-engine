@@ -4,6 +4,8 @@
 package com.ph.syntropyengine.jooq.generated.tables.pojos;
 
 
+import com.ph.syntropyengine.jooq.generated.enums.ConsumerConnectionType;
+
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -20,6 +22,7 @@ public class Consumers implements Serializable {
     private UUID consumerId;
     private UUID channelId;
     private String routingKey;
+    private ConsumerConnectionType connectionType;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
@@ -29,6 +32,7 @@ public class Consumers implements Serializable {
         this.consumerId = value.consumerId;
         this.channelId = value.channelId;
         this.routingKey = value.routingKey;
+        this.connectionType = value.connectionType;
         this.createdAt = value.createdAt;
         this.updatedAt = value.updatedAt;
     }
@@ -37,12 +41,14 @@ public class Consumers implements Serializable {
         UUID consumerId,
         UUID channelId,
         String routingKey,
+        ConsumerConnectionType connectionType,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
     ) {
         this.consumerId = consumerId;
         this.channelId = channelId;
         this.routingKey = routingKey;
+        this.connectionType = connectionType;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -87,6 +93,20 @@ public class Consumers implements Serializable {
      */
     public void setRoutingKey(String routingKey) {
         this.routingKey = routingKey;
+    }
+
+    /**
+     * Getter for <code>public.consumers.connection_type</code>.
+     */
+    public ConsumerConnectionType getConnectionType() {
+        return this.connectionType;
+    }
+
+    /**
+     * Setter for <code>public.consumers.connection_type</code>.
+     */
+    public void setConnectionType(ConsumerConnectionType connectionType) {
+        this.connectionType = connectionType;
     }
 
     /**
@@ -144,6 +164,12 @@ public class Consumers implements Serializable {
         }
         else if (!this.routingKey.equals(other.routingKey))
             return false;
+        if (this.connectionType == null) {
+            if (other.connectionType != null)
+                return false;
+        }
+        else if (!this.connectionType.equals(other.connectionType))
+            return false;
         if (this.createdAt == null) {
             if (other.createdAt != null)
                 return false;
@@ -166,6 +192,7 @@ public class Consumers implements Serializable {
         result = prime * result + ((this.consumerId == null) ? 0 : this.consumerId.hashCode());
         result = prime * result + ((this.channelId == null) ? 0 : this.channelId.hashCode());
         result = prime * result + ((this.routingKey == null) ? 0 : this.routingKey.hashCode());
+        result = prime * result + ((this.connectionType == null) ? 0 : this.connectionType.hashCode());
         result = prime * result + ((this.createdAt == null) ? 0 : this.createdAt.hashCode());
         result = prime * result + ((this.updatedAt == null) ? 0 : this.updatedAt.hashCode());
         return result;
@@ -178,6 +205,7 @@ public class Consumers implements Serializable {
         sb.append(consumerId);
         sb.append(", ").append(channelId);
         sb.append(", ").append(routingKey);
+        sb.append(", ").append(connectionType);
         sb.append(", ").append(createdAt);
         sb.append(", ").append(updatedAt);
 

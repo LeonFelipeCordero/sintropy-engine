@@ -2,12 +2,14 @@ package com.ph.syntropyengine
 
 import com.ph.syntropyengine.broker.model.Channel
 import com.ph.syntropyengine.broker.model.Consumer
+import com.ph.syntropyengine.broker.model.Message
 import com.ph.syntropyengine.broker.model.Producer
 import com.ph.syntropyengine.broker.repository.ChannelRepository
 import com.ph.syntropyengine.broker.repository.ConsumerRepository
 import com.ph.syntropyengine.broker.repository.MessageRepository
 import com.ph.syntropyengine.broker.repository.ProducerRepository
 import java.io.File
+import java.time.OffsetDateTime
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -59,6 +61,34 @@ abstract class IntegrationTestBase {
         val channel = createChannel()
         val consumer = producerRepository.save(Fixtures.createProducer(channel.channelId!!))
         return Pair(channel, consumer)
+    }
+
+    protected fun publishMessage(
+        channel: Channel,
+        producer: Producer,
+        routingKey: String = channel.routingKeys.first(),
+        timestamp: OffsetDateTime = OffsetDateTime.now()
+    ): Message {
+        return messageRepository.save(
+            Fixtures.createMessage(
+                channelId = channel.channelId!!,
+                producerId = producer.producerId!!,
+                routingKey = routingKey,
+                timestamp = timestamp
+            )
+        )
+    }
+
+    protected fun publishMessage(): Message {
+        val (channel, producer) = createChannelWithProducer()
+
+        return messageRepository.save(
+            Fixtures.createMessage(
+                channel.channelId!!,
+                producer.producerId!!,
+                channel.routingKeys.first()
+            )
+        )
     }
 
     companion object {

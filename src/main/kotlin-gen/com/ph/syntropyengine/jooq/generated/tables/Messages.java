@@ -7,6 +7,7 @@ package com.ph.syntropyengine.jooq.generated.tables;
 import com.ph.syntropyengine.jooq.generated.Indexes;
 import com.ph.syntropyengine.jooq.generated.Keys;
 import com.ph.syntropyengine.jooq.generated.Public;
+import com.ph.syntropyengine.jooq.generated.enums.MessageStatusType;
 import com.ph.syntropyengine.jooq.generated.tables.Channels.ChannelsPath;
 import com.ph.syntropyengine.jooq.generated.tables.Producers.ProducersPath;
 import com.ph.syntropyengine.jooq.generated.tables.records.MessagesRecord;
@@ -92,6 +93,21 @@ public class Messages extends TableImpl<MessagesRecord> {
     public final TableField<MessagesRecord, String> MESSAGE = createField(DSL.name("message"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
+     * The column <code>public.messages.status</code>.
+     */
+    public final TableField<MessagesRecord, MessageStatusType> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR.nullable(false).defaultValue(DSL.field(DSL.raw("'READY'::message_status_type"), SQLDataType.VARCHAR)).asEnumDataType(MessageStatusType.class), this, "");
+
+    /**
+     * The column <code>public.messages.last_delivered</code>.
+     */
+    public final TableField<MessagesRecord, OffsetDateTime> LAST_DELIVERED = createField(DSL.name("last_delivered"), SQLDataType.TIMESTAMPWITHTIMEZONE(6), this, "");
+
+    /**
+     * The column <code>public.messages.delivered_times</code>.
+     */
+    public final TableField<MessagesRecord, Integer> DELIVERED_TIMES = createField(DSL.name("delivered_times"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.INTEGER)), this, "");
+
+    /**
      * The column <code>public.messages.created_at</code>.
      */
     public final TableField<MessagesRecord, OffsetDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
@@ -170,12 +186,12 @@ public class Messages extends TableImpl<MessagesRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.MESSAGES_PRODUCER_ID_IDX);
+        return Arrays.asList(Indexes.MESSAGES_POLLING_1IDX);
     }
 
     @Override
     public UniqueKey<MessagesRecord> getPrimaryKey() {
-        return Keys.MESSAGES_MESSAGE_ID_TIMESTAMP_OK;
+        return Keys.MESSAGES_MESSAGE_ID_PK;
     }
 
     @Override

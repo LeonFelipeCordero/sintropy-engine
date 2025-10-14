@@ -3,6 +3,8 @@ package com.ph.syntropyengine.broker.service
 import com.ph.syntropyengine.Fixtures
 import com.ph.syntropyengine.IntegrationTestBase
 import com.ph.syntropyengine.broker.model.Channel
+import com.ph.syntropyengine.broker.model.MessageStatus
+import com.ph.syntropyengine.jooq.generated.enums.MessageStatusType
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
@@ -63,5 +65,32 @@ class ProducerServiceTest : IntegrationTestBase() {
                     )
                 )
             }.withMessageContainingAll("Channel", "does not have routing-key test.2")
+    }
+
+    @Test
+    fun `should create a message and it trigger and insert in event log`() {
+        val (channel, producer) = createChannelWithProducer()
+
+        producerService.publishMessage(
+            Fixtures.createMessage(channel.channelId!!, producer.producerId!!)
+        )
+
+        val messages = messageRepository.findAll()
+        val eventLogs = messageRepository.findAllEventLog()
+        assertThat(messages).hasSize(1)
+        assertThat(eventLogs).hasSize(1)
+        val message = messages.first()
+        val eventLog = eventLogs.first()
+        assertThat(message.messageId).isEqualTo(eventLog.messageId)
+        assertThat(message.timestamp).isEqualTo(eventLog.timestamp)
+        assertThat(message.channelId).isEqualTo(eventLog.channelId)
+        assertThat(message.producerId).isEqualTo(eventLog.producerId)
+        assertThat(message.routingKey).isEqualTo(eventLog.routingKey)
+
+        assertThat(message.status).isEqualTo(MessageStatus.READY)
+        assertThat(message.lastDelivered).isNull()
+        assertThat(message.deliveredTimes).isZero
+
+        assertThat(eventLog.processed).isFalse
     }
 }

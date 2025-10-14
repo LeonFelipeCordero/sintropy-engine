@@ -4,12 +4,13 @@
 package com.ph.syntropyengine.jooq.generated.tables.records;
 
 
+import com.ph.syntropyengine.jooq.generated.enums.MessageStatusType;
 import com.ph.syntropyengine.jooq.generated.tables.Messages;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-import org.jooq.Record3;
+import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -106,31 +107,73 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
     }
 
     /**
+     * Setter for <code>public.messages.status</code>.
+     */
+    public void setStatus(MessageStatusType value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>public.messages.status</code>.
+     */
+    public MessageStatusType getStatus() {
+        return (MessageStatusType) get(6);
+    }
+
+    /**
+     * Setter for <code>public.messages.last_delivered</code>.
+     */
+    public void setLastDelivered(OffsetDateTime value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>public.messages.last_delivered</code>.
+     */
+    public OffsetDateTime getLastDelivered() {
+        return (OffsetDateTime) get(7);
+    }
+
+    /**
+     * Setter for <code>public.messages.delivered_times</code>.
+     */
+    public void setDeliveredTimes(Integer value) {
+        set(8, value);
+    }
+
+    /**
+     * Getter for <code>public.messages.delivered_times</code>.
+     */
+    public Integer getDeliveredTimes() {
+        return (Integer) get(8);
+    }
+
+    /**
      * Setter for <code>public.messages.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(6, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>public.messages.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(6);
+        return (OffsetDateTime) get(9);
     }
 
     /**
      * Setter for <code>public.messages.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(7, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>public.messages.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(7);
+        return (OffsetDateTime) get(10);
     }
 
     // -------------------------------------------------------------------------
@@ -138,8 +181,8 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record3<UUID, OffsetDateTime, UUID> key() {
-        return (Record3) super.key();
+    public Record1<UUID> key() {
+        return (Record1) super.key();
     }
 
     // -------------------------------------------------------------------------
@@ -156,7 +199,7 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
     /**
      * Create a detached, initialised MessagesRecord
      */
-    public MessagesRecord(UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, String message, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public MessagesRecord(UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, String message, MessageStatusType status, OffsetDateTime lastDelivered, Integer deliveredTimes, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(Messages.MESSAGES);
 
         setMessageId(messageId);
@@ -165,6 +208,9 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
         setProducerId(producerId);
         setRoutingKey(routingKey);
         setMessage(message);
+        setStatus(status);
+        setLastDelivered(lastDelivered);
+        setDeliveredTimes(deliveredTimes);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
         resetChangedOnNotNull();
@@ -183,6 +229,9 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
             setProducerId(value.getProducerId());
             setRoutingKey(value.getRoutingKey());
             setMessage(value.getMessage());
+            setStatus(value.getStatus());
+            setLastDelivered(value.getLastDelivered());
+            setDeliveredTimes(value.getDeliveredTimes());
             setCreatedAt(value.getCreatedAt());
             setUpdatedAt(value.getUpdatedAt());
             resetChangedOnNotNull();

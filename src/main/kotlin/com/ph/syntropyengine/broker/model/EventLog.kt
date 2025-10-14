@@ -3,20 +3,12 @@ package com.ph.syntropyengine.broker.model
 import java.time.OffsetDateTime
 import java.util.UUID
 
-data class Message(
+data class EventLog(
     val messageId: UUID,
     val timestamp: OffsetDateTime,
     val channelId: UUID,
     val producerId: UUID,
     val routingKey: String,
     val message: String,
-    val status: MessageStatus= MessageStatus.READY,
-    val lastDelivered: OffsetDateTime? = null,
-    val deliveredTimes: Int = 0
+    val processed: Boolean
 )
-
-enum class MessageStatus {
-    READY,
-    IN_FLIGHT,
-    FAILED
-}

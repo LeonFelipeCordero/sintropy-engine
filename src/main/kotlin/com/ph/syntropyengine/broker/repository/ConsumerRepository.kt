@@ -1,9 +1,12 @@
 package com.ph.syntropyengine.broker.repository
 
+import com.ph.syntropyengine.broker.model.ConnectionType
 import com.ph.syntropyengine.broker.model.Consumer
 import com.ph.syntropyengine.broker.model.Producer
 import com.ph.syntropyengine.jooq.generated.Tables.CHANNELS
 import com.ph.syntropyengine.jooq.generated.Tables.CONSUMERS
+import com.ph.syntropyengine.jooq.generated.enums.ConsumerConnectionType
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.util.UUID
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
@@ -15,8 +18,19 @@ class ConsumerRepository(
 
     fun save(consumer: Consumer): Consumer {
         val consumerId = UUID.randomUUID()
-        return context.insertInto(CONSUMERS, CONSUMERS.CONSUMER_ID, CONSUMERS.CHANNEL_ID, CONSUMERS.ROUTING_KEY)
-            .values(consumerId, consumer.channelId, consumer.routingKey)
+        return context.insertInto(
+            CONSUMERS,
+            CONSUMERS.CONSUMER_ID,
+            CONSUMERS.CHANNEL_ID,
+            CONSUMERS.ROUTING_KEY,
+            CONSUMERS.CONNECTION_TYPE
+        )
+            .values(
+                consumerId,
+                consumer.channelId,
+                consumer.routingKey,
+                consumer.connectionType.toDBEnum()
+            )
             .returning()
             .fetchOneInto(Consumer::class.java)
             ?: throw IllegalStateException("Something went wrong creating a new consumer")
@@ -52,4 +66,8 @@ class ConsumerRepository(
 //            routingKey = record["routing_key"] as String,
 //        )
 //    }
+}
+
+private fun ConnectionType.toDBEnum(): ConsumerConnectionType {
+    return ConsumerConnectionType.valueOf(this.toString())
 }

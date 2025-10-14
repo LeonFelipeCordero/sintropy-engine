@@ -28,23 +28,29 @@ class PGReplicationConsumer private constructor(
     private val objectMapper: ObjectMapper,
     private val databaseProperties: DatabaseProperties
 ) {
+    private lateinit var connectionAndReplication: ConnectionAndReplication
 
     companion object {
-        fun connect(databaseProperties: DatabaseProperties): PGReplicationConsumer =
-            PGReplicationConsumer(
+        fun connect(databaseProperties: DatabaseProperties): PGReplicationConsumer {
+            return PGReplicationConsumer(
                 Channel(),
                 CustomObjectMapper(),
                 databaseProperties
-            )
+            ).establishConnection()
+        }
+    }
+
+    private fun establishConnection(): PGReplicationConsumer {
+        this.connectionAndReplication = preparePGStream()
+        logger.info { "Connection established for streaming..." }
+
+        return this
     }
 
     suspend fun startConsuming() = withContext(Dispatchers.IO) {
-        val (connection, replicationStream) = preparePGStream()
-        logger.info { "Connection established for streaming..." }
-
-        connection.use {
+        connectionAndReplication.connection.use {
             while (true) {
-                val message = replicationStream.readPending()
+                val message = connectionAndReplication.replicationStream.readPending()
                 if (message == null) {
                     delay(10)
                     continue
@@ -81,8 +87,8 @@ class PGReplicationConsumer private constructor(
                     channel.send(record.toMessage())
                 }
 
-                replicationStream.setAppliedLSN(replicationStream.lastReceiveLSN)
-                replicationStream.setFlushedLSN(replicationStream.lastReceiveLSN)
+                connectionAndReplication.replicationStream.setAppliedLSN(connectionAndReplication.replicationStream.lastReceiveLSN)
+                connectionAndReplication.replicationStream.setFlushedLSN(connectionAndReplication.replicationStream.lastReceiveLSN)
             }
 
         }

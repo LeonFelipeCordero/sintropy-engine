@@ -4,6 +4,7 @@
 package com.ph.syntropyengine.jooq.generated.tables.records;
 
 
+import com.ph.syntropyengine.jooq.generated.enums.ConsumerConnectionType;
 import com.ph.syntropyengine.jooq.generated.tables.Consumers;
 
 import java.time.OffsetDateTime;
@@ -64,31 +65,45 @@ public class ConsumersRecord extends UpdatableRecordImpl<ConsumersRecord> {
     }
 
     /**
+     * Setter for <code>public.consumers.connection_type</code>.
+     */
+    public void setConnectionType(ConsumerConnectionType value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>public.consumers.connection_type</code>.
+     */
+    public ConsumerConnectionType getConnectionType() {
+        return (ConsumerConnectionType) get(3);
+    }
+
+    /**
      * Setter for <code>public.consumers.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>public.consumers.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(3);
+        return (OffsetDateTime) get(4);
     }
 
     /**
      * Setter for <code>public.consumers.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>public.consumers.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(4);
+        return (OffsetDateTime) get(5);
     }
 
     // -------------------------------------------------------------------------
@@ -114,12 +129,13 @@ public class ConsumersRecord extends UpdatableRecordImpl<ConsumersRecord> {
     /**
      * Create a detached, initialised ConsumersRecord
      */
-    public ConsumersRecord(UUID consumerId, UUID channelId, String routingKey, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public ConsumersRecord(UUID consumerId, UUID channelId, String routingKey, ConsumerConnectionType connectionType, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(Consumers.CONSUMERS);
 
         setConsumerId(consumerId);
         setChannelId(channelId);
         setRoutingKey(routingKey);
+        setConnectionType(connectionType);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
         resetChangedOnNotNull();
@@ -135,6 +151,7 @@ public class ConsumersRecord extends UpdatableRecordImpl<ConsumersRecord> {
             setConsumerId(value.getConsumerId());
             setChannelId(value.getChannelId());
             setRoutingKey(value.getRoutingKey());
+            setConnectionType(value.getConnectionType());
             setCreatedAt(value.getCreatedAt());
             setUpdatedAt(value.getUpdatedAt());
             resetChangedOnNotNull();

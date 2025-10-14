@@ -1,5 +1,7 @@
 package com.ph.syntropyengine.broker.replication
 
+import com.ph.syntropyengine.broker.service.MessageRouter
+import com.ph.syntropyengine.broker.service.PollingQueue
 import com.ph.syntropyengine.configuration.DatabaseProperties
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +20,9 @@ private val logger = KotlinLogging.logger {}
 // TODO move this down the line to make a real and fake implementation base on the flag
 @ConditionalOnProperty(value = ["syen.feature-flags.with-full-replication"], havingValue = "true")
 class PGReplicationController(
-    private val databaseProperties: DatabaseProperties
+    private val databaseProperties: DatabaseProperties,
+    private val messageRouter: MessageRouter,
+    private val pollingQueue: PollingQueue
 ) {
     private final val job = SupervisorJob()
     val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + job)
@@ -33,13 +37,13 @@ class PGReplicationController(
 
         scope.launch {
             replicationConsumer.channel.consumeEach { message ->
-                logger.info { "### new message: $message" }
+                logger.debug { "### new message: $message" }
 
-                /**
-                 * Take the incoming message and give to the message routes
-                 * The message router takes care of
-                 * 1) Find the consumer - could be one channel and one coroutine per consumer
-                 */
+//                val consumers = messageRouter.getConsumersByRouting(message.channelId, message.routingKey)
+//
+//                consumers.forEach { consumer ->
+//
+//                }
             }
         }
     }
