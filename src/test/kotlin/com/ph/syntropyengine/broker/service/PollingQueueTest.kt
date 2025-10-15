@@ -2,8 +2,20 @@ package com.ph.syntropyengine.broker.service
 
 import com.ph.syntropyengine.Fixtures
 import com.ph.syntropyengine.IntegrationTestBase
+import com.ph.syntropyengine.broker.model.Channel
+import com.ph.syntropyengine.broker.model.Message
+import com.ph.syntropyengine.broker.model.Producer
+import com.ph.syntropyengine.utils.Patterns.loggingPair
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.OffsetDateTime
 import java.util.UUID
+import kotlin.random.Random
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
@@ -11,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
+private val logger = KotlinLogging.logger {}
 
 class PollingQueueTest : IntegrationTestBase() {
 
@@ -19,6 +32,9 @@ class PollingQueueTest : IntegrationTestBase() {
 
     @Autowired
     private lateinit var channelService: ChannelService
+
+    @Autowired
+    private lateinit var producerService: ProducerService
 
     @BeforeEach
     fun setUp() {
@@ -247,7 +263,232 @@ class PollingQueueTest : IntegrationTestBase() {
 
 
     @Test
-    fun `concurrent processing of messages is always in order`() {
+    fun `concurrent processing of messages`() = runTest {
+        val testData = createTestData()
 
+        val mutexProducer = Mutex()
+        val publishedMessages = mutableListOf<Message>()
+
+        val mutexConsumer = Mutex()
+        val polledMessages = mutableListOf<Message>()
+
+        val launchConsumer: suspend (channelId: UUID, routingKey: String) -> Unit = { channelId, routingKey ->
+            val messages = launchConsumers(channelId, routingKey)
+            mutexConsumer.withLock { polledMessages.addAll(messages) }
+        }
+
+        val allWork = launch {
+            val producersJobs = List(5000) {
+                launch {
+                    val message = launchProducers(testData)
+                    mutexProducer.withLock {
+                        publishedMessages.add(message)
+                    }
+                }
+            }
+
+            producersJobs.joinAll()
+
+            delay(1000)
+
+            val consumersJobs = mutableListOf<Job>()
+            repeat(10) {
+                consumersJobs.addAll(
+                    listOf(
+                        launch { launchConsumer(testData.channel1().channelId!!, testData.channel1().routingKeys[0]) },
+                        launch { launchConsumer(testData.channel1().channelId!!, testData.channel1().routingKeys[1]) },
+                        launch { launchConsumer(testData.channel1().channelId!!, testData.channel1().routingKeys[2]) },
+                        launch { launchConsumer(testData.channel2().channelId!!, testData.channel2().routingKeys[0]) },
+                        launch { launchConsumer(testData.channel2().channelId!!, testData.channel2().routingKeys[1]) },
+                        launch { launchConsumer(testData.channel3().channelId!!, testData.channel3().routingKeys[0]) }
+                    )
+                )
+            }
+
+            consumersJobs.joinAll()
+        }
+
+        allWork.join()
+
+        assertThat(publishedMessages).hasSize(5000)
+        assertThat(polledMessages).hasSize(5000)
+
+        assertThat(publishedMessages.map { it.messageId }.sorted())
+            .isEqualTo(polledMessages.map { it.messageId }.sorted())
     }
+
+    @Test
+    fun `single processing of routing pair is always in chronological order`() = runTest {
+        val testData = createTestData()
+
+        val mutexProducer = Mutex()
+        val publishedMessages = mutableMapOf<String, MutableList<Message>>(
+            routing(testData.channel1().channelId!!, testData.channel1().routingKeys[0]) to mutableListOf(),
+            routing(testData.channel1().channelId!!, testData.channel1().routingKeys[1]) to mutableListOf(),
+            routing(testData.channel1().channelId!!, testData.channel1().routingKeys[2]) to mutableListOf(),
+            routing(testData.channel2().channelId!!, testData.channel2().routingKeys[0]) to mutableListOf(),
+            routing(testData.channel2().channelId!!, testData.channel2().routingKeys[1]) to mutableListOf(),
+            routing(testData.channel3().channelId!!, testData.channel3().routingKeys[0]) to mutableListOf(),
+        )
+
+        val mutexConsumer = Mutex()
+        val polledMessages = mutableMapOf<String, MutableList<Message>>(
+            routing(testData.channel1().channelId!!, testData.channel1().routingKeys[0]) to mutableListOf(),
+            routing(testData.channel1().channelId!!, testData.channel1().routingKeys[1]) to mutableListOf(),
+            routing(testData.channel1().channelId!!, testData.channel1().routingKeys[2]) to mutableListOf(),
+            routing(testData.channel2().channelId!!, testData.channel2().routingKeys[0]) to mutableListOf(),
+            routing(testData.channel2().channelId!!, testData.channel2().routingKeys[1]) to mutableListOf(),
+            routing(testData.channel3().channelId!!, testData.channel3().routingKeys[0]) to mutableListOf(),
+        )
+
+        val launchConsumer: suspend (channelId: UUID, routingKey: String) -> Unit = { channelId, routingKey ->
+            val messages = launchConsumers(channelId, routingKey)
+            mutexConsumer.withLock {
+                polledMessages[routing(channelId, routingKey)]!!.addAll(messages)
+            }
+        }
+
+        val allWork = launch {
+            val producersJobs = List(5000) {
+                launch {
+                    val message = launchProducers(testData)
+                    mutexProducer.withLock {
+                        publishedMessages[message.routing()]!!.add(message)
+                    }
+                }
+            }
+
+            producersJobs.joinAll()
+
+            delay(1000)
+
+            val consumersJobs = listOf(
+                launch { launchConsumer(testData.channel1().channelId!!, testData.channel1().routingKeys[0]) },
+                launch { launchConsumer(testData.channel1().channelId!!, testData.channel1().routingKeys[1]) },
+                launch { launchConsumer(testData.channel1().channelId!!, testData.channel1().routingKeys[2]) },
+                launch { launchConsumer(testData.channel2().channelId!!, testData.channel2().routingKeys[0]) },
+                launch { launchConsumer(testData.channel2().channelId!!, testData.channel2().routingKeys[1]) },
+                launch { launchConsumer(testData.channel3().channelId!!, testData.channel3().routingKeys[0]) }
+            )
+
+            consumersJobs.joinAll()
+        }
+
+        allWork.join()
+
+        publishedMessages.forEach { (key, messages) ->
+            assertThat(messages)
+                .usingRecursiveComparison()
+                .ignoringFields("status", "lastDelivered", "deliveredTimes")
+                .isEqualTo(polledMessages[key])
+        }
+    }
+
+    private suspend fun launchProducers(testData: TestData): Message {
+        logger.info { "launching new producer..." }
+        val message = when (Random.nextInt(1, 4)) {
+            1 -> Fixtures.createMessage(
+                channelId = testData.channel1().channelId!!,
+                routingKey = testData.channel1().routingKeys[Random.nextInt(0, 3)],
+                producerId = testData.producer1().producerId!!,
+            )
+
+            2 -> Fixtures.createMessage(
+                channelId = testData.channel2().channelId!!,
+                routingKey = testData.channel2().routingKeys[Random.nextInt(0, 2)],
+                producerId = testData.producer2().producerId!!
+            )
+
+            3 -> Fixtures.createMessage(
+                channelId = testData.channel3().channelId!!,
+                routingKey = testData.channel3().routingKeys.first(),
+                producerId = testData.producer3().producerId!!
+            )
+
+            else -> {
+                throw IllegalStateException("Failure setting test data")
+            }
+        }
+
+        return producerService.publishMessage(message)
+    }
+
+    private suspend fun launchConsumers(channelId: UUID, routingKey: String): MutableList<Message> {
+        logger.info { "launching new consumer for ${loggingPair(channelId, routingKey)}" }
+        var counter = 0
+        val totalMessages = mutableListOf<Message>()
+        while (true) {
+            val messages = pollingQueue.poll(channelId, routingKey, pollingCount = Random.nextInt(1, 6))
+
+            if (messages.isEmpty()) {
+                if (counter > 5) {
+                    logger.info { "Consumer finished polling work for ${loggingPair(channelId, routingKey)}" }
+                    break
+                }
+
+                counter++
+                delay(20)
+                continue
+            }
+
+            val routingInMessages = messages.map { it.routing() }.toSet()
+            if (routingInMessages.size > 1 || routingInMessages.first() != routing(channelId, routingKey)) {
+                throw IllegalStateException(
+                    "Polling got a message form another pair ${
+                        loggingPair(
+                            channelId,
+                            routingKey
+                        )
+                    }"
+                )
+            }
+
+            totalMessages.addAll(messages)
+
+            messages.forEach {
+                pollingQueue.dequeue(it.messageId)
+            }
+
+            delay(10)
+
+        }
+        return totalMessages
+    }
+
+    private fun createTestData(): TestData {
+        val channel1 = channelRepository.save(
+            Fixtures.createChannel(routingKeys = mutableListOf("test.1.1", "test.1.2", "test.1.3"))
+        )
+        val channel2 = channelRepository.save(
+            Fixtures.createChannel(routingKeys = mutableListOf("test.2.1", "test.2.2"))
+        )
+        val channel3 = channelRepository.save(Fixtures.createChannel(routingKeys = mutableListOf("test.3.1")))
+        val producer1 = producerRepository.save(Fixtures.createProducer(channel1.channelId!!))
+        val producer2 = producerRepository.save(Fixtures.createProducer(channel2.channelId!!))
+        val producer3 = producerRepository.save(Fixtures.createProducer(channel3.channelId!!))
+
+        return TestData(
+            ChannelProducer(channel1, producer1),
+            ChannelProducer(channel2, producer2),
+            ChannelProducer(channel3, producer3)
+        )
+    }
+
+    private data class TestData(
+        private val channelProducer1: ChannelProducer,
+        private val channelProducer2: ChannelProducer,
+        private val channelProducer3: ChannelProducer,
+    ) {
+        fun channel1() = channelProducer1.channel
+        fun channel2() = channelProducer2.channel
+        fun channel3() = channelProducer3.channel
+        fun producer1() = channelProducer1.producer
+        fun producer2() = channelProducer2.producer
+        fun producer3() = channelProducer3.producer
+    }
+
+    private data class ChannelProducer(
+        val channel: Channel,
+        val producer: Producer
+    )
 }

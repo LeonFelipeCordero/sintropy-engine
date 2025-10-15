@@ -3,10 +3,9 @@ package com.ph.syntropyengine.broker.service
 import com.ph.syntropyengine.broker.model.Message
 import com.ph.syntropyengine.broker.model.MessageStatus
 import com.ph.syntropyengine.broker.repository.MessageRepository
+import com.ph.syntropyengine.utils.Patterns.loggingPair
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.util.UUID
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.sync.Mutex
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -33,14 +32,19 @@ class PollingQueue(
 
     @Transactional
     fun poll(channelId: UUID, routingKey: String, pollingCount: Int = 1): List<Message> {
-        return messageRepository
+        val messages = messageRepository
             .pollFromQueueAndRoutingKey(channelId, routingKey, pollingCount)
             .sortedBy { it.timestamp } // todo find a way to sort in database as the update unsort
+
+        logger.info { "polled ${messages.size} messages for ${loggingPair(channelId, routingKey)}" }
+
+        return messages
     }
 
     @Transactional
     fun markAsFailed(messageId: UUID) {
         messageRepository.markAsFailed(messageId)
+        logger.info { "marked message as failed $messageId" }
     }
 
     @Transactional
@@ -52,8 +56,11 @@ class PollingQueue(
 
             messageRepository.dequeue(messageId)
 
+            logger.info { "dequeue message $messageId" }
+
         } ?: throw IllegalStateException("Message with id $messageId not found")
     }
+    //TODO dequeue bach and and markAsFailed batch
 
 //    suspend fun addConnection(channelId: UUID, routingKey: String) {
 //       mutex.withLock {
