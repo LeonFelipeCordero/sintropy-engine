@@ -7,6 +7,7 @@ package com.ph.syntropyengine.jooq.generated.tables;
 import com.ph.syntropyengine.jooq.generated.Indexes;
 import com.ph.syntropyengine.jooq.generated.Keys;
 import com.ph.syntropyengine.jooq.generated.Public;
+import com.ph.syntropyengine.jooq.generated.enums.ChannelType;
 import com.ph.syntropyengine.jooq.generated.tables.Consumers.ConsumersPath;
 import com.ph.syntropyengine.jooq.generated.tables.EventLog.EventLogPath;
 import com.ph.syntropyengine.jooq.generated.tables.Messages.MessagesPath;
@@ -73,6 +74,11 @@ public class Channels extends TableImpl<ChannelsRecord> {
      * The column <code>public.channels.name</code>.
      */
     public final TableField<ChannelsRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(256).nullable(false), this, "");
+
+    /**
+     * The column <code>public.channels.channel_type</code>.
+     */
+    public final TableField<ChannelsRecord, ChannelType> CHANNEL_TYPE = createField(DSL.name("channel_type"), SQLDataType.VARCHAR.nullable(false).asEnumDataType(ChannelType.class), this, "");
 
     /**
      * The column <code>public.channels.created_at</code>.

@@ -1,7 +1,7 @@
 package com.ph.syntropyengine.broker.replication
 
 import com.ph.syntropyengine.broker.service.MessageRouter
-import com.ph.syntropyengine.broker.service.PollingQueue
+import com.ph.syntropyengine.broker.service.PollingStandardQueue
 import com.ph.syntropyengine.configuration.DatabaseProperties
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
@@ -22,7 +22,7 @@ private val logger = KotlinLogging.logger {}
 class PGReplicationController(
     private val databaseProperties: DatabaseProperties,
     private val messageRouter: MessageRouter,
-    private val pollingQueue: PollingQueue
+    private val pollingQueue: PollingStandardQueue
 ) {
     private final val job = SupervisorJob()
     val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + job)

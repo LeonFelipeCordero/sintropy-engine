@@ -1,6 +1,7 @@
 package com.ph.syntropyengine
 
 import com.ph.syntropyengine.broker.model.Channel
+import com.ph.syntropyengine.broker.model.ChannelType
 import com.ph.syntropyengine.broker.model.ConnectionType
 import com.ph.syntropyengine.broker.model.Consumer
 import com.ph.syntropyengine.broker.model.Message
@@ -17,11 +18,13 @@ object Fixtures {
 
     fun createChannel(
         channelId: UUID? = null,
+        channelType: ChannelType = ChannelType.STANDARD,
         routingKeys: MutableList<String> = mutableListOf(DEFAULT_ROUTING_KEY)
     ): Channel {
         return Channel(
             channelId = channelId,
             name = UUID.randomUUID().toString(),
+            channelType = channelType,
             consumers = emptyList(),
             routingKeys = routingKeys
         )

@@ -25,10 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired
 
 private val logger = KotlinLogging.logger {}
 
-class PollingQueueTest : IntegrationTestBase() {
+class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Autowired
-    private lateinit var pollingQueue: PollingQueue
+    private lateinit var pollingQueue: PollingStandardQueue
 
     @Autowired
     private lateinit var channelService: ChannelService

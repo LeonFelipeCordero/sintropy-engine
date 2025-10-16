@@ -4,6 +4,8 @@
 package com.ph.syntropyengine.jooq.generated.tables.pojos;
 
 
+import com.ph.syntropyengine.jooq.generated.enums.ChannelType;
+
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -19,6 +21,7 @@ public class Channels implements Serializable {
 
     private UUID channelId;
     private String name;
+    private ChannelType channelType;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
@@ -27,6 +30,7 @@ public class Channels implements Serializable {
     public Channels(Channels value) {
         this.channelId = value.channelId;
         this.name = value.name;
+        this.channelType = value.channelType;
         this.createdAt = value.createdAt;
         this.updatedAt = value.updatedAt;
     }
@@ -34,11 +38,13 @@ public class Channels implements Serializable {
     public Channels(
         UUID channelId,
         String name,
+        ChannelType channelType,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
     ) {
         this.channelId = channelId;
         this.name = name;
+        this.channelType = channelType;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -69,6 +75,20 @@ public class Channels implements Serializable {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Getter for <code>public.channels.channel_type</code>.
+     */
+    public ChannelType getChannelType() {
+        return this.channelType;
+    }
+
+    /**
+     * Setter for <code>public.channels.channel_type</code>.
+     */
+    public void setChannelType(ChannelType channelType) {
+        this.channelType = channelType;
     }
 
     /**
@@ -120,6 +140,12 @@ public class Channels implements Serializable {
         }
         else if (!this.name.equals(other.name))
             return false;
+        if (this.channelType == null) {
+            if (other.channelType != null)
+                return false;
+        }
+        else if (!this.channelType.equals(other.channelType))
+            return false;
         if (this.createdAt == null) {
             if (other.createdAt != null)
                 return false;
@@ -141,6 +167,7 @@ public class Channels implements Serializable {
         int result = 1;
         result = prime * result + ((this.channelId == null) ? 0 : this.channelId.hashCode());
         result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
+        result = prime * result + ((this.channelType == null) ? 0 : this.channelType.hashCode());
         result = prime * result + ((this.createdAt == null) ? 0 : this.createdAt.hashCode());
         result = prime * result + ((this.updatedAt == null) ? 0 : this.updatedAt.hashCode());
         return result;
@@ -152,6 +179,7 @@ public class Channels implements Serializable {
 
         sb.append(channelId);
         sb.append(", ").append(name);
+        sb.append(", ").append(channelType);
         sb.append(", ").append(createdAt);
         sb.append(", ").append(updatedAt);
 

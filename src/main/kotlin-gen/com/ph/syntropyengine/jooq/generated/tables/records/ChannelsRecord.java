@@ -4,6 +4,7 @@
 package com.ph.syntropyengine.jooq.generated.tables.records;
 
 
+import com.ph.syntropyengine.jooq.generated.enums.ChannelType;
 import com.ph.syntropyengine.jooq.generated.tables.Channels;
 
 import java.time.OffsetDateTime;
@@ -50,31 +51,45 @@ public class ChannelsRecord extends UpdatableRecordImpl<ChannelsRecord> {
     }
 
     /**
+     * Setter for <code>public.channels.channel_type</code>.
+     */
+    public void setChannelType(ChannelType value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>public.channels.channel_type</code>.
+     */
+    public ChannelType getChannelType() {
+        return (ChannelType) get(2);
+    }
+
+    /**
      * Setter for <code>public.channels.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.channels.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(2);
+        return (OffsetDateTime) get(3);
     }
 
     /**
      * Setter for <code>public.channels.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>public.channels.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(3);
+        return (OffsetDateTime) get(4);
     }
 
     // -------------------------------------------------------------------------
@@ -100,11 +115,12 @@ public class ChannelsRecord extends UpdatableRecordImpl<ChannelsRecord> {
     /**
      * Create a detached, initialised ChannelsRecord
      */
-    public ChannelsRecord(UUID channelId, String name, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public ChannelsRecord(UUID channelId, String name, ChannelType channelType, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(Channels.CHANNELS);
 
         setChannelId(channelId);
         setName(name);
+        setChannelType(channelType);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
         resetChangedOnNotNull();
@@ -119,6 +135,7 @@ public class ChannelsRecord extends UpdatableRecordImpl<ChannelsRecord> {
         if (value != null) {
             setChannelId(value.getChannelId());
             setName(value.getName());
+            setChannelType(value.getChannelType());
             setCreatedAt(value.getCreatedAt());
             setUpdatedAt(value.getUpdatedAt());
             resetChangedOnNotNull();

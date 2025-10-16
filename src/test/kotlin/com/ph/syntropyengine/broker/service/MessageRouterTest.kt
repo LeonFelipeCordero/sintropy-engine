@@ -113,13 +113,16 @@ class MessageRouterTest {
     @Test
     fun `should spread keys when multiple coroutines write at the same time`() = runTest {
         val channel1 = Fixtures.createChannel(
-            UUID.randomUUID(),
-            mutableListOf("test.1.1", "test.1.2", "test.1.3")
+            channelId = UUID.randomUUID(),
+            routingKeys = mutableListOf("test.1.1", "test.1.2", "test.1.3")
         )
 
-        val channel2 = Fixtures.createChannel(UUID.randomUUID(), mutableListOf("test.2.1", "test.2.2"))
+        val channel2 = Fixtures.createChannel(
+            channelId = UUID.randomUUID(),
+            routingKeys = mutableListOf("test.2.1", "test.2.2")
+        )
 
-        val channel3 = Fixtures.createChannel(UUID.randomUUID(), mutableListOf("test.3.1"))
+        val channel3 = Fixtures.createChannel(channelId = UUID.randomUUID(), routingKeys = mutableListOf("test.3.1"))
 
         val mutex = Mutex()
         val consumers = mutableListOf<Consumer>()

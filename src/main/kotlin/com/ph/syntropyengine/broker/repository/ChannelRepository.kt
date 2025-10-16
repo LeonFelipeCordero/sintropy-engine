@@ -1,8 +1,12 @@
 package com.ph.syntropyengine.broker.repository
 
 import com.ph.syntropyengine.broker.model.Channel
+import com.ph.syntropyengine.broker.model.ChannelType
+import com.ph.syntropyengine.broker.model.ConnectionType
+import com.ph.syntropyengine.broker.repository.toDBEnum
 import com.ph.syntropyengine.jooq.generated.Tables.CHANNELS
 import com.ph.syntropyengine.jooq.generated.Tables.ROUTING_KEY
+import com.ph.syntropyengine.jooq.generated.enums.ConsumerConnectionType
 import java.util.UUID
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -18,9 +22,8 @@ class ChannelRepository(
 
     fun save(channel: Channel): Channel {
         val channelId = UUID.randomUUID()
-        val channelRecord = context.insertInto(CHANNELS)
-            .set(CHANNELS.CHANNEL_ID, channelId)
-            .set(CHANNELS.NAME, channel.name)
+        val channelRecord = context.insertInto(CHANNELS, CHANNELS.CHANNEL_ID, CHANNELS.NAME, CHANNELS.CHANNEL_TYPE)
+            .values(channelId, channel.name, channel.channelType.toDBEnum())
             .returning()
             .fetchOne()
 
@@ -36,6 +39,7 @@ class ChannelRepository(
         return Channel(
             channelId = channelRecord!!.channelId,
             name = channelRecord.name,
+            channelType = channelRecord.channelType.toDomainEnum(),
             routingKeys = routingKeyRecords.map { it.routingKey }
         )
     }
@@ -83,13 +87,22 @@ class ChannelRepository(
 
     private fun mapRecordWithKeysToDTO(records: Result<Record>): Channel? {
         return records.groupBy { record ->
-            Pair(record[CHANNELS.CHANNEL_ID], record[CHANNELS.NAME])
+            Triple(record[CHANNELS.CHANNEL_ID], record[CHANNELS.NAME], record[CHANNELS.CHANNEL_TYPE])
         }.map { (key, rows) ->
             Channel(
                 channelId = key.first,
                 name = key.second,
+                channelType = key.third.toDomainEnum(),
                 routingKeys = rows.map { it[ROUTING_KEY.ROUTING_KEY_] }.toMutableList()
             )
         }.firstOrNull()
     }
+}
+
+private fun ChannelType.toDBEnum(): com.ph.syntropyengine.jooq.generated.enums.ChannelType {
+    return com.ph.syntropyengine.jooq.generated.enums.ChannelType.valueOf(this.toString())
+}
+
+private fun com.ph.syntropyengine.jooq.generated.enums.ChannelType.toDomainEnum(): ChannelType {
+    return ChannelType.valueOf(this.toString())
 }

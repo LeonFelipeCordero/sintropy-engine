@@ -12,7 +12,7 @@ class ConsumerService(
     private val channelService: ChannelService,
     private val consumerRepository: ConsumerRepository,
     private val messageRouter: MessageRouter,
-    private val pollingQueue: PollingQueue
+    private val pollingQueue: PollingStandardQueue
 ) {
 
     @Transactional

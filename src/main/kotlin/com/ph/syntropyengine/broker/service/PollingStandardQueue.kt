@@ -11,8 +11,9 @@ import org.springframework.transaction.annotation.Transactional
 
 private val logger = KotlinLogging.logger {}
 
+// TODO clean up all comments here
 @Service
-class PollingQueue(
+class PollingStandardQueue(
     private val messageRepository: MessageRepository
 ) {
 //     Key: ChannelId|RoutingKey, value channel where messages are published and park for client consumption
