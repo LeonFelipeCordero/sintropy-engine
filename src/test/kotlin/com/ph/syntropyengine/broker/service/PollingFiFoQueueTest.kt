@@ -2,12 +2,12 @@ package com.ph.syntropyengine.broker.service
 
 import com.ph.syntropyengine.Fixtures
 import com.ph.syntropyengine.IntegrationTestBase
+import com.ph.syntropyengine.broker.model.ChannelType.*
 import com.ph.syntropyengine.broker.model.Message
 import com.ph.syntropyengine.utils.Patterns.routing
 import java.time.OffsetDateTime
 import java.util.UUID
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -19,10 +19,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class PollingStandardQueueTest : IntegrationTestBase() {
+class PollingFifoQueueTest : IntegrationTestBase() {
 
     @Autowired
-    private lateinit var pollingQueue: PollingStandardQueue
+    private lateinit var pollingQueue: PollingFifoQueue
 
     @Autowired
     private lateinit var channelService: ChannelService
@@ -34,7 +34,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should queue a message and poll`() {
-        val message = publishMessage()
+        val message = publishMessage(channelType = FIFO)
 
         val polledMessage = pollingQueue.poll(message.channelId, message.routingKey)
 
@@ -47,7 +47,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should not return anything if the message is consumed`() = runTest {
-        val message = publishMessage()
+        val message = publishMessage(FIFO)
 
         pollingQueue.poll(message.channelId, message.routingKey)
         val polledMessage = pollingQueue.poll(message.channelId, message.routingKey)
@@ -57,11 +57,12 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should queue two messages and poll one by one`() = runTest {
-        val (channel, producer) = createChannelWithProducer()
+        val (channel, producer) = createChannelWithProducer(FIFO)
         val message1 = publishMessage(channel, producer)
         val message2 = publishMessage(channel, producer)
 
         val polledMessage1 = pollingQueue.poll(message1.channelId, message1.routingKey)
+        pollingQueue.dequeue(polledMessage1.first().messageId)
         val polledMessage2 = pollingQueue.poll(message1.channelId, message1.routingKey)
 
         assertThat(polledMessage1).hasSize(1)
@@ -77,8 +78,26 @@ class PollingStandardQueueTest : IntegrationTestBase() {
     }
 
     @Test
+    fun `should not poll any message if the previous poll hasn't confirm anything`() {
+        val (channel, producer) = createChannelWithProducer(FIFO)
+        val message1 = publishMessage(channel, producer)
+        val message2 = publishMessage(channel, producer)
+
+        val polledMessage1 = pollingQueue.poll(message1.channelId, message1.routingKey)
+        val polledMessage2 = pollingQueue.poll(message1.channelId, message1.routingKey)
+
+        assertThat(polledMessage1).hasSize(1)
+        assertThat(polledMessage2).hasSize(0)
+        assertThat(message1)
+            .usingRecursiveComparison()
+            .ignoringFields("status", "lastDelivered", "deliveredTimes")
+            .isEqualTo(polledMessage1.first())
+    }
+
+
+    @Test
     fun `should queue a message and try to poll five`() = runTest {
-        val message = publishMessage()
+        val message = publishMessage(FIFO)
 
         val polledMessage = pollingQueue.poll(message.channelId, message.routingKey, pollingCount = 5)
 
@@ -98,13 +117,15 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should poll messages in chronological order one by one`() {
-        val (channel, producer) = createChannelWithProducer()
+        val (channel, producer) = createChannelWithProducer(FIFO)
         val message1 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(5))
         val message2 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(10))
         val message3 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(15))
 
         val polledMessage1 = pollingQueue.poll(channel.channelId!!, channel.routingKeys.first())
+        pollingQueue.dequeue(polledMessage1.first().messageId)
         val polledMessage2 = pollingQueue.poll(channel.channelId, channel.routingKeys.first())
+        pollingQueue.dequeue(polledMessage2.first().messageId)
         val polledMessage3 = pollingQueue.poll(channel.channelId, channel.routingKeys.first())
 
         assertThat(polledMessage1).hasSize(1)
@@ -127,7 +148,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should poll messages in chronological order all at once`() {
-        val (channel, producer) = createChannelWithProducer()
+        val (channel, producer) = createChannelWithProducer(FIFO)
         val message1 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(15))
         val message2 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(17))
         val message3 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(5))
@@ -146,7 +167,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should not poll messages from other routing key`() {
-        val (channel, producer) = createChannelWithProducer()
+        val (channel, producer) = createChannelWithProducer(FIFO)
         val message1 = publishMessage(
             channel,
             producer,
@@ -162,6 +183,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
         )
 
         val polledMessage1 = pollingQueue.poll(message1.channelId, message1.routingKey, pollingCount = 2)
+        pollingQueue.dequeue(polledMessage1.first().messageId)
         val polledMessage2 = pollingQueue.poll(message1.channelId, secondRoutingKey, pollingCount = 2)
 
         assertThat(polledMessage1).hasSize(1)
@@ -179,10 +201,11 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should not poll messages from other channel`() {
-        val message1 = publishMessage()
-        val message2 = publishMessage()
+        val message1 = publishMessage(FIFO)
+        val message2 = publishMessage(FIFO)
 
         val polledMessage1 = pollingQueue.poll(message1.channelId, message1.routingKey, pollingCount = 2)
+        pollingQueue.dequeue(polledMessage1.first().messageId)
         val polledMessage2 = pollingQueue.poll(message2.channelId, message2.routingKey, pollingCount = 2)
 
         assertThat(polledMessage1).hasSize(1)
@@ -200,7 +223,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should not pull a message that has been poll more than three times`() {
-        val message = publishMessage()
+        val message = publishMessage(FIFO)
 
         messageRepository.setMessageDeliveriesOutOfScope(message.messageId)
 
@@ -211,7 +234,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should not pull a message that has been marked as failed`() {
-        val message = publishMessage()
+        val message = publishMessage(FIFO)
 
         pollingQueue.markAsFailed(message.messageId)
 
@@ -222,7 +245,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should dequeue a message that is processed and mark it in the event log`() {
-        val message = publishMessage()
+        val message = publishMessage(FIFO)
 
         pollingQueue.poll(message.channelId, message.routingKey)
 
@@ -238,7 +261,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should not dequeue a message that is on ready`() {
-        val message = publishMessage()
+        val message = publishMessage(FIFO)
 
         assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy { pollingQueue.dequeue(message.messageId) }
@@ -251,7 +274,6 @@ class PollingStandardQueueTest : IntegrationTestBase() {
             .isThrownBy { pollingQueue.dequeue(UUID.randomUUID()) }
             .withMessageContainingAll("Message with id", "not found")
     }
-
 
     @Test
     fun `concurrent processing of messages`() = runTest {
@@ -363,8 +385,6 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
             producersJobs.joinAll()
 
-            delay(1000)
-
             val pollingChannel = kotlinx.coroutines.channels.Channel<Message>(capacity = messagesCount)
             val consumersJobs = listOf(
                 launch {
@@ -439,4 +459,6 @@ class PollingStandardQueueTest : IntegrationTestBase() {
                 .isEqualTo(allEventLog.filter { it.routing() == key }.sortedBy { it.timestamp })
         }
     }
+
+
 }

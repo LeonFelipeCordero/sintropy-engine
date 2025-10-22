@@ -32,9 +32,6 @@ class ReplicationTest : IntegrationTestBase() {
     private lateinit var pgReplicationConsumer: PGReplicationConsumer
 
     @Autowired
-    private lateinit var producerService: ProducerService
-
-    @Autowired
     private lateinit var databaseProperties: DatabaseProperties
 
     @BeforeEach

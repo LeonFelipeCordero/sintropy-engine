@@ -113,13 +113,17 @@ jooq {
     }
 }
 
+/**
+ * This is too problematic as it requires to always have a database to be up to date,
+ * Therefore is preferable to generate your entities manually
+ */
 tasks.named("compileKotlin") {
     dependsOn(tasks.named("jooqCodegen"))
 }
 
-tasks.named("jooqCodegen") {
-    dependsOn(tasks.named("update"))
-}
+//tasks.named("jooqCodegen") {
+//    dependsOn(tasks.named("update"))
+//}
 
 //liquibase//tasks.named("dev") {
 //    dependsOn(tasks.named("update"))

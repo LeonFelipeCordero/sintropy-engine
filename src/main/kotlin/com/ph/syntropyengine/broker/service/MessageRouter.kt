@@ -1,8 +1,7 @@
 package com.ph.syntropyengine.broker.service
 
 import com.ph.syntropyengine.broker.model.Consumer
-import com.ph.syntropyengine.broker.model.Message
-import com.ph.syntropyengine.jooq.generated.tables.RoutingKey
+import com.ph.syntropyengine.utils.Patterns.routing
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.util.UUID
 import kotlinx.coroutines.sync.Mutex
@@ -49,9 +48,3 @@ class MessageRouter {
         return routingTable[routing(channelId, routingKey)] ?: emptyList()
     }
 }
-
-internal fun routing(channelId: UUID, routingKey: String) = "${channelId}|${routingKey}"
-
-internal fun Consumer.routing() = routing(this.channelId, this.routingKey)
-
-internal fun Message.routing() = routing(this.channelId, this.routingKey)

@@ -10,7 +10,7 @@ data class Message(
     val producerId: UUID,
     val routingKey: String,
     val message: String,
-    val status: MessageStatus= MessageStatus.READY,
+    val status: MessageStatus = MessageStatus.READY,
     val lastDelivered: OffsetDateTime? = null,
     val deliveredTimes: Int = 0
 )

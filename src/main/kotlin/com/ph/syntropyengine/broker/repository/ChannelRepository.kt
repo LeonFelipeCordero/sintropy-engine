@@ -2,11 +2,8 @@ package com.ph.syntropyengine.broker.repository
 
 import com.ph.syntropyengine.broker.model.Channel
 import com.ph.syntropyengine.broker.model.ChannelType
-import com.ph.syntropyengine.broker.model.ConnectionType
-import com.ph.syntropyengine.broker.repository.toDBEnum
 import com.ph.syntropyengine.jooq.generated.Tables.CHANNELS
 import com.ph.syntropyengine.jooq.generated.Tables.ROUTING_KEY
-import com.ph.syntropyengine.jooq.generated.enums.ConsumerConnectionType
 import java.util.UUID
 import kotlin.collections.component1
 import kotlin.collections.component2

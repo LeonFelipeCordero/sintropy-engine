@@ -2,20 +2,14 @@ package com.ph.syntropyengine.broker.service
 
 import com.ph.syntropyengine.Fixtures
 import com.ph.syntropyengine.IntegrationTestBase
-import com.ph.syntropyengine.broker.model.Channel
 import com.ph.syntropyengine.broker.model.MessageStatus
-import com.ph.syntropyengine.jooq.generated.enums.MessageStatusType
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 
 class ProducerServiceTest : IntegrationTestBase() {
-
-    @Autowired
-    private lateinit var producerService: ProducerService
 
     @BeforeEach
     fun setUp() {

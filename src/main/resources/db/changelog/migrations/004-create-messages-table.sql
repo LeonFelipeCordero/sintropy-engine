@@ -22,17 +22,8 @@ create table messages
 
     constraint messages_message_id_pk primary key (message_id)
 );
--- TODO things to consider to test, 1) is index by delivered times useful?, 2) is last delivered useful?
 create index messages_polling_1idx
     on messages (channel_id, routing_key, status, last_delivered, delivered_times);
-
--- todo in case the index above is not good, try by creating others more granular
--- create unique index messages_channel_id_routing_key_idx
---     on messages (channel_id, routing_key);
--- create unique index messages_channel_id_routing_key_ready_idx
---     on messages (channel_id, routing_key) where status = 'READY';
--- todo let's try this one when metrics will be needed
--- create index messages_status_idx on messages (status);
 
 create table event_log
 (

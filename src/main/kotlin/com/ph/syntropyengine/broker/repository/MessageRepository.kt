@@ -8,7 +8,6 @@ import com.ph.syntropyengine.jooq.generated.enums.MessageStatusType
 import java.time.OffsetDateTime
 import java.util.UUID
 import org.jooq.DSLContext
-import org.jooq.impl.DSL.select
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -34,34 +33,60 @@ class MessageRepository(
         ).returning().fetchOneInto(Message::class.java)
             ?: throw IllegalStateException("Something went wrong persisting the message")
 
-    /**
-     * Poll messages that are ready and lock on the record for update.
-     * Could be it's needed to use an advisory lock such as pg_try_advisory_xact_lock for better consistency
-     */
-    fun pollFromQueueAndRoutingKey(channelId: UUID, routingKey: String, pollingCount: Int): List<Message> {
-        val subQuery = select(MESSAGES.MESSAGE_ID)
-            .from(MESSAGES)
-            .where(MESSAGES.CHANNEL_ID.eq(channelId))
-            .and(MESSAGES.ROUTING_KEY.eq(routingKey))
-            .and(
-                MESSAGES.STATUS.eq(MessageStatusType.READY)
-                    .or(
-                        MESSAGES.STATUS.ge(MessageStatusType.IN_FLIGHT)
-                            .and(
-                                MESSAGES.LAST_DELIVERED.lessThan(OffsetDateTime.now().minusMinutes(15))
-                                    .and(MESSAGES.DELIVERED_TIMES.lessThan(4))
-                            )
-                    )
-            ).orderBy(MESSAGES.TIMESTAMP)
-            .limit(pollingCount)
-            .forUpdate().skipLocked() // TODO would it be needed here
-        return context.update(MESSAGES)
-            .set(MESSAGES.STATUS, MessageStatusType.IN_FLIGHT)
-            .set(MESSAGES.LAST_DELIVERED, OffsetDateTime.now())
-            .set(MESSAGES.DELIVERED_TIMES, MESSAGES.DELIVERED_TIMES.add(1))
-            .set(MESSAGES.UPDATED_AT, OffsetDateTime.now())
-            .where(MESSAGES.MESSAGE_ID.`in`(subQuery))
-            .returning()
+    fun pollFromStandardChannelByRoutingKey(channelId: UUID, routingKey: String, pollingCount: Int): List<Message> {
+        val hash = hashCode(channelId, routingKey)
+        val query = """
+            with result as (select message_id
+                            from messages
+                            where channel_id = :channelId
+                              and routing_key = :routingKey
+                              and (status = 'READY' or
+                                   (status = 'IN_FLIGHT' and
+                                    last_delivered < now() - interval '15 minutes' and
+                                    delivered_times < 4))
+                              and pg_try_advisory_xact_lock(:hash)
+                            order by timestamp
+                            limit :pollingCount for update skip locked)
+            update messages
+            set status          = 'IN_FLIGHT',
+                last_delivered  = now(),
+                delivered_times = delivered_times + 1,
+                updated_at      = now()
+            from result
+            where messages.message_id in (result.message_id)
+            returning messages.*;
+            ;
+        """.trimIndent()
+        return context.resultQuery(query, channelId, routingKey, hash, pollingCount).fetchInto(Message::class.java)
+    }
+
+    fun pollFromFifoChannelByRoutingKey(channelId: UUID, routingKey: String, pollingCount: Int): List<Message> {
+        val hash = hashCode(channelId, routingKey)
+        val query = """
+            with result as (select message_id
+                               from messages
+                               where channel_id = :channelId
+                                 and routing_key = :routingKey
+                                 and status = 'READY'
+                                 and not exists (select 1
+                                                 from messages
+                                                 where channel_id = :channelId
+                                                   and routing_key = :routingKey
+                                                   and status = 'IN_FLIGHT')
+                                 and pg_try_advisory_xact_lock(:hash)
+                               order by timestamp
+                               limit :pollingCount for update skip locked)
+               update messages
+               set status          = 'IN_FLIGHT',
+                   last_delivered  = now(),
+                   delivered_times = delivered_times + 1,
+                   updated_at      = now()
+               from result
+               where messages.message_id in (result.message_id)
+               returning messages.*;
+            ;
+        """.trimIndent()
+        return context.resultQuery(query, channelId, routingKey, channelId, routingKey, hash, pollingCount)
             .fetchInto(Message::class.java)
     }
 
@@ -107,5 +132,9 @@ class MessageRepository(
             .set(MESSAGES.UPDATED_AT, OffsetDateTime.now())
             .where(MESSAGES.MESSAGE_ID.eq(messageId))
             .execute()
+    }
+
+    private fun hashCode(channelId: UUID, routingKey: String): Int {
+        return (channelId.toString() + routingKey).hashCode()
     }
 }
