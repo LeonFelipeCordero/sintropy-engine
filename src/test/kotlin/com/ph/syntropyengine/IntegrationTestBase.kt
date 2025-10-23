@@ -246,13 +246,13 @@ abstract class IntegrationTestBase {
                         "-c",
                         "wal_level=logical",
                         "-c",
-                        "max_wal_senders=1",
+                        "max_wal_senders=15",
                         "-c",
-                        "max_replication_slots=2",
+                        "max_replication_slots=15",
                         "-c",
-                        "max_logical_replication_workers=1",
+                        "max_logical_replication_workers=15",
                         "-c",
-                        "max_worker_processes=2",
+                        "max_worker_processes=16",
                         "-c",
                         "hba_file=/etc/postgresql/pg_hba.conf"
                     )

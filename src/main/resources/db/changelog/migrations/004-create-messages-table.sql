@@ -12,7 +12,8 @@ create table messages
     channel_id      uuid                not null references channels (channel_id),
     producer_id     uuid                not null references producers (producer_id),
     routing_key     varchar(128)        not null,
-    message         text                not null,
+    message         jsonb               not null,
+    headers         jsonb               not null,
     status          message_status_type not null default 'READY',
     last_delivered  timestamptz,
     delivered_times int4                not null default 0,
@@ -32,7 +33,8 @@ create table event_log
     channel_id  uuid         not null references channels (channel_id),
     producer_id uuid         not null references producers (producer_id),
     routing_key varchar(128) not null,
-    message     text         not null, -- todo JSONB maybe?
+    message     jsonb        not null,
+    headers     jsonb        not null,
     processed   bool         not null default false,
 
     created_at  timestamptz  not null,
@@ -51,6 +53,7 @@ begin
                           producer_id,
                           routing_key,
                           message,
+                          headers,
                           processed,
                           created_at,
                           updated_at)
@@ -60,6 +63,7 @@ begin
             new.producer_id,
             new.routing_key,
             new.message,
+            new.headers,
             false,
             new.created_at,
             new.updated_at);

@@ -12,7 +12,6 @@ class ConsumerService(
     private val channelService: ChannelService,
     private val consumerRepository: ConsumerRepository,
     private val messageRouter: MessageRouter,
-    private val pollingQueue: PollingStandardQueue
 ) {
 
     @Transactional
@@ -31,13 +30,7 @@ class ConsumerService(
         )
         val storedConsumer = consumerRepository.save(consumer)
 
-        // TODO: For now it uses this in memory approach, things to consider are:
-        // This has to be transactional, and how to make sure the consumer get's available in the channel,
-        // after being save?
-        // When a consumer is explicitly created, it will hold a live connection and receive updates via WS (at start)
-        // Consumers can poll directly from a channel with poll mechanisim
         messageRouter.addConsumer(storedConsumer)
-//        pollingQueue.
 
         return storedConsumer
     }

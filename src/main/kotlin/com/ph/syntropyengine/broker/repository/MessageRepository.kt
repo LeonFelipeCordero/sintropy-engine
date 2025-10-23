@@ -8,6 +8,7 @@ import com.ph.syntropyengine.jooq.generated.enums.MessageStatusType
 import java.time.OffsetDateTime
 import java.util.UUID
 import org.jooq.DSLContext
+import org.jooq.JSONB
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -23,13 +24,15 @@ class MessageRepository(
             MESSAGES.PRODUCER_ID,
             MESSAGES.ROUTING_KEY,
             MESSAGES.MESSAGE,
+            MESSAGES.HEADERS
         ).values(
             message.messageId,
             message.timestamp,
             message.channelId,
             message.producerId,
             message.routingKey,
-            message.message
+            JSONB.jsonb(message.message),
+            JSONB.jsonb(message.headers)
         ).returning().fetchOneInto(Message::class.java)
             ?: throw IllegalStateException("Something went wrong persisting the message")
 

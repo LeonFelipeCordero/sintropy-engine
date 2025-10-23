@@ -10,6 +10,7 @@ import com.ph.syntropyengine.jooq.generated.tables.Messages;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+import org.jooq.JSONB;
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 
@@ -95,85 +96,99 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
     /**
      * Setter for <code>public.messages.message</code>.
      */
-    public void setMessage(String value) {
+    public void setMessage(JSONB value) {
         set(5, value);
     }
 
     /**
      * Getter for <code>public.messages.message</code>.
      */
-    public String getMessage() {
-        return (String) get(5);
+    public JSONB getMessage() {
+        return (JSONB) get(5);
+    }
+
+    /**
+     * Setter for <code>public.messages.headers</code>.
+     */
+    public void setHeaders(JSONB value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>public.messages.headers</code>.
+     */
+    public JSONB getHeaders() {
+        return (JSONB) get(6);
     }
 
     /**
      * Setter for <code>public.messages.status</code>.
      */
     public void setStatus(MessageStatusType value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>public.messages.status</code>.
      */
     public MessageStatusType getStatus() {
-        return (MessageStatusType) get(6);
+        return (MessageStatusType) get(7);
     }
 
     /**
      * Setter for <code>public.messages.last_delivered</code>.
      */
     public void setLastDelivered(OffsetDateTime value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>public.messages.last_delivered</code>.
      */
     public OffsetDateTime getLastDelivered() {
-        return (OffsetDateTime) get(7);
+        return (OffsetDateTime) get(8);
     }
 
     /**
      * Setter for <code>public.messages.delivered_times</code>.
      */
     public void setDeliveredTimes(Integer value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>public.messages.delivered_times</code>.
      */
     public Integer getDeliveredTimes() {
-        return (Integer) get(8);
+        return (Integer) get(9);
     }
 
     /**
      * Setter for <code>public.messages.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>public.messages.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(9);
+        return (OffsetDateTime) get(10);
     }
 
     /**
      * Setter for <code>public.messages.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>public.messages.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(10);
+        return (OffsetDateTime) get(11);
     }
 
     // -------------------------------------------------------------------------
@@ -199,7 +214,7 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
     /**
      * Create a detached, initialised MessagesRecord
      */
-    public MessagesRecord(UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, String message, MessageStatusType status, OffsetDateTime lastDelivered, Integer deliveredTimes, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public MessagesRecord(UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, JSONB message, JSONB headers, MessageStatusType status, OffsetDateTime lastDelivered, Integer deliveredTimes, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(Messages.MESSAGES);
 
         setMessageId(messageId);
@@ -208,6 +223,7 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
         setProducerId(producerId);
         setRoutingKey(routingKey);
         setMessage(message);
+        setHeaders(headers);
         setStatus(status);
         setLastDelivered(lastDelivered);
         setDeliveredTimes(deliveredTimes);
@@ -229,6 +245,7 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
             setProducerId(value.getProducerId());
             setRoutingKey(value.getRoutingKey());
             setMessage(value.getMessage());
+            setHeaders(value.getHeaders());
             setStatus(value.getStatus());
             setLastDelivered(value.getLastDelivered());
             setDeliveredTimes(value.getDeliveredTimes());

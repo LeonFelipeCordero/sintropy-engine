@@ -15,7 +15,8 @@ object Fixtures {
     const val DEFAULT_ROUTING_KEY = "test.1"
     const val DEFAULT_PRODUCER_NAME = "test_producer"
     const val DEFAULT_CHANNEL_NAME = "test_channel"
-    const val DEFAULT_MESSAGE = "test_message"
+    const val DEFAULT_MESSAGE = """{"id": "test1345", "number": 10}"""
+    const val DEFAULT_ATTRIBUTES = """{"header1": "12345", "header2": "abcdefg"}"""
 
     fun createChannel(
         channelId: UUID? = null,
@@ -69,6 +70,7 @@ object Fixtures {
             producerId = producerId,
             routingKey = routingKey,
             message = DEFAULT_MESSAGE,
+            headers = DEFAULT_ATTRIBUTES
         )
     }
 

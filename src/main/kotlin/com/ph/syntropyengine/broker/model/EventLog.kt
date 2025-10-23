@@ -10,5 +10,6 @@ data class EventLog(
     val producerId: UUID,
     val routingKey: String,
     val message: String,
+    val headers: String,
     val processed: Boolean
 )

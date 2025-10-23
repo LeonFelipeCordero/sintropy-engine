@@ -23,6 +23,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Index;
 import org.jooq.InverseForeignKey;
+import org.jooq.JSONB;
 import org.jooq.Name;
 import org.jooq.Path;
 import org.jooq.PlainSQL;
@@ -90,7 +91,12 @@ public class Messages extends TableImpl<MessagesRecord> {
     /**
      * The column <code>public.messages.message</code>.
      */
-    public final TableField<MessagesRecord, String> MESSAGE = createField(DSL.name("message"), SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<MessagesRecord, JSONB> MESSAGE = createField(DSL.name("message"), SQLDataType.JSONB.nullable(false), this, "");
+
+    /**
+     * The column <code>public.messages.headers</code>.
+     */
+    public final TableField<MessagesRecord, JSONB> HEADERS = createField(DSL.name("headers"), SQLDataType.JSONB.nullable(false), this, "");
 
     /**
      * The column <code>public.messages.status</code>.

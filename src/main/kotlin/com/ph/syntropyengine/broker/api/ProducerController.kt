@@ -51,6 +51,8 @@ data class CreateMessageRequest(
     val routingKey: String,
     @param:NotEmpty
     val message: String,
+    @param:NotEmpty
+    val headers: String,
 ) {
     fun toDto(): Message {
         return Message(
@@ -60,6 +62,7 @@ data class CreateMessageRequest(
             producerId = producerId,
             routingKey = routingKey,
             message = message,
+            headers = headers,
         )
     }
 }

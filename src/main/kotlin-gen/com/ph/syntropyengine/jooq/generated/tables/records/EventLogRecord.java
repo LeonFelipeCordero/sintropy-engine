@@ -9,6 +9,7 @@ import com.ph.syntropyengine.jooq.generated.tables.EventLog;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+import org.jooq.JSONB;
 import org.jooq.Record3;
 import org.jooq.impl.UpdatableRecordImpl;
 
@@ -94,57 +95,71 @@ public class EventLogRecord extends UpdatableRecordImpl<EventLogRecord> {
     /**
      * Setter for <code>public.event_log.message</code>.
      */
-    public void setMessage(String value) {
+    public void setMessage(JSONB value) {
         set(5, value);
     }
 
     /**
      * Getter for <code>public.event_log.message</code>.
      */
-    public String getMessage() {
-        return (String) get(5);
+    public JSONB getMessage() {
+        return (JSONB) get(5);
+    }
+
+    /**
+     * Setter for <code>public.event_log.headers</code>.
+     */
+    public void setHeaders(JSONB value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>public.event_log.headers</code>.
+     */
+    public JSONB getHeaders() {
+        return (JSONB) get(6);
     }
 
     /**
      * Setter for <code>public.event_log.processed</code>.
      */
     public void setProcessed(Boolean value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>public.event_log.processed</code>.
      */
     public Boolean getProcessed() {
-        return (Boolean) get(6);
+        return (Boolean) get(7);
     }
 
     /**
      * Setter for <code>public.event_log.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>public.event_log.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(7);
+        return (OffsetDateTime) get(8);
     }
 
     /**
      * Setter for <code>public.event_log.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>public.event_log.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(8);
+        return (OffsetDateTime) get(9);
     }
 
     // -------------------------------------------------------------------------
@@ -170,7 +185,7 @@ public class EventLogRecord extends UpdatableRecordImpl<EventLogRecord> {
     /**
      * Create a detached, initialised EventLogRecord
      */
-    public EventLogRecord(UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, String message, Boolean processed, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public EventLogRecord(UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, JSONB message, JSONB headers, Boolean processed, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(EventLog.EVENT_LOG);
 
         setMessageId(messageId);
@@ -179,6 +194,7 @@ public class EventLogRecord extends UpdatableRecordImpl<EventLogRecord> {
         setProducerId(producerId);
         setRoutingKey(routingKey);
         setMessage(message);
+        setHeaders(headers);
         setProcessed(processed);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
@@ -198,6 +214,7 @@ public class EventLogRecord extends UpdatableRecordImpl<EventLogRecord> {
             setProducerId(value.getProducerId());
             setRoutingKey(value.getRoutingKey());
             setMessage(value.getMessage());
+            setHeaders(value.getHeaders());
             setProcessed(value.getProcessed());
             setCreatedAt(value.getCreatedAt());
             setUpdatedAt(value.getUpdatedAt());

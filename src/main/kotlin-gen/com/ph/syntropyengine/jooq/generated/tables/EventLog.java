@@ -20,6 +20,7 @@ import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.InverseForeignKey;
+import org.jooq.JSONB;
 import org.jooq.Name;
 import org.jooq.Path;
 import org.jooq.PlainSQL;
@@ -87,7 +88,12 @@ public class EventLog extends TableImpl<EventLogRecord> {
     /**
      * The column <code>public.event_log.message</code>.
      */
-    public final TableField<EventLogRecord, String> MESSAGE = createField(DSL.name("message"), SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<EventLogRecord, JSONB> MESSAGE = createField(DSL.name("message"), SQLDataType.JSONB.nullable(false), this, "");
+
+    /**
+     * The column <code>public.event_log.headers</code>.
+     */
+    public final TableField<EventLogRecord, JSONB> HEADERS = createField(DSL.name("headers"), SQLDataType.JSONB.nullable(false), this, "");
 
     /**
      * The column <code>public.event_log.processed</code>.

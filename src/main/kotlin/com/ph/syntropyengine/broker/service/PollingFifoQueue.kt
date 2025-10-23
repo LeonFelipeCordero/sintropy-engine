@@ -20,11 +20,9 @@ class PollingFifoQueue(
         val messages = messageRepository
             .pollFromFifoChannelByRoutingKey(channelId, routingKey, pollingCount)
             .sortedBy { it.timestamp }
-        // todo find a way to sort in database as the update unsort
-        // todo also this is the given external timestamp
 
-        logger.info { "polled ${messages.map { it.messageId }} messages for [${routing(channelId, routingKey)}]" }
-//        logger.info { "polled [${messages.size}] messages for ${loggingPair(channelId, routingKey)}" }
+//        logger.info { "polled ${messages.map { it.messageId }} messages for [${routing(channelId, routingKey)}]" }
+        logger.info { "polled [${messages.size}] messages for [${routing(channelId, routingKey)}]" }
 
         return messages
     }

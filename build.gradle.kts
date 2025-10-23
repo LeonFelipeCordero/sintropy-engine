@@ -121,9 +121,9 @@ tasks.named("compileKotlin") {
     dependsOn(tasks.named("jooqCodegen"))
 }
 
-//tasks.named("jooqCodegen") {
-//    dependsOn(tasks.named("update"))
-//}
+tasks.named("jooqCodegen") {
+    dependsOn(tasks.named("update"))
+}
 
 //liquibase//tasks.named("dev") {
 //    dependsOn(tasks.named("update"))
