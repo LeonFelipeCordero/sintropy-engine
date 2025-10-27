@@ -1,0 +1,26 @@
+quarkus:
+  arc:
+    fail-on-intercepted-private-method: false
+  application:
+    name: sintropy-engine
+    version: 0.0.1
+  log:
+    console:
+      format: '%d{yyyy-MM-dd HH:mm:ss} %-5p [%c] (%t) %s%e%n'
+      level: INFO
+  datasource:
+    username: postgres
+    password: postgres
+    db-kind: postgresql
+    jdbc:
+      url: jdbc:postgresql://localhost:5432/postgres
+  flyway:
+    migrate-at-start: true
+  jooq:
+    dialect: POSTGRES
+http:
+  port: 8080
+
+syen:
+  feature-flags:
+    with-full-replication: false

@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  postgres:
+#    image: timescale/timescaledb-ha:pg17
+#    image: postgres:17
+    build: postgres17-wal2json
+    restart: always
+    networks:
+      - app
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres:$HOME/postgres/pgdata/data
+      # - ./pg-config/pg_hba.conf:/etc/postgresql/pg_hba.conf
+#      - ./pg/postgresql.conf:/etc/postgresql/postgresql.conf
+    #command: >
+      # postgres
+      # -c hba_file=/etc/postgresql/pg_hba.conf
+      # -c wal_level=logical
+      # -c max_wal_senders=1
+      # -c max_replication_slots=2
+      # -c max_logical_replication_workers=1
+      # -c max_worker_processes=2
+      # -c config_file=/etc/postgresql/postgresql.conf
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  postgres:
