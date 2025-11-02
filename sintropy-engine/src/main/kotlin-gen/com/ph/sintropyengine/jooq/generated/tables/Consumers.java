@@ -7,7 +7,6 @@ package com.ph.sintropyengine.jooq.generated.tables;
 import com.ph.sintropyengine.jooq.generated.Indexes;
 import com.ph.sintropyengine.jooq.generated.Keys;
 import com.ph.sintropyengine.jooq.generated.Public;
-import com.ph.sintropyengine.jooq.generated.enums.ConsumerConnectionType;
 import com.ph.sintropyengine.jooq.generated.tables.Channels.ChannelsPath;
 import com.ph.sintropyengine.jooq.generated.tables.records.ConsumersRecord;
 
@@ -75,11 +74,6 @@ public class Consumers extends TableImpl<ConsumersRecord> {
      * The column <code>public.consumers.routing_key</code>.
      */
     public final TableField<ConsumersRecord, String> ROUTING_KEY = createField(DSL.name("routing_key"), SQLDataType.VARCHAR(128).nullable(false), this, "");
-
-    /**
-     * The column <code>public.consumers.connection_type</code>.
-     */
-    public final TableField<ConsumersRecord, ConsumerConnectionType> CONNECTION_TYPE = createField(DSL.name("connection_type"), SQLDataType.VARCHAR.nullable(false).asEnumDataType(ConsumerConnectionType.class), this, "");
 
     /**
      * The column <code>public.consumers.created_at</code>.

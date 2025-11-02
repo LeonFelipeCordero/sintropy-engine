@@ -3,6 +3,7 @@ plugins {
     kotlin("plugin.allopen") version "2.2.20"
     id("io.quarkus")
     id("org.jooq.jooq-codegen-gradle") version "3.19.26"
+    id("org.flywaydb.flyway") version "11.15.0"
 }
 
 repositories {
@@ -18,17 +19,22 @@ val coroutinesVersion = "1.10.2"
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-config-yaml")
-    implementation("io.quarkus:quarkus-opentelemetry")
+//    implementation("io.quarkus:quarkus-opentelemetry")
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-logging-json")
     implementation("io.quarkus:quarkus-vertx")
     implementation("io.quarkus:quarkus-arc")
+    implementation("io.quarkus:quarkus-websockets-next")
+    implementation("io.quarkus:quarkus-rest")
+    implementation("io.quarkus:quarkus-rest-jackson")
 
-    implementation("org.postgresql:postgresql:42.7.3")
-    jooqCodegen("org.postgresql:postgresql:42.7.3")
+    implementation("io.smallrye.reactive:mutiny-kotlin:3.0.1")
+
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     implementation("io.quarkus:quarkus-flyway")
-    implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.flywaydb:flyway-database-postgresql:11.15.0")
+    implementation("org.postgresql:postgresql:42.7.3")
+    jooqCodegen("org.postgresql:postgresql:42.7.3")
     implementation("io.quarkiverse.jooq:quarkus-jooq:2.1.0")
 
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
@@ -37,6 +43,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}")
 
+    testImplementation("io.mockk:mockk:1.14.6")
     testImplementation("org.testcontainers:testcontainers:1.20.2")
     testImplementation("org.testcontainers:postgresql:1.20.2")
     testImplementation("org.testcontainers:junit-jupiter:1.20.2")
@@ -102,4 +109,19 @@ jooq {
 
 tasks.named("compileKotlin") {
     dependsOn(tasks.named("jooqCodegen"))
+}
+
+// Flyway migrations in command line
+buildscript {
+    repositories { mavenCentral() }
+    dependencies {
+        classpath("org.flywaydb:flyway-database-postgresql:11.15.0")
+    }
+}
+flyway {
+    url = "jdbc:postgresql://localhost:5432/postgres"
+    user = "postgres"
+    password = "postgres"
+    locations = arrayOf("classpath:db/migration")
+    driver = "org.postgresql.Driver"
 }

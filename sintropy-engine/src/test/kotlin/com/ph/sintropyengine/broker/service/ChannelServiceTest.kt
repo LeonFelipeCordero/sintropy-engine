@@ -23,7 +23,7 @@ class ChannelServiceTest : IntegrationTestBase() {
     @Test
     fun `should create and persist a channel`() {
         val createdChannel = channelService.createChannel("test", STANDARD, listOf("test.1"))
-        val fetchedChannel = channelService.findByIdName("test")
+        val fetchedChannel = channelService.findByName("test")
 
         assertThat(createdChannel).usingRecursiveComparison().isEqualTo(fetchedChannel);
     }

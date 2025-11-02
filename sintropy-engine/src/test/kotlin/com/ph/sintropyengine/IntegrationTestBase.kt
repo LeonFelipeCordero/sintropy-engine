@@ -3,7 +3,6 @@ package com.ph.sintropyengine
 import com.ph.sintropyengine.broker.model.Channel
 import com.ph.sintropyengine.broker.model.ChannelType
 import com.ph.sintropyengine.broker.model.ChannelType.*
-import com.ph.sintropyengine.broker.model.Consumer
 import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.broker.model.Producer
 import com.ph.sintropyengine.broker.repository.ChannelRepository
@@ -15,7 +14,6 @@ import com.ph.sintropyengine.broker.service.ProducerService
 import com.ph.sintropyengine.utils.Patterns.routing
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.quarkus.test.common.QuarkusTestResource
-import io.quarkus.test.junit.TestProfile
 import jakarta.inject.Inject
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -25,7 +23,6 @@ import kotlinx.coroutines.delay
 private val logger = KotlinLogging.logger {}
 
 @QuarkusTestResource(PostgresqlDBTestResource::class)
-@TestProfile(TestWithoutFullReplicationProfile::class)
 abstract class IntegrationTestBase {
 
     @Inject
@@ -45,7 +42,7 @@ abstract class IntegrationTestBase {
 
     protected fun clean() {
         messageRepository.deleteAll()
-        consumerRepository.deleteAll()
+//        consumerRepository.deleteAll()
         producerRepository.deleteAll()
         channelRepository.deleteAll()
     }
@@ -53,11 +50,11 @@ abstract class IntegrationTestBase {
     /**
      * Create a new channel and new consumer with unique ID
      */
-    protected fun createChannelAndConsumer(): Pair<Channel, Consumer> {
-        val channel = createChannel()
-        val consumer = consumerRepository.save(Fixtures.createConsumer(channel.channelId!!))
-        return Pair(channel, consumer)
-    }
+//    protected fun createChannelAndConsumer(): Pair<Channel, Consumer> {
+//        val channel = createChannel()
+//        val consumer = consumerRepository.save(Fixtures.createConsumer(channel.channelId!!))
+//        return Pair(channel, consumer)
+//    }
 
     /**
      * Create a new channel with unique IDs
@@ -68,12 +65,18 @@ abstract class IntegrationTestBase {
     }
 
     /**
+     * Create a new producer with unique IDs for the given channel
+     */
+    protected fun createProducer(channel: Channel): Producer =
+        producerRepository.save(Fixtures.createProducer(channel.channelId!!))
+
+    /**
      * Create a new channel and a new producer with unique IDs
      */
     protected fun createChannelWithProducer(channelType: ChannelType = STANDARD): Pair<Channel, Producer> {
         val channel = createChannel(channelType = channelType)
-        val consumer = producerRepository.save(Fixtures.createProducer(channel.channelId!!))
-        return Pair(channel, consumer)
+        val producer = createProducer(channel)
+        return Pair(channel, producer)
     }
 
     /**
@@ -187,6 +190,7 @@ abstract class IntegrationTestBase {
         val channel1 = channelRepository.save(
             Fixtures.createChannel(
                 channelType = FIFO,
+
                 routingKeys = mutableListOf("test.1.0", "test.1.1", "test.1.2")
             )
         )

@@ -8,6 +8,7 @@ quarkus:
     console:
       format: '%d{yyyy-MM-dd HH:mm:ss} %-5p [%c] (%t) %s%e%n'
       level: INFO
+      json: false
   datasource:
     username: postgres
     password: postgres

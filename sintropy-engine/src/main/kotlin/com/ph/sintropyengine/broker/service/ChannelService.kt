@@ -30,7 +30,7 @@ class ChannelService(
 
     fun findById(channelId: UUID): Channel? = channelRepository.findById(channelId)
 
-    fun findByIdName(name: String): Channel? = channelRepository.findByName(name)
+    fun findByName(name: String): Channel? = channelRepository.findByName(name)
 
     @Transactional
     fun deleteChannel(id: UUID) {

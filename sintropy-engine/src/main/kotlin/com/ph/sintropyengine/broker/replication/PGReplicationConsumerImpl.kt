@@ -70,7 +70,6 @@ class PGReplicationConsumerImpl private constructor(
                         continue
                     }
 
-                    // todo this ?: continue sucks
                     val columnNames = change["columnnames"]?.map { it.asText() } ?: continue
                     val columnValues = change["columnvalues"]?.map { it.asText() } ?: continue
 

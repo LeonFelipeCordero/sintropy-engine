@@ -1,5 +1,6 @@
 package com.ph.sintropyengine.utils
 
+import com.ph.sintropyengine.broker.model.Channel
 import com.ph.sintropyengine.broker.model.EventLog
 import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.broker.model.Consumer
@@ -14,4 +15,6 @@ object Patterns {
     fun Message.routing() = routing(this.channelId, this.routingKey)
 
     fun EventLog.routing() = routing(this.channelId, this.routingKey)
+
+    fun Channel.routing(routingKey: String) = routing(this.channelId!!, routingKey)
 }

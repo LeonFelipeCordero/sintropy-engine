@@ -19,7 +19,7 @@ class ProducerService(
     @Transactional
     fun createProducer(name: String, channelName: String): Producer {
         val channel =
-            channelService.findByIdName(channelName) ?: throw IllegalStateException("Channel $channelName not found")
+            channelService.findByName(channelName) ?: throw IllegalStateException("Channel $channelName not found")
 
         val producer = Producer(name = name, channelId = channel.channelId!!)
         return producerRepository.save(producer)
@@ -28,7 +28,7 @@ class ProducerService(
     fun findById(consumerId: UUID): Producer? = producerRepository.findById(consumerId)
 
     fun findByChannel(channelName: String): List<Producer> =
-        channelService.findByIdName(channelName)?.let {
+        channelService.findByName(channelName)?.let {
             producerRepository.findByChannel(channelName)
         } ?: throw IllegalStateException("Channel $channelName not found")
 

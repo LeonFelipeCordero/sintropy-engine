@@ -16,11 +16,11 @@ class PGReplicationConsumerFactory(
 
     fun getStreamConsumer(): PGReplicationConsumer {
         if (featureFlags.withFullReplication()) {
-            logger.debug { "Using full replication consumer" }
+            logger.info { "Using full replication consumer" }
             return PGReplicationConsumerImpl(databaseProperties)
         }
 
-        logger.debug { "Using FAKE replication consumer" }
+        logger.info { "Using FAKE replication consumer" }
         return PGReplicationConsumerFaker()
     }
 
