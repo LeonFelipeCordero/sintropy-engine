@@ -23,7 +23,7 @@ class ConnectionRouterTest {
 
     private lateinit var connectionRouter: ConnectionRouter
 
-    val defaultChannel = Fixtures.createChannel(UUID.randomUUID(), routingKeys = listOf(DEFAULT_ROUTING_KEY, "test.2"))
+    val defaultChannel = Fixtures.createChannel(UUID.randomUUID(), routingKeys = listOf(DEFAULT_ROUTING_KEY, "test.2"),)
 
     @BeforeEach
     fun setUp() {
@@ -116,17 +116,17 @@ class ConnectionRouterTest {
 
         val channel1 = Fixtures.createChannel(
             channelId = UUID.randomUUID(),
-            routingKeys = mutableListOf("test.1.1", "test.1.2", "test.1.3")
+            routingKeys = mutableListOf("test.1.1", "test.1.2", "test.1.3"),
         )
         every { channelService.findByName(channel1.name) } returns channel1
 
         val channel2 = Fixtures.createChannel(
             channelId = UUID.randomUUID(),
-            routingKeys = mutableListOf("test.2.1", "test.2.2")
+            routingKeys = mutableListOf("test.2.1", "test.2.2"),
         )
         every { channelService.findByName(channel2.name) } returns channel2
 
-        val channel3 = Fixtures.createChannel(channelId = UUID.randomUUID(), routingKeys = mutableListOf("test.3.1"))
+        val channel3 = Fixtures.createChannel(channelId = UUID.randomUUID(), routingKeys = mutableListOf("test.3.1"),)
         every { channelService.findByName(channel3.name) } returns channel3
 
         val mutex = Mutex()

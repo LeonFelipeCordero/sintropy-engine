@@ -9,13 +9,15 @@ import com.ph.sintropyengine.jooq.generated.tables.Consumers;
 import com.ph.sintropyengine.jooq.generated.tables.EventLog;
 import com.ph.sintropyengine.jooq.generated.tables.Messages;
 import com.ph.sintropyengine.jooq.generated.tables.Producers;
-import com.ph.sintropyengine.jooq.generated.tables.RoutingKey;
+import com.ph.sintropyengine.jooq.generated.tables.Queues;
+import com.ph.sintropyengine.jooq.generated.tables.RoutingKeys;
 import com.ph.sintropyengine.jooq.generated.tables.records.ChannelsRecord;
 import com.ph.sintropyengine.jooq.generated.tables.records.ConsumersRecord;
 import com.ph.sintropyengine.jooq.generated.tables.records.EventLogRecord;
 import com.ph.sintropyengine.jooq.generated.tables.records.MessagesRecord;
 import com.ph.sintropyengine.jooq.generated.tables.records.ProducersRecord;
-import com.ph.sintropyengine.jooq.generated.tables.records.RoutingKeyRecord;
+import com.ph.sintropyengine.jooq.generated.tables.records.QueuesRecord;
+import com.ph.sintropyengine.jooq.generated.tables.records.RoutingKeysRecord;
 
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
@@ -40,7 +42,8 @@ public class Keys {
     public static final UniqueKey<EventLogRecord> EVENT_LOG_MESSAGE_ID_TIMESTAMP_PK = Internal.createUniqueKey(EventLog.EVENT_LOG, DSL.name("event_log_message_id_timestamp_pk"), new TableField[] { EventLog.EVENT_LOG.MESSAGE_ID, EventLog.EVENT_LOG.TIMESTAMP, EventLog.EVENT_LOG.CHANNEL_ID }, true);
     public static final UniqueKey<MessagesRecord> MESSAGES_MESSAGE_ID_PK = Internal.createUniqueKey(Messages.MESSAGES, DSL.name("messages_message_id_pk"), new TableField[] { Messages.MESSAGES.MESSAGE_ID }, true);
     public static final UniqueKey<ProducersRecord> PRODUCERS_PKEY = Internal.createUniqueKey(Producers.PRODUCERS, DSL.name("producers_pkey"), new TableField[] { Producers.PRODUCERS.PRODUCER_ID }, true);
-    public static final UniqueKey<RoutingKeyRecord> ROUTING_KEY_PKEY = Internal.createUniqueKey(RoutingKey.ROUTING_KEY, DSL.name("routing_key_pkey"), new TableField[] { RoutingKey.ROUTING_KEY.ROUTING_KEY_, RoutingKey.ROUTING_KEY.CHANNEL_ID }, true);
+    public static final UniqueKey<QueuesRecord> QUEUES_PKEY = Internal.createUniqueKey(Queues.QUEUES, DSL.name("queues_pkey"), new TableField[] { Queues.QUEUES.CHANNEL_ID }, true);
+    public static final UniqueKey<RoutingKeysRecord> ROUTING_KEYS_PKEY = Internal.createUniqueKey(RoutingKeys.ROUTING_KEYS, DSL.name("routing_keys_pkey"), new TableField[] { RoutingKeys.ROUTING_KEYS.ROUTING_KEY, RoutingKeys.ROUTING_KEYS.CHANNEL_ID }, true);
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -52,5 +55,6 @@ public class Keys {
     public static final ForeignKey<MessagesRecord, ChannelsRecord> MESSAGES__MESSAGES_CHANNEL_ID_FKEY = Internal.createForeignKey(Messages.MESSAGES, DSL.name("messages_channel_id_fkey"), new TableField[] { Messages.MESSAGES.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
     public static final ForeignKey<MessagesRecord, ProducersRecord> MESSAGES__MESSAGES_PRODUCER_ID_FKEY = Internal.createForeignKey(Messages.MESSAGES, DSL.name("messages_producer_id_fkey"), new TableField[] { Messages.MESSAGES.PRODUCER_ID }, Keys.PRODUCERS_PKEY, new TableField[] { Producers.PRODUCERS.PRODUCER_ID }, true);
     public static final ForeignKey<ProducersRecord, ChannelsRecord> PRODUCERS__PRODUCERS_CHANNEL_ID_FKEY = Internal.createForeignKey(Producers.PRODUCERS, DSL.name("producers_channel_id_fkey"), new TableField[] { Producers.PRODUCERS.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
-    public static final ForeignKey<RoutingKeyRecord, ChannelsRecord> ROUTING_KEY__ROUTING_KEY_CHANNEL_ID_FKEY = Internal.createForeignKey(RoutingKey.ROUTING_KEY, DSL.name("routing_key_channel_id_fkey"), new TableField[] { RoutingKey.ROUTING_KEY.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
+    public static final ForeignKey<QueuesRecord, ChannelsRecord> QUEUES__QUEUES_CHANNEL_ID_FKEY = Internal.createForeignKey(Queues.QUEUES, DSL.name("queues_channel_id_fkey"), new TableField[] { Queues.QUEUES.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
+    public static final ForeignKey<RoutingKeysRecord, ChannelsRecord> ROUTING_KEYS__ROUTING_KEYS_CHANNEL_ID_FKEY = Internal.createForeignKey(RoutingKeys.ROUTING_KEYS, DSL.name("routing_keys_channel_id_fkey"), new TableField[] { RoutingKeys.ROUTING_KEYS.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
 }

@@ -2,7 +2,10 @@ package com.ph.sintropyengine
 
 import com.ph.sintropyengine.broker.model.Channel
 import com.ph.sintropyengine.broker.model.ChannelType
+import com.ph.sintropyengine.broker.model.ChannelType.*
+import com.ph.sintropyengine.broker.model.ConsumptionType
 import com.ph.sintropyengine.broker.model.Consumer
+import com.ph.sintropyengine.broker.model.ConsumptionType.*
 import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.broker.model.Producer
 import com.ph.sintropyengine.utils.Patterns.routing
@@ -20,15 +23,16 @@ object Fixtures {
 
     fun createChannel(
         channelId: UUID? = null,
-        channelType: ChannelType = ChannelType.STANDARD,
-        routingKeys: List<String> = listOf(DEFAULT_ROUTING_KEY)
+        channelType: ChannelType = QUEUE,
+        routingKeys: List<String> = listOf(DEFAULT_ROUTING_KEY),
+        consumptionType: ConsumptionType = STANDARD,
     ): Channel {
         return Channel(
             channelId = channelId,
             name = UUID.randomUUID().toString(),
             channelType = channelType,
-            consumers = emptyList(),
-            routingKeys = routingKeys.toMutableList()
+            routingKeys = routingKeys.toMutableList(),
+            consumptionType = consumptionType,
         )
     }
 

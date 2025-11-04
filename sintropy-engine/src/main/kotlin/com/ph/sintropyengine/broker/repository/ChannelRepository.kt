@@ -2,8 +2,11 @@ package com.ph.sintropyengine.broker.repository
 
 import com.ph.sintropyengine.broker.model.Channel
 import com.ph.sintropyengine.broker.model.ChannelType
+import com.ph.sintropyengine.broker.model.ChannelType.*
+import com.ph.sintropyengine.broker.model.ConsumptionType
 import com.ph.sintropyengine.jooq.generated.Tables.CHANNELS
-import com.ph.sintropyengine.jooq.generated.Tables.ROUTING_KEY
+import com.ph.sintropyengine.jooq.generated.Tables.QUEUES
+import com.ph.sintropyengine.jooq.generated.Tables.ROUTING_KEYS
 import jakarta.enterprise.context.ApplicationScoped
 import java.util.UUID
 import org.jooq.DSLContext
@@ -24,25 +27,36 @@ class ChannelRepository(
 
         // TODO: ths can be solved with context.batch([...items])
         var routingKeysInsertStatement =
-            context.insertInto(ROUTING_KEY, ROUTING_KEY.ROUTING_KEY_, ROUTING_KEY.CHANNEL_ID)
+            context.insertInto(ROUTING_KEYS, ROUTING_KEYS.ROUTING_KEY, ROUTING_KEYS.CHANNEL_ID)
         channel.routingKeys
             .forEach {
                 routingKeysInsertStatement = routingKeysInsertStatement.values(it, channelRecord?.channelId)
             }
         val routingKeyRecords = routingKeysInsertStatement.returning().fetch()
 
+        val queueRecord = if (channel.channelType == QUEUE) {
+            context.insertInto(QUEUES, QUEUES.CHANNEL_ID, QUEUES.CONSUMPTION_TYPE)
+                .values(
+                    channelId,
+                    channel.consumptionType?.toDBEnum()
+                        ?: throw IllegalStateException("Channel type is QUEUE, but not consumption type is provided")
+                ).returning().fetchOne()
+        } else null
+
         return Channel(
             channelId = channelRecord!!.channelId,
             name = channelRecord.name,
             channelType = channelRecord.channelType.toDomainEnum(),
-            routingKeys = routingKeyRecords.map { it.routingKey }
+            routingKeys = routingKeyRecords.map { it.routingKey },
+            consumptionType = queueRecord?.consumptionType?.toDomainEnum(),
         )
     }
 
     fun findById(id: UUID): Channel? {
-        val records = context.select(CHANNELS.asterisk(), ROUTING_KEY.ROUTING_KEY_)
+        val records = context.select(CHANNELS.asterisk(), ROUTING_KEYS.ROUTING_KEY, QUEUES.CONSUMPTION_TYPE)
             .from(CHANNELS)
-            .leftJoin(ROUTING_KEY).on(CHANNELS.CHANNEL_ID.eq(ROUTING_KEY.CHANNEL_ID))
+            .leftJoin(ROUTING_KEYS).on(CHANNELS.CHANNEL_ID.eq(ROUTING_KEYS.CHANNEL_ID))
+            .leftJoin(QUEUES).on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
             .where(CHANNELS.CHANNEL_ID.eq(id))
             .fetch()
 
@@ -50,9 +64,10 @@ class ChannelRepository(
     }
 
     fun findByName(name: String): Channel? {
-        val records = context.select(CHANNELS.asterisk(), ROUTING_KEY.ROUTING_KEY_)
+        val records = context.select(CHANNELS.asterisk(), ROUTING_KEYS.ROUTING_KEY, QUEUES.CONSUMPTION_TYPE)
             .from(CHANNELS)
-            .leftJoin(ROUTING_KEY).on(CHANNELS.CHANNEL_ID.eq(ROUTING_KEY.CHANNEL_ID))
+            .leftJoin(ROUTING_KEYS).on(CHANNELS.CHANNEL_ID.eq(ROUTING_KEYS.CHANNEL_ID))
+            .leftJoin(QUEUES).on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
             .where(CHANNELS.NAME.eq(name))
             .fetch()
 
@@ -60,8 +75,12 @@ class ChannelRepository(
     }
 
     fun delete(channelId: UUID) {
-        context.delete(ROUTING_KEY)
-            .where(ROUTING_KEY.CHANNEL_ID.eq(channelId))
+        context.delete(ROUTING_KEYS)
+            .where(ROUTING_KEYS.CHANNEL_ID.eq(channelId))
+            .execute()
+
+        context.deleteFrom(QUEUES)
+            .where(QUEUES.CHANNEL_ID.eq(channelId))
             .execute()
 
         context.delete(CHANNELS)
@@ -70,13 +89,14 @@ class ChannelRepository(
     }
 
     fun addRoutingKey(channelId: UUID, routingKey: String) {
-        context.insertInto(ROUTING_KEY, ROUTING_KEY.ROUTING_KEY_, ROUTING_KEY.CHANNEL_ID)
+        context.insertInto(ROUTING_KEYS, ROUTING_KEYS.ROUTING_KEY, ROUTING_KEYS.CHANNEL_ID)
             .values(routingKey, channelId)
             .execute()
     }
 
     fun deleteAll() {
-        context.deleteFrom(ROUTING_KEY).execute()
+        context.deleteFrom(ROUTING_KEYS).execute()
+        context.deleteFrom(QUEUES).execute()
         context.deleteFrom(CHANNELS).execute()
     }
 
@@ -88,10 +108,22 @@ class ChannelRepository(
                 channelId = key.first,
                 name = key.second,
                 channelType = key.third.toDomainEnum(),
-                routingKeys = rows.map { it[ROUTING_KEY.ROUTING_KEY_] }.toMutableList()
+                routingKeys = rows.map { it[ROUTING_KEYS.ROUTING_KEY] }.toMutableList(),
+                consumptionType =
+                    if (key.third.toDomainEnum() == QUEUE)
+                        rows.map { it[QUEUES.CONSUMPTION_TYPE] }.first().toDomainEnum()
+                    else null
             )
         }.firstOrNull()
     }
+}
+
+private fun ConsumptionType.toDBEnum(): com.ph.sintropyengine.jooq.generated.enums.ConsumptionType {
+    return com.ph.sintropyengine.jooq.generated.enums.ConsumptionType.valueOf(this.toString())
+}
+
+private fun com.ph.sintropyengine.jooq.generated.enums.ConsumptionType.toDomainEnum(): ConsumptionType {
+    return ConsumptionType.valueOf(this.toString())
 }
 
 private fun ChannelType.toDBEnum(): com.ph.sintropyengine.jooq.generated.enums.ChannelType {

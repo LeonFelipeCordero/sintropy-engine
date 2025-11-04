@@ -17,14 +17,12 @@ class ConsumerStreaming {
     private lateinit var connectionRouter: ConnectionRouter
 
     @OnOpen(broadcast = true)
-    suspend fun onOpen(webSocketConnection: WebSocketConnection): String {
+    suspend fun onOpen(webSocketConnection: WebSocketConnection) {
         val channelName = webSocketConnection.pathParam("channelName")
         val routingKey = webSocketConnection.pathParam("routingKey")
         connectionRouter.add(webSocketConnection.id(), channelName, routingKey)
 
         logger.info { "Consumer streaming started for connection ${webSocketConnection.id()}" }
-
-        return "ready"
     }
 
     @OnClose

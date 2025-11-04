@@ -12,7 +12,8 @@ import com.ph.sintropyengine.jooq.generated.tables.Consumers.ConsumersPath;
 import com.ph.sintropyengine.jooq.generated.tables.EventLog.EventLogPath;
 import com.ph.sintropyengine.jooq.generated.tables.Messages.MessagesPath;
 import com.ph.sintropyengine.jooq.generated.tables.Producers.ProducersPath;
-import com.ph.sintropyengine.jooq.generated.tables.RoutingKey.RoutingKeyPath;
+import com.ph.sintropyengine.jooq.generated.tables.Queues.QueuesPath;
+import com.ph.sintropyengine.jooq.generated.tables.RoutingKeys.RoutingKeysPath;
 import com.ph.sintropyengine.jooq.generated.tables.records.ChannelsRecord;
 
 import java.time.OffsetDateTime;
@@ -219,17 +220,30 @@ public class Channels extends TableImpl<ChannelsRecord> {
         return _producers;
     }
 
-    private transient RoutingKeyPath _routingKey;
+    private transient QueuesPath _queues;
 
     /**
-     * Get the implicit to-many join path to the <code>public.routing_key</code>
+     * Get the implicit to-many join path to the <code>public.queues</code>
      * table
      */
-    public RoutingKeyPath routingKey() {
-        if (_routingKey == null)
-            _routingKey = new RoutingKeyPath(this, null, Keys.ROUTING_KEY__ROUTING_KEY_CHANNEL_ID_FKEY.getInverseKey());
+    public QueuesPath queues() {
+        if (_queues == null)
+            _queues = new QueuesPath(this, null, Keys.QUEUES__QUEUES_CHANNEL_ID_FKEY.getInverseKey());
 
-        return _routingKey;
+        return _queues;
+    }
+
+    private transient RoutingKeysPath _routingKeys;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.routing_keys</code> table
+     */
+    public RoutingKeysPath routingKeys() {
+        if (_routingKeys == null)
+            _routingKeys = new RoutingKeysPath(this, null, Keys.ROUTING_KEYS__ROUTING_KEYS_CHANNEL_ID_FKEY.getInverseKey());
+
+        return _routingKeys;
     }
 
     @Override

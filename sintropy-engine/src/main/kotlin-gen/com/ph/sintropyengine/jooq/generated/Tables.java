@@ -9,7 +9,8 @@ import com.ph.sintropyengine.jooq.generated.tables.Consumers;
 import com.ph.sintropyengine.jooq.generated.tables.EventLog;
 import com.ph.sintropyengine.jooq.generated.tables.Messages;
 import com.ph.sintropyengine.jooq.generated.tables.Producers;
-import com.ph.sintropyengine.jooq.generated.tables.RoutingKey;
+import com.ph.sintropyengine.jooq.generated.tables.Queues;
+import com.ph.sintropyengine.jooq.generated.tables.RoutingKeys;
 
 
 /**
@@ -44,7 +45,12 @@ public class Tables {
     public static final Producers PRODUCERS = Producers.PRODUCERS;
 
     /**
-     * The table <code>public.routing_key</code>.
+     * The table <code>public.queues</code>.
      */
-    public static final RoutingKey ROUTING_KEY = RoutingKey.ROUTING_KEY;
+    public static final Queues QUEUES = Queues.QUEUES;
+
+    /**
+     * The table <code>public.routing_keys</code>.
+     */
+    public static final RoutingKeys ROUTING_KEYS = RoutingKeys.ROUTING_KEYS;
 }

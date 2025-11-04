@@ -19,9 +19,9 @@ quarkus:
     migrate-at-start: true
   jooq:
     dialect: POSTGRES
-http:
-  port: 8080
+  http:
+    port: 8080
 
 syen:
   feature-flags:
-    with-full-replication: false
+    with-full-replication: true

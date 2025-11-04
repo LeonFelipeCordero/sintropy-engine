@@ -1,6 +1,7 @@
 package com.ph.sintropyengine.broker.resource
 
 import com.ph.sintropyengine.broker.model.ChannelType
+import com.ph.sintropyengine.broker.model.ConsumptionType
 import com.ph.sintropyengine.broker.service.ChannelService
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
@@ -17,12 +18,18 @@ class ChannelResource(
     data class CreateChannelRequest(
         val name: String,
         val channelType: ChannelType,
-        val routingKeys: List<String>
+        val routingKeys: List<String>,
+        val consumptionType: ConsumptionType?,
     )
 
     @POST
     fun createChannel(request: CreateChannelRequest): Response {
-        val channel = channelService.createChannel(request.name, request.channelType, request.routingKeys)
+        val channel = channelService.createChannel(
+            name = request.name,
+            channelType = request.channelType,
+            routingKeys = request.routingKeys,
+            consumptionType = request.consumptionType
+        )
         return Response.status(Response.Status.CREATED).entity(channel).build()
     }
 

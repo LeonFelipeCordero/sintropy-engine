@@ -4,25 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.Fixtures.DEFAULT_ROUTING_KEY
 import com.ph.sintropyengine.IntegrationTestBase
-import com.ph.sintropyengine.TestWithFullReplicationProfile
 import com.ph.sintropyengine.broker.model.Channel
 import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.broker.service.ConnectionRouter
 import com.ph.sintropyengine.utils.Patterns.routing
 import io.quarkus.test.junit.QuarkusTest
-import io.quarkus.test.junit.TestProfile
 import io.quarkus.websockets.next.BasicWebSocketConnector
 import jakarta.inject.Inject
 import java.net.URI
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
-@TestProfile(TestWithFullReplicationProfile::class)
 class ConsumerStreamingTest : IntegrationTestBase() {
 
     @Inject
@@ -75,7 +73,7 @@ class ConsumerStreamingTest : IntegrationTestBase() {
             .onTextMessage { _, _ ->
                 latch.countDown()
             }
-            .onClose {  _, _ ->
+            .onClose { _, _ ->
                 closeLatch.countDown()
             }
             .connectAndAwait()
@@ -93,7 +91,6 @@ class ConsumerStreamingTest : IntegrationTestBase() {
     @Test
     fun `should receive notifications on every message`() = runTest {
         val latch = CountDownLatch(5)
-        val initialLatch = CountDownLatch(1)
         val producer = createProducer(channel)
 
         val receivedMessages = mutableListOf<Message>()
@@ -102,16 +99,12 @@ class ConsumerStreamingTest : IntegrationTestBase() {
             .baseUri(streamingUri)
             .executionModel(BasicWebSocketConnector.ExecutionModel.NON_BLOCKING)
             .onTextMessage { _, message ->
-                if (initialLatch.count > 0) {
-                    initialLatch.countDown()
-                } else {
-                   receivedMessages.add(objectMapper.readValue(message, Message::class.java))
-                    latch.countDown()
-                }
+                receivedMessages.add(objectMapper.readValue(message, Message::class.java))
+                latch.countDown()
             }
             .connectAndAwait()
 
-        initialLatch.await()
+        delay(1000)
 
         sentMessages.add(
             producerService.publishMessage(Fixtures.createMessage(channel.channelId!!, producer.producerId!!))

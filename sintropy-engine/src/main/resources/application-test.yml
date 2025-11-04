@@ -1,0 +1,8 @@
+quarkus:
+  log:
+    console:
+      level: INFO
+
+#syen:
+#  feature-flags:
+#    with-full-replication: false

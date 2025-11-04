@@ -1,6 +1,6 @@
 package com.ph.sintropyengine.broker.resource
 
-import com.ph.sintropyengine.broker.model.ChannelType
+import com.ph.sintropyengine.broker.model.ConsumptionType
 import com.ph.sintropyengine.broker.service.ChannelService
 import com.ph.sintropyengine.broker.service.PollingFifoQueue
 import com.ph.sintropyengine.broker.service.PollingStandardQueue
@@ -31,9 +31,15 @@ class QueueResource(
         val channel = channelService.findByName(request.channelName)
             ?: return Response.status(Response.Status.NOT_FOUND).entity("Channel not found").build()
 
-        val messages = when (channel.channelType) {
-            ChannelType.FIFO -> pollingFifoQueue.poll(channel.channelId!!, request.routingKey, request.pollingCount)
-            ChannelType.STANDARD -> pollingStandardQueue.poll(channel.channelId!!, request.routingKey, request.pollingCount)
+        // TODO this should be done in the service
+        val consumptionType = channel.getConsumptionOrFail()
+        val messages = when (consumptionType) {
+            ConsumptionType.FIFO -> pollingFifoQueue.poll(channel.channelId!!, request.routingKey, request.pollingCount)
+            ConsumptionType.STANDARD -> pollingStandardQueue.poll(
+                channel.channelId!!,
+                request.routingKey,
+                request.pollingCount
+            )
         }
 
         return Response.ok(messages).build()

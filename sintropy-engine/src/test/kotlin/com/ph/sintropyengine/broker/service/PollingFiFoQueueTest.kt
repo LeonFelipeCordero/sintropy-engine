@@ -2,7 +2,7 @@ package com.ph.sintropyengine.broker.service
 
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
-import com.ph.sintropyengine.broker.model.ChannelType.*
+import com.ph.sintropyengine.broker.model.ConsumptionType.*
 import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.utils.Patterns.routing
 import io.quarkus.test.junit.QuarkusTest
@@ -37,7 +37,7 @@ class PollingFifoQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should queue a message and poll`() {
-        val message = publishMessage(channelType = FIFO)
+        val message = publishMessage(consumptionType = FIFO)
 
         val polledMessage = pollingQueue.poll(message.channelId, message.routingKey)
 

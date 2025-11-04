@@ -2,6 +2,7 @@ package com.ph.sintropyengine.broker.service
 
 import com.ph.sintropyengine.broker.model.Channel
 import com.ph.sintropyengine.broker.model.ChannelType
+import com.ph.sintropyengine.broker.model.ConsumptionType
 import com.ph.sintropyengine.broker.repository.ChannelRepository
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
@@ -13,7 +14,12 @@ class ChannelService(
 ) {
 
     @Transactional
-    fun createChannel(name: String, channelType: ChannelType, routingKeys: List<String>): Channel {
+    fun createChannel(
+        name: String,
+        channelType: ChannelType,
+        routingKeys: List<String>,
+        consumptionType: ConsumptionType? = null
+    ): Channel {
         require(routingKeys.isNotEmpty()) { "At least one routing key must be provided" }
 
         channelRepository.findByName(name)
@@ -23,7 +29,7 @@ class ChannelService(
             name = name,
             channelType = channelType,
             routingKeys = routingKeys.toMutableList(),
-            consumers = emptyList()
+            consumptionType = consumptionType
         )
         return channelRepository.save(channel)
     }

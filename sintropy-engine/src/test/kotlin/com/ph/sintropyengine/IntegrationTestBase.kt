@@ -3,6 +3,8 @@ package com.ph.sintropyengine
 import com.ph.sintropyengine.broker.model.Channel
 import com.ph.sintropyengine.broker.model.ChannelType
 import com.ph.sintropyengine.broker.model.ChannelType.*
+import com.ph.sintropyengine.broker.model.ConsumptionType
+import com.ph.sintropyengine.broker.model.ConsumptionType.*
 import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.broker.model.Producer
 import com.ph.sintropyengine.broker.repository.ChannelRepository
@@ -14,6 +16,7 @@ import com.ph.sintropyengine.broker.service.ProducerService
 import com.ph.sintropyengine.utils.Patterns.routing
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.quarkus.test.common.QuarkusTestResource
+import io.quarkus.test.junit.TestProfile
 import jakarta.inject.Inject
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -23,7 +26,7 @@ import kotlinx.coroutines.delay
 private val logger = KotlinLogging.logger {}
 
 @QuarkusTestResource(PostgresqlDBTestResource::class)
-abstract class IntegrationTestBase {
+open class IntegrationTestBase {
 
     @Inject
     protected lateinit var messageRepository: MessageRepository
@@ -59,8 +62,11 @@ abstract class IntegrationTestBase {
     /**
      * Create a new channel with unique IDs
      */
-    protected fun createChannel(channelType: ChannelType = STANDARD): Channel {
-        val channel = Fixtures.createChannel(channelType = channelType)
+    protected fun createChannel(
+        channelType: ChannelType = QUEUE,
+        consumptionType: ConsumptionType = STANDARD
+    ): Channel {
+        val channel = Fixtures.createChannel(channelType=channelType, consumptionType = consumptionType)
         return channelRepository.save(channel)
     }
 
@@ -73,8 +79,8 @@ abstract class IntegrationTestBase {
     /**
      * Create a new channel and a new producer with unique IDs
      */
-    protected fun createChannelWithProducer(channelType: ChannelType = STANDARD): Pair<Channel, Producer> {
-        val channel = createChannel(channelType = channelType)
+    protected fun createChannelWithProducer(consumptionType: ConsumptionType = STANDARD): Pair<Channel, Producer> {
+        val channel = createChannel(consumptionType = consumptionType)
         val producer = createProducer(channel)
         return Pair(channel, producer)
     }
@@ -103,8 +109,8 @@ abstract class IntegrationTestBase {
      * Publishes a messages to freshly created channels from freshly created producers
      * Each new entry created have a unique ID
      */
-    protected fun publishMessage(channelType: ChannelType = STANDARD): Message {
-        val (channel, producer) = createChannelWithProducer(channelType = channelType)
+    protected fun publishMessage(consumptionType: ConsumptionType = STANDARD): Message {
+        val (channel, producer) = createChannelWithProducer(consumptionType = consumptionType)
 
         return messageRepository.save(
             Fixtures.createMessage(
@@ -189,21 +195,20 @@ abstract class IntegrationTestBase {
     protected fun createTestData(): TestData {
         val channel1 = channelRepository.save(
             Fixtures.createChannel(
-                channelType = FIFO,
-
-                routingKeys = mutableListOf("test.1.0", "test.1.1", "test.1.2")
+                consumptionType = FIFO,
+                routingKeys = mutableListOf("test.1.0", "test.1.1", "test.1.2"),
             )
         )
         val channel2 = channelRepository.save(
             Fixtures.createChannel(
-                channelType = FIFO,
-                routingKeys = mutableListOf("test.2.0", "test.2.1")
+                consumptionType = FIFO,
+                routingKeys = mutableListOf("test.2.0", "test.2.1"),
             )
         )
         val channel3 = channelRepository.save(
             Fixtures.createChannel(
-                channelType = FIFO,
-                routingKeys = mutableListOf("test.3.0")
+                consumptionType = FIFO,
+                routingKeys = mutableListOf("test.3.0"),
             )
         )
         val producer1 = producerRepository.save(Fixtures.createProducer(channel1.channelId!!))

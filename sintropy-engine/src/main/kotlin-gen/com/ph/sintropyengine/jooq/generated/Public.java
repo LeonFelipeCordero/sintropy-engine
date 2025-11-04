@@ -9,7 +9,8 @@ import com.ph.sintropyengine.jooq.generated.tables.Consumers;
 import com.ph.sintropyengine.jooq.generated.tables.EventLog;
 import com.ph.sintropyengine.jooq.generated.tables.Messages;
 import com.ph.sintropyengine.jooq.generated.tables.Producers;
-import com.ph.sintropyengine.jooq.generated.tables.RoutingKey;
+import com.ph.sintropyengine.jooq.generated.tables.Queues;
+import com.ph.sintropyengine.jooq.generated.tables.RoutingKeys;
 
 import java.util.Arrays;
 import java.util.List;
@@ -58,9 +59,14 @@ public class Public extends SchemaImpl {
     public final Producers PRODUCERS = Producers.PRODUCERS;
 
     /**
-     * The table <code>public.routing_key</code>.
+     * The table <code>public.queues</code>.
      */
-    public final RoutingKey ROUTING_KEY = RoutingKey.ROUTING_KEY;
+    public final Queues QUEUES = Queues.QUEUES;
+
+    /**
+     * The table <code>public.routing_keys</code>.
+     */
+    public final RoutingKeys ROUTING_KEYS = RoutingKeys.ROUTING_KEYS;
 
     /**
      * No further instances allowed
@@ -83,7 +89,8 @@ public class Public extends SchemaImpl {
             EventLog.EVENT_LOG,
             Messages.MESSAGES,
             Producers.PRODUCERS,
-            RoutingKey.ROUTING_KEY
+            Queues.QUEUES,
+            RoutingKeys.ROUTING_KEYS
         );
     }
 }
