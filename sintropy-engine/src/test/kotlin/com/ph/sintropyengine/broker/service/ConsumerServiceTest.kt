@@ -1,13 +1,9 @@
 package com.ph.sintropyengine.broker.service
 
-import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
 import io.quarkus.test.junit.QuarkusTest
 import jakarta.inject.Inject
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

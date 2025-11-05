@@ -1,7 +1,7 @@
 quarkus:
   log:
     console:
-      level: INFO
+      level: DEBUG
 
 #syen:
 #  feature-flags:

@@ -25,7 +25,7 @@ import kotlinx.coroutines.delay
 
 private val logger = KotlinLogging.logger {}
 
-@QuarkusTestResource(PostgresqlDBTestResource::class)
+//@QuarkusTestResource(PostgresqlDBTestResource::class)
 open class IntegrationTestBase {
 
     @Inject

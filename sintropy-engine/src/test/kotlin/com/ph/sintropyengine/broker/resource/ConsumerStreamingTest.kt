@@ -2,25 +2,29 @@ package com.ph.sintropyengine.broker.resource
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ph.sintropyengine.Fixtures
-import com.ph.sintropyengine.Fixtures.DEFAULT_ROUTING_KEY
 import com.ph.sintropyengine.IntegrationTestBase
+import com.ph.sintropyengine.TestWithFullReplicationProfile
 import com.ph.sintropyengine.broker.model.Channel
+import com.ph.sintropyengine.broker.model.ChannelType
 import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.broker.service.ConnectionRouter
 import com.ph.sintropyengine.utils.Patterns.routing
 import io.quarkus.test.junit.QuarkusTest
+import io.quarkus.test.junit.TestProfile
 import io.quarkus.websockets.next.BasicWebSocketConnector
 import jakarta.inject.Inject
 import java.net.URI
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
+@TestProfile(TestWithFullReplicationProfile::class)
 class ConsumerStreamingTest : IntegrationTestBase() {
 
     @Inject
@@ -39,8 +43,8 @@ class ConsumerStreamingTest : IntegrationTestBase() {
     fun setUp() {
         clean()
 
-        channel = createChannel()
-        streamingUri = URI.create("ws://localhost:8081/ws/streaming/${channel.name}/${DEFAULT_ROUTING_KEY}")
+        channel = createChannel(channelType = ChannelType.STREAM)
+        streamingUri = URI.create("ws://localhost:8081/ws/streaming/${channel.name}/${Fixtures.DEFAULT_ROUTING_KEY}")
     }
 
     @Test
@@ -57,9 +61,9 @@ class ConsumerStreamingTest : IntegrationTestBase() {
 
         latch.await(1, TimeUnit.SECONDS)
 
-        val connections = connectionRouter.getByRoutingKey(channel.routing(DEFAULT_ROUTING_KEY))
+        val connections = connectionRouter.getByRoutingKey(channel.routing(Fixtures.DEFAULT_ROUTING_KEY))
 
-        assertThat(connections).hasSize(1)
+        Assertions.assertThat(connections).hasSize(1)
     }
 
     @Test
@@ -83,9 +87,9 @@ class ConsumerStreamingTest : IntegrationTestBase() {
         connection.closeAndAwait()
         closeLatch.await(1, TimeUnit.SECONDS)
 
-        val connections = connectionRouter.getByRoutingKey(channel.routing(DEFAULT_ROUTING_KEY))
+        val connections = connectionRouter.getByRoutingKey(channel.routing(Fixtures.DEFAULT_ROUTING_KEY))
 
-        assertThat(connections).hasSize(0)
+        Assertions.assertThat(connections).hasSize(0)
     }
 
     @Test
@@ -103,8 +107,6 @@ class ConsumerStreamingTest : IntegrationTestBase() {
                 latch.countDown()
             }
             .connectAndAwait()
-
-        delay(1000)
 
         sentMessages.add(
             producerService.publishMessage(Fixtures.createMessage(channel.channelId!!, producer.producerId!!))
@@ -124,7 +126,61 @@ class ConsumerStreamingTest : IntegrationTestBase() {
 
         latch.await()
 
-        assertThat(receivedMessages).hasSize(5)
-        assertThat(sentMessages).usingRecursiveComparison().isEqualTo(receivedMessages)
+        Assertions.assertThat(receivedMessages).hasSize(5)
+        Assertions.assertThat(sentMessages).usingRecursiveComparison().isEqualTo(receivedMessages)
+    }
+
+    @Test
+    fun `should get a message and it should not be in message table and should be processed in event log`() = runTest {
+        val latch = CountDownLatch(5)
+        val producer = createProducer(channel)
+
+        val receivedMessages = mutableListOf<Message>()
+        val sentMessages = mutableListOf<Message>()
+        basicWebSocketConnector
+            .baseUri(streamingUri)
+            .executionModel(BasicWebSocketConnector.ExecutionModel.NON_BLOCKING)
+            .onTextMessage { _, message ->
+                receivedMessages.add(objectMapper.readValue(message, Message::class.java))
+                latch.countDown()
+            }
+            .connectAndAwait()
+
+        sentMessages.add(
+            producerService.publishMessage(Fixtures.createMessage(channel.channelId!!, producer.producerId!!))
+        )
+        sentMessages.add(
+            producerService.publishMessage(Fixtures.createMessage(channel.channelId!!, producer.producerId))
+        )
+        sentMessages.add(
+            producerService.publishMessage(Fixtures.createMessage(channel.channelId!!, producer.producerId))
+        )
+        sentMessages.add(
+            producerService.publishMessage(Fixtures.createMessage(channel.channelId!!, producer.producerId))
+        )
+        sentMessages.add(
+            producerService.publishMessage(Fixtures.createMessage(channel.channelId!!, producer.producerId))
+        )
+
+        latch.await()
+
+        val wait = launch {
+            repeat(5) {
+                val messages = messageRepository.findAll()
+                if (messages.isNotEmpty()) {
+                    delay(1000)
+                } else {
+                    return@repeat
+                }
+            }
+       }
+        wait.join()
+
+        val messages = messageRepository.findAll()
+        Assertions.assertThat(messages).hasSize(0)
+
+        val evetLogs = messageRepository.findAllEventLog()
+        Assertions.assertThat(evetLogs).hasSize(5)
+        Assertions.assertThat(evetLogs.map { it.processed }.toSet().first()).isTrue
     }
 }

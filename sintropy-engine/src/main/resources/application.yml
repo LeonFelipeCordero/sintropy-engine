@@ -7,8 +7,7 @@ quarkus:
   log:
     console:
       format: '%d{yyyy-MM-dd HH:mm:ss} %-5p [%c] (%t) %s%e%n'
-      level: INFO
-      json: false
+    level: INFO
   datasource:
     username: postgres
     password: postgres
@@ -24,4 +23,9 @@ quarkus:
 
 syen:
   feature-flags:
-    with-full-replication: true
+    with-full-replication: false
+
+"%test":
+  quarkus:
+    log:
+      level: DEBUG

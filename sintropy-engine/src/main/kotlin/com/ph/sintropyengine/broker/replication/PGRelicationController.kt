@@ -1,9 +1,13 @@
 package com.ph.sintropyengine.broker.replication
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.ph.sintropyengine.broker.model.ChannelType
+import com.ph.sintropyengine.broker.repository.MessageRepository
+import com.ph.sintropyengine.broker.service.ChannelService
 import com.ph.sintropyengine.broker.service.ConnectionRouter
 import com.ph.sintropyengine.utils.Patterns.routing
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.quarkus.narayana.jta.QuarkusTransaction
 import io.quarkus.runtime.Startup
 import io.quarkus.websockets.next.OpenConnections
 import io.smallrye.mutiny.coroutines.awaitSuspending
@@ -22,7 +26,9 @@ private val logger = KotlinLogging.logger {}
 class PGReplicationController(
     private val pgReplicationConsumerFactory: PGReplicationConsumerFactory,
     private val connectionRouter: ConnectionRouter,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val messageRepository: MessageRepository,
+    private val channelService: ChannelService
 ) {
 
     @Inject
@@ -42,16 +48,32 @@ class PGReplicationController(
             while (true) {
                 val message = replicationConsumer.channel().receive()
 
+                val channel = channelService.findById(message.channelId)
+                    ?: throw IllegalStateException("No channel found for ${message.channelId}")
+
+                if (channel.channelType == ChannelType.QUEUE) {
+                    logger.debug { "Skipping message ${message.messageId} because channel is for queue polling" }
+                    continue
+                }
+
                 val connections = connectionRouter.getByRoutingKey(message.routing())
 
                 // TODO: Create it's out response and catch global exemption to keep coroutine running
+                // TODO: Different object to stream back
                 openConnections
                     .filter { connections.contains(it.id()) }
                     .forEach {
                         val messageString = objectMapper.writeValueAsString(message)
                         it.sendText(messageString).awaitSuspending()
-                        logger.info { "message sent ${message.routing()}: $message" }
+                        logger.debug { "message sent ${message.routing()}: $message" }
                     }
+
+                launch {
+                    QuarkusTransaction.requiringNew().run {
+                        messageRepository.dequeue(message.messageId)
+                        logger.debug { "Removed message ${message.routing()}: $message" }
+                    }
+                }
             }
         }
     }
