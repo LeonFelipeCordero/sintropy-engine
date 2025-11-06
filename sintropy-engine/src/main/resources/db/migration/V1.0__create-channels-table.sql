@@ -3,7 +3,7 @@ create cast (varchar as channel_type) with inout as implicit;
 
 create table channels
 (
-    channel_id   uuid         not null primary key,
+    channel_id   uuid         not null default gen_random_uuid() primary key,
     name         varchar(256) not null,
     channel_type channel_type not null,
 

@@ -63,7 +63,7 @@ public class Consumers extends TableImpl<ConsumersRecord> {
     /**
      * The column <code>public.consumers.consumer_id</code>.
      */
-    public final TableField<ConsumersRecord, UUID> CONSUMER_ID = createField(DSL.name("consumer_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<ConsumersRecord, UUID> CONSUMER_ID = createField(DSL.name("consumer_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.consumers.channel_id</code>.

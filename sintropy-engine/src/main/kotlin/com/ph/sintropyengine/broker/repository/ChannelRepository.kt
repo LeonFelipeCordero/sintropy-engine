@@ -19,9 +19,11 @@ class ChannelRepository(
 ) {
 
     fun save(channel: Channel): Channel {
-        val channelId = UUID.randomUUID()
-        val channelRecord = context.insertInto(CHANNELS, CHANNELS.CHANNEL_ID, CHANNELS.NAME, CHANNELS.CHANNEL_TYPE)
-            .values(channelId, channel.name, channel.channelType.toDBEnum())
+        val channelRecord = context.insertInto(
+            CHANNELS,
+            CHANNELS.NAME,
+            CHANNELS.CHANNEL_TYPE
+        ).values(channel.name, channel.channelType.toDBEnum())
             .returning()
             .fetchOne()
 
@@ -37,7 +39,7 @@ class ChannelRepository(
         val queueRecord = if (channel.channelType == QUEUE) {
             context.insertInto(QUEUES, QUEUES.CHANNEL_ID, QUEUES.CONSUMPTION_TYPE)
                 .values(
-                    channelId,
+                    channelRecord?.channelId,
                     channel.consumptionType?.toDBEnum()
                         ?: throw IllegalStateException("Channel type is QUEUE, but not consumption type is provided")
                 ).returning().fetchOne()

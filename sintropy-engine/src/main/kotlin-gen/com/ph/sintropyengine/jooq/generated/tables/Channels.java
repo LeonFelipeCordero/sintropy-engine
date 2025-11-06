@@ -69,7 +69,7 @@ public class Channels extends TableImpl<ChannelsRecord> {
     /**
      * The column <code>public.channels.channel_id</code>.
      */
-    public final TableField<ChannelsRecord, UUID> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<ChannelsRecord, UUID> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.channels.name</code>.

@@ -1,6 +1,6 @@
 create table consumers
 (
-    consumer_id     uuid                     not null primary key,
+    consumer_id     uuid                     not null default gen_random_uuid() primary key,
     channel_id      uuid                     not null references channels (channel_id),
     routing_key     varchar(128)             not null,
 

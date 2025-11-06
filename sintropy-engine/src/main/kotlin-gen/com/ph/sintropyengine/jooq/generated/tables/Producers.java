@@ -65,7 +65,7 @@ public class Producers extends TableImpl<ProducersRecord> {
     /**
      * The column <code>public.producers.producer_id</code>.
      */
-    public final TableField<ProducersRecord, UUID> PRODUCER_ID = createField(DSL.name("producer_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<ProducersRecord, UUID> PRODUCER_ID = createField(DSL.name("producer_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.producers.name</code>.

@@ -13,9 +13,11 @@ class ProducerRepository(
 ) {
 
     fun save(producer: Producer): Producer {
-        val producerId = UUID.randomUUID()
-        return context.insertInto(PRODUCERS, PRODUCERS.PRODUCER_ID, PRODUCERS.NAME, PRODUCERS.CHANNEL_ID)
-            .values(producerId, producer.name, producer.channelId)
+        return context.insertInto(
+            PRODUCERS,
+            PRODUCERS.NAME,
+            PRODUCERS.CHANNEL_ID
+        ).values(producer.name, producer.channelId)
             .returning()
             .fetchOneInto(Producer::class.java)
             ?: throw IllegalStateException("Something went wrong creating a new Producer")
