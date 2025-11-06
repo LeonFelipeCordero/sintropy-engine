@@ -16,9 +16,7 @@ import com.ph.sintropyengine.broker.service.ProducerService
 import com.ph.sintropyengine.utils.Patterns.routing
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.quarkus.test.common.QuarkusTestResource
-import io.quarkus.test.junit.TestProfile
 import jakarta.inject.Inject
-import java.time.OffsetDateTime
 import java.util.UUID
 import kotlin.random.Random
 import kotlinx.coroutines.delay
@@ -66,7 +64,7 @@ open class IntegrationTestBase {
         channelType: ChannelType = QUEUE,
         consumptionType: ConsumptionType = STANDARD
     ): Channel {
-        val channel = Fixtures.createChannel(channelType=channelType, consumptionType = consumptionType)
+        val channel = Fixtures.createChannel(channelType = channelType, consumptionType = consumptionType)
         return channelRepository.save(channel)
     }
 
@@ -93,14 +91,12 @@ open class IntegrationTestBase {
         channel: Channel,
         producer: Producer,
         routingKey: String = channel.routingKeys.first(),
-        timestamp: OffsetDateTime = OffsetDateTime.now()
     ): Message {
         return messageRepository.save(
             Fixtures.createMessage(
                 channelId = channel.channelId!!,
                 producerId = producer.producerId!!,
                 routingKey = routingKey,
-                timestamp = timestamp
             )
         )
     }
@@ -124,22 +120,22 @@ open class IntegrationTestBase {
     protected fun launchProducers(testData: TestData) {
         logger.debug { "launching new producer..." }
         val message = when (Random.nextInt(1, 4)) {
-            1 -> Fixtures.createMessage(
-                channelId = testData.channel1().channelId!!,
+            1 -> Fixtures.createMessageRequest(
+                channelName = testData.channel1().name,
                 routingKey = testData.channel1().routingKeys[Random.nextInt(0, 3)],
-                producerId = testData.producer1().producerId!!,
+                producerName = testData.producer1().name,
             )
 
-            2 -> Fixtures.createMessage(
-                channelId = testData.channel2().channelId!!,
+            2 -> Fixtures.createMessageRequest(
+                channelName = testData.channel2().name,
                 routingKey = testData.channel2().routingKeys[Random.nextInt(0, 2)],
-                producerId = testData.producer2().producerId!!
+                producerName = testData.producer2().name
             )
 
-            3 -> Fixtures.createMessage(
-                channelId = testData.channel3().channelId!!,
+            3 -> Fixtures.createMessageRequest(
+                channelName = testData.channel3().name,
                 routingKey = testData.channel3().routingKeys.first(),
-                producerId = testData.producer3().producerId!!
+                producerName = testData.producer3().name
             )
 
             else -> {

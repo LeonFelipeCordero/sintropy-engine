@@ -4,10 +4,12 @@ import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.broker.model.Producer
 import com.ph.sintropyengine.broker.repository.MessageRepository
 import com.ph.sintropyengine.broker.repository.ProducerRepository
+import com.ph.sintropyengine.broker.resource.PublishMessageRequest
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 import java.lang.IllegalStateException
 import java.util.UUID
+import org.jooq.JSONB
 
 @ApplicationScoped
 class ProducerService(
@@ -39,16 +41,27 @@ class ProducerService(
         } ?: throw IllegalStateException("Consumer $producerId not found")
 
     @Transactional
-    fun publishMessage(message: Message): Message {
-        val channel = channelService.findById(message.channelId)
-            ?: throw IllegalStateException("Channel ${message.channelId} not found")
+    fun publishMessage(request: PublishMessageRequest): Message {
+        val channel = channelService.findByName(request.channelName)
+            ?: throw IllegalStateException("Channel ${request.channelName} not found")
 
-        if (!channel.containsRoutingKey(message.routingKey)) {
+        val producer = producerRepository.findByName(request.producerName)
+            ?: throw IllegalStateException("Producer ${request.producerName} not found")
+
+        if (!channel.containsRoutingKey(request.routingKey)) {
             throw IllegalStateException(
-                "Channel ${message.channelId} does not have routing-key ${message.routingKey}"
+                "Channel ${request.channelName} does not have routing-key ${request.routingKey}"
             )
         }
 
+        val message = Message(
+            messageId = request.messageId,
+            channelId = channel.channelId!!,
+            producerId = producer.producerId!!,
+            routingKey = request.routingKey,
+            message = JSONB.jsonb(request.message),
+            headers = JSONB.jsonb(request.headers)
+        )
         return messageRepository.save(message)
     }
 }

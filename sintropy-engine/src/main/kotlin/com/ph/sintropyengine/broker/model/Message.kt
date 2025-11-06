@@ -10,7 +10,7 @@ import org.jooq.JSONB
 
 data class Message(
     val messageId: UUID,
-    val timestamp: OffsetDateTime,
+    val timestamp: OffsetDateTime? = null,
     val channelId: UUID,
     val producerId: UUID,
     val routingKey: String,

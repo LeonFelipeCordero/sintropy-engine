@@ -26,6 +26,11 @@ class ProducerRepository(
             .where(PRODUCERS.PRODUCER_ID.eq(id))
             .fetchOneInto(Producer::class.java)
 
+    fun findByName(name: String): Producer? =
+        context.selectFrom(PRODUCERS)
+            .where(PRODUCERS.NAME.eq(name))
+            .fetchOneInto(Producer::class.java)
+
     fun findByChannel(channelName: String): List<Producer> =
         context.select(PRODUCERS.asterisk())
             .from(PRODUCERS)

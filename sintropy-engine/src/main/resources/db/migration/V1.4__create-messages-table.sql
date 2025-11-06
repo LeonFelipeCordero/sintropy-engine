@@ -4,7 +4,7 @@ create cast (varchar as message_status_type) with inout as implicit;
 create table messages
 (
     message_id      uuid                not null,
-    timestamp       timestamptz         not null,
+    timestamp       timestamptz         not null default now(),
     channel_id      uuid                not null references channels (channel_id),
     producer_id     uuid                not null references producers (producer_id),
     routing_key     varchar(128)        not null,

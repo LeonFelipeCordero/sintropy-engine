@@ -20,7 +20,6 @@ class MessageRepository(
         context.insertInto(
             MESSAGES,
             MESSAGES.MESSAGE_ID,
-            MESSAGES.TIMESTAMP,
             MESSAGES.CHANNEL_ID,
             MESSAGES.PRODUCER_ID,
             MESSAGES.ROUTING_KEY,
@@ -28,7 +27,6 @@ class MessageRepository(
             MESSAGES.HEADERS
         ).values(
             message.messageId,
-            message.timestamp,
             message.channelId,
             message.producerId,
             message.routingKey,

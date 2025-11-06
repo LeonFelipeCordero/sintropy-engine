@@ -6,7 +6,6 @@ import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.utils.Patterns.routing
 import io.quarkus.test.junit.QuarkusTest
 import jakarta.inject.Inject
-import java.time.OffsetDateTime
 import java.util.UUID
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -102,9 +101,11 @@ class PollingStandardQueueTest : IntegrationTestBase() {
     @Test
     fun `should poll messages in chronological order one by one`() {
         val (channel, producer) = createChannelWithProducer()
-        val message1 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(5))
-        val message2 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(10))
-        val message3 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(15))
+        val message1 = publishMessage(channel, producer)
+        Thread.sleep(100)
+        val message2 = publishMessage(channel, producer)
+        Thread.sleep(200)
+        val message3 = publishMessage(channel, producer)
 
         val polledMessage1 = pollingQueue.poll(channel.channelId!!, channel.routingKeys.first())
         val polledMessage2 = pollingQueue.poll(channel.channelId, channel.routingKeys.first())
@@ -117,7 +118,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
         assertThat(polledMessage1.first())
             .usingRecursiveComparison()
             .ignoringFields("status", "lastDelivered", "deliveredTimes")
-            .isEqualTo(message3)
+            .isEqualTo(message1)
         assertThat(polledMessage2.first())
             .usingRecursiveComparison()
             .ignoringFields("status", "lastDelivered", "deliveredTimes")
@@ -125,23 +126,25 @@ class PollingStandardQueueTest : IntegrationTestBase() {
         assertThat(polledMessage3.first())
             .usingRecursiveComparison()
             .ignoringFields("status", "lastDelivered", "deliveredTimes")
-            .isEqualTo(message1)
+            .isEqualTo(message3)
     }
 
     @Test
     fun `should poll messages in chronological order all at once`() {
         val (channel, producer) = createChannelWithProducer()
-        val message1 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(15))
-        val message2 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(17))
-        val message3 = publishMessage(channel, producer, timestamp = OffsetDateTime.now().minusSeconds(5))
+        val message1 = publishMessage(channel, producer)
+        Thread.sleep(100)
+        val message2 = publishMessage(channel, producer)
+        Thread.sleep(200)
+        val message3 = publishMessage(channel, producer)
 
         val polledMessages = pollingQueue.poll(channel.channelId!!, channel.routingKeys.first(), 3)
 
         assertThat(polledMessages).hasSize(3)
         assertThat(polledMessages.map { it.messageId }).isEqualTo(
             listOf(
-                message2.messageId,
                 message1.messageId,
+                message2.messageId,
                 message3.messageId
             )
         )

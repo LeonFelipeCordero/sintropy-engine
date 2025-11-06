@@ -31,7 +31,7 @@ class ProducerServiceTest : IntegrationTestBase() {
         val (channel, producer) = createChannelWithProducer()
 
         val createdMessage = producerService.publishMessage(
-            Fixtures.createMessage(channel.channelId!!, producer.producerId!!)
+            Fixtures.createMessageRequest(channel.name, producer.name)
         )
 
         val all = messageRepository.findAll()
@@ -43,7 +43,7 @@ class ProducerServiceTest : IntegrationTestBase() {
     fun `should fail if message doesn't exist`() {
         assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy {
-                producerService.publishMessage(Fixtures.createMessage(UUID.randomUUID(), UUID.randomUUID()))
+                producerService.publishMessage(Fixtures.createMessageRequest(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
             }.withMessageContainingAll("Channel", "not found")
     }
 
@@ -54,9 +54,9 @@ class ProducerServiceTest : IntegrationTestBase() {
         assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy {
                 producerService.publishMessage(
-                    Fixtures.createMessage(
-                        channel.channelId!!,
-                        producer.producerId!!,
+                    Fixtures.createMessageRequest(
+                        channel.name,
+                        producer.name,
                         "test.2"
                     )
                 )
@@ -68,7 +68,7 @@ class ProducerServiceTest : IntegrationTestBase() {
         val (channel, producer) = createChannelWithProducer()
 
         producerService.publishMessage(
-            Fixtures.createMessage(channel.channelId!!, producer.producerId!!)
+            Fixtures.createMessageRequest(channel.name, producer.name)
         )
 
         val messages = messageRepository.findAll()

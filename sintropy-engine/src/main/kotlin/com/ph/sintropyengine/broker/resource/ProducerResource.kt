@@ -14,11 +14,6 @@ class ProducerResource(
     private val producerService: ProducerService
 ) {
 
-    data class CreateProducerRequest(
-        val name: String,
-        val channelName: String
-    )
-
     @POST
     fun createProducer(request: CreateProducerRequest): Response {
         val producer = producerService.createProducer(request.name, request.channelName)
@@ -50,10 +45,25 @@ class ProducerResource(
         return Response.noContent().build()
     }
 
+
     @POST
     @Path("/messages")
-    fun publishMessage(message: Message): Response {
-        val publishedMessage = producerService.publishMessage(message)
+    fun publishMessage(request: PublishMessageRequest): Response {
+        val publishedMessage = producerService.publishMessage(request)
         return Response.status(Response.Status.CREATED).entity(publishedMessage).build()
     }
 }
+
+data class CreateProducerRequest(
+    val name: String,
+    val channelName: String
+)
+
+data class PublishMessageRequest(
+    val messageId: UUID,
+    val channelName: String,
+    val producerName: String,
+    val routingKey: String,
+    val message: String,
+    val headers: String
+)
