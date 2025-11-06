@@ -1,6 +1,7 @@
 package com.ph.sintropyengine.broker.service
 
 import com.ph.sintropyengine.broker.model.Message
+import com.ph.sintropyengine.broker.model.MessagePreStore
 import com.ph.sintropyengine.broker.model.Producer
 import com.ph.sintropyengine.broker.repository.MessageRepository
 import com.ph.sintropyengine.broker.repository.ProducerRepository
@@ -9,7 +10,6 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 import java.lang.IllegalStateException
 import java.util.UUID
-import org.jooq.JSONB
 
 @ApplicationScoped
 class ProducerService(
@@ -54,13 +54,12 @@ class ProducerService(
             )
         }
 
-        val message = Message(
-            messageId = request.messageId,
+        val message = MessagePreStore(
             channelId = channel.channelId!!,
             producerId = producer.producerId!!,
             routingKey = request.routingKey,
-            message = JSONB.jsonb(request.message),
-            headers = JSONB.jsonb(request.headers)
+            message = request.message,
+            headers = request.headers
         )
         return messageRepository.save(message)
     }

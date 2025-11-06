@@ -20,9 +20,9 @@ data class Message(
     @param:JsonSerialize(using = JsonbSerializer::class)
     @param:JsonDeserialize(using = JsonbDeserializer::class)
     val headers: JSONB,
-    val status: MessageStatus = MessageStatus.READY,
+    val status: MessageStatus,
     val lastDelivered: OffsetDateTime? = null,
-    val deliveredTimes: Int = 0
+    val deliveredTimes: Int,
 )
 
 enum class MessageStatus {
@@ -30,3 +30,11 @@ enum class MessageStatus {
     IN_FLIGHT,
     FAILED
 }
+
+data class MessagePreStore(
+    val channelId: UUID,
+    val producerId: UUID,
+    val routingKey: String,
+    val message: String,
+    val headers: String,
+)

@@ -7,9 +7,10 @@ import com.ph.sintropyengine.broker.model.ConsumptionType
 import com.ph.sintropyengine.broker.model.Consumer
 import com.ph.sintropyengine.broker.model.ConsumptionType.*
 import com.ph.sintropyengine.broker.model.Message
+import com.ph.sintropyengine.broker.model.MessagePreStore
+import com.ph.sintropyengine.broker.model.MessageStatus
 import com.ph.sintropyengine.broker.model.Producer
 import com.ph.sintropyengine.broker.resource.PublishMessageRequest
-import com.ph.sintropyengine.utils.Patterns.routing
 import java.util.UUID
 import org.jooq.JSONB
 
@@ -72,7 +73,24 @@ object Fixtures {
             producerId = producerId,
             routingKey = routingKey,
             message = JSONB.jsonb(DEFAULT_MESSAGE),
-            headers = JSONB.jsonb(DEFAULT_ATTRIBUTES)
+            headers = JSONB.jsonb(DEFAULT_ATTRIBUTES),
+            status = MessageStatus.READY,
+            lastDelivered = null,
+            deliveredTimes = 0
+        )
+    }
+
+    fun createMessagePreStore(
+        channelId: UUID,
+        producerId: UUID,
+        routingKey: String = DEFAULT_ROUTING_KEY,
+    ): MessagePreStore {
+        return MessagePreStore(
+            channelId = channelId,
+            producerId = producerId,
+            routingKey = routingKey,
+            message = DEFAULT_MESSAGE,
+            headers = DEFAULT_ATTRIBUTES,
         )
     }
 
@@ -82,7 +100,6 @@ object Fixtures {
         routingKey: String = DEFAULT_ROUTING_KEY,
     ): PublishMessageRequest {
         return PublishMessageRequest(
-            messageId = UUID.randomUUID(),
             channelName = channelName,
             producerName = producerName,
             routingKey = routingKey,

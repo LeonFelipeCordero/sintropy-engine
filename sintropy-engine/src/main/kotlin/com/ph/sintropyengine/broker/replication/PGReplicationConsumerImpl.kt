@@ -2,6 +2,7 @@ package com.ph.sintropyengine.broker.replication
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ph.sintropyengine.broker.model.Message
+import com.ph.sintropyengine.broker.model.MessageStatus
 import com.ph.sintropyengine.configuration.CustomObjectMapper
 import com.ph.sintropyengine.configuration.DatabaseProperties
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -75,8 +76,8 @@ class PGReplicationConsumerImpl private constructor(
 
                     val record = columnNames.zip(columnValues).toMap()
 
-                    logger.debug { "New record: $record" }
                     channel.send(record.toMessage())
+                    logger.debug { "New record: $record" }
                 }
 
                 connectionAndReplication.replicationStream.setAppliedLSN(connectionAndReplication.replicationStream.lastReceiveLSN)
@@ -132,15 +133,21 @@ class PGReplicationConsumerImpl private constructor(
 private fun Map<String, String>.toMessage(): Message {
     return Message(
         messageId = UUID.fromString(this["message_id"]),
-        timestamp = OffsetDateTime.parse(
-            this["timestamp"]?.replace(' ', 'T')
-                ?: throw IllegalStateException("timestamp missing in message streaming"),
-        ),
+        timestamp = this["timestamp"]?.let { OffsetDateTime.parse(it.replace(' ', 'T')) }
+            ?: throw IllegalStateException("Timestamp missing in message streaming"),
         channelId = UUID.fromString(this["channel_id"]),
         producerId = UUID.fromString(this["producer_id"]),
         routingKey = this["routing_key"] ?: throw IllegalStateException("routing_key missing in message streaming"),
         message = JSONB.jsonb(this["message"] ?: throw IllegalStateException("message missing in message streaming")),
         headers = JSONB.jsonb(this["headers"] ?: throw IllegalStateException("headers missing in message streaming")),
+        status = this["status"]?.let { MessageStatus.valueOf(it) }
+            ?: throw IllegalStateException("status missing in message streaming"),
+        lastDelivered = this["last_delivered"]?.let {
+            if (it == "null") null
+            else OffsetDateTime.parse(it.replace(' ', 'T'))
+        },
+        deliveredTimes = this["delivered_times"]?.toInt()
+            ?: throw IllegalStateException("delivered times missing in message streaming")
     )
 }
 

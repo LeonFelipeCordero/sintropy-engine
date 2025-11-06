@@ -93,7 +93,7 @@ open class IntegrationTestBase {
         routingKey: String = channel.routingKeys.first(),
     ): Message {
         return messageRepository.save(
-            Fixtures.createMessage(
+            Fixtures.createMessagePreStore(
                 channelId = channel.channelId!!,
                 producerId = producer.producerId!!,
                 routingKey = routingKey,
@@ -109,7 +109,7 @@ open class IntegrationTestBase {
         val (channel, producer) = createChannelWithProducer(consumptionType = consumptionType)
 
         return messageRepository.save(
-            Fixtures.createMessage(
+            Fixtures.createMessagePreStore(
                 channel.channelId!!,
                 producer.producerId!!,
                 channel.routingKeys.first()

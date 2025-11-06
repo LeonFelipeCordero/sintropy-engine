@@ -60,7 +60,6 @@ data class CreateProducerRequest(
 )
 
 data class PublishMessageRequest(
-    val messageId: UUID,
     val channelName: String,
     val producerName: String,
     val routingKey: String,

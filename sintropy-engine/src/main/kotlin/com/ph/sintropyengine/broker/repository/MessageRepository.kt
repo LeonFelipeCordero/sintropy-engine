@@ -2,6 +2,7 @@ package com.ph.sintropyengine.broker.repository
 
 import com.ph.sintropyengine.broker.model.EventLog
 import com.ph.sintropyengine.broker.model.Message
+import com.ph.sintropyengine.broker.model.MessagePreStore
 import com.ph.sintropyengine.jooq.generated.Tables.EVENT_LOG
 import com.ph.sintropyengine.jooq.generated.Tables.MESSAGES
 import com.ph.sintropyengine.jooq.generated.enums.MessageStatusType
@@ -16,22 +17,20 @@ class MessageRepository(
     private val context: DSLContext
 ) {
 
-    fun save(message: Message): Message =
+    fun save(message: MessagePreStore): Message =
         context.insertInto(
             MESSAGES,
-            MESSAGES.MESSAGE_ID,
             MESSAGES.CHANNEL_ID,
             MESSAGES.PRODUCER_ID,
             MESSAGES.ROUTING_KEY,
             MESSAGES.MESSAGE,
             MESSAGES.HEADERS
         ).values(
-            message.messageId,
             message.channelId,
             message.producerId,
             message.routingKey,
-            message.message,
-            message.headers
+            JSONB.jsonb(message.message),
+            JSONB.jsonb(message.headers)
         ).returning().fetchOneInto(Message::class.java)
             ?: throw IllegalStateException("Something went wrong persisting the message")
 

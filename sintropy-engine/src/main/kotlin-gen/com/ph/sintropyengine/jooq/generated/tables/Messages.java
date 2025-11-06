@@ -66,7 +66,7 @@ public class Messages extends TableImpl<MessagesRecord> {
     /**
      * The column <code>public.messages.message_id</code>.
      */
-    public final TableField<MessagesRecord, UUID> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<MessagesRecord, UUID> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.messages.timestamp</code>.
