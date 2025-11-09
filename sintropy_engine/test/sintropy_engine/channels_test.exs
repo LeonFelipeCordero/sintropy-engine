@@ -31,18 +31,18 @@ defmodule SintropyEngine.ChannelsTest do
     end
 
     test "create_channel/1 with valid data creates a channel with type queue" do
-      valid_attrs = %{name: "some name", channel_type: :QUEUE}
+      valid_attrs = %{name: "some_name", channel_type: :QUEUE}
 
       assert {:ok, %Channel{} = channel} = Channels.create_channel(valid_attrs)
-      assert channel.name == "some name"
+      assert channel.name == "some_name"
       assert channel.channel_type == :QUEUE
     end
 
     test "create_channel/1 with valid data creates a channel with type stream" do
-      valid_attrs = %{name: "some name", channel_type: :STREAM}
+      valid_attrs = %{name: "some_name", channel_type: :STREAM}
 
       assert {:ok, %Channel{} = channel} = Channels.create_channel(valid_attrs)
-      assert channel.name == "some name"
+      assert channel.name == "some_name"
       assert channel.channel_type == :STREAM
     end
 
@@ -50,12 +50,17 @@ defmodule SintropyEngine.ChannelsTest do
       assert {:error, %Ecto.Changeset{}} = Channels.create_channel(@invalid_attrs)
     end
 
+    test "create_channel/1 fail when name contains blank spaces" do
+      assert {:error, %Ecto.Changeset{}} =
+               Channels.create_channel(%{name: "some name", channel_type: :QUEUE})
+    end
+
     test "update_channel/2 with valid data updates the channel" do
       channel = channel_fixture()
-      update_attrs = %{name: "some updated name", channel_type: :STREAM}
+      update_attrs = %{name: "some_updated_name", channel_type: :STREAM}
 
       assert {:ok, %Channel{} = channel} = Channels.update_channel(channel, update_attrs)
-      assert channel.name == "some updated name"
+      assert channel.name == "some_updated_name"
       assert channel.channel_type == :STREAM
     end
 

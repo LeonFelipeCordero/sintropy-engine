@@ -12,7 +12,7 @@ defmodule SintropyEngine.ChannelsFixtures do
       attrs
       |> Enum.into(%{
         channel_type: :QUEUE,
-        name: "some name"
+        name: "some_name"
       })
       |> SintropyEngine.Channels.create_channel()
 
