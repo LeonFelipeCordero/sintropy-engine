@@ -8,7 +8,7 @@ defmodule SintropyEngine.ChannelsTest do
 
     import SintropyEngine.ChannelsFixtures
 
-    @invalid_attrs %{name: nil, channel_id: nil, channel_type: nil}
+    @invalid_attrs %{name: nil, channel_type: nil}
 
     test "list_channels/0 returns all channels" do
       channel = channel_fixture()
@@ -20,13 +20,30 @@ defmodule SintropyEngine.ChannelsTest do
       assert Channels.get_channel!(channel.id) == channel
     end
 
-    test "create_channel/1 with valid data creates a channel" do
-      valid_attrs = %{name: "some name", channel_id: "7488a646-e31f-11e4-aace-600308960662", channel_type: :QUEUE}
+    test "find_channel_by_id/1 returns the channel with given name" do
+      channel = channel_fixture()
+      assert Channels.find_channel_by_name(channel.name) == channel
+    end
+
+    test "find_channel_by_id/1 returns nil when channel not found by name" do
+      channel_fixture()
+      assert Channels.find_channel_by_name("fake name") == nil
+    end
+
+    test "create_channel/1 with valid data creates a channel with type queue" do
+      valid_attrs = %{name: "some name", channel_type: :QUEUE}
 
       assert {:ok, %Channel{} = channel} = Channels.create_channel(valid_attrs)
       assert channel.name == "some name"
-      assert channel.channel_id == "7488a646-e31f-11e4-aace-600308960662"
       assert channel.channel_type == :QUEUE
+    end
+
+    test "create_channel/1 with valid data creates a channel with type stream" do
+      valid_attrs = %{name: "some name", channel_type: :STREAM}
+
+      assert {:ok, %Channel{} = channel} = Channels.create_channel(valid_attrs)
+      assert channel.name == "some name"
+      assert channel.channel_type == :STREAM
     end
 
     test "create_channel/1 with invalid data returns error changeset" do
@@ -35,11 +52,10 @@ defmodule SintropyEngine.ChannelsTest do
 
     test "update_channel/2 with valid data updates the channel" do
       channel = channel_fixture()
-      update_attrs = %{name: "some updated name", channel_id: "7488a646-e31f-11e4-aace-600308960668", channel_type: :STREAM}
+      update_attrs = %{name: "some updated name", channel_type: :STREAM}
 
       assert {:ok, %Channel{} = channel} = Channels.update_channel(channel, update_attrs)
       assert channel.name == "some updated name"
-      assert channel.channel_id == "7488a646-e31f-11e4-aace-600308960668"
       assert channel.channel_type == :STREAM
     end
 

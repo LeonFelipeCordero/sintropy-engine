@@ -37,6 +37,8 @@ defmodule SintropyEngine.Channels do
   """
   def get_channel!(id), do: Repo.get!(Channel, id)
 
+  def find_channel_by_name(name), do: Repo.get_by(Channel, name: name)
+
   @doc """
   Creates a channel.
 

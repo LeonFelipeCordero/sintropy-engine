@@ -4,7 +4,6 @@ defmodule SintropyEngine.Repo.Migrations.CreateChannels do
   def change do
     create table(:channels, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :channel_id, :uuid
       add :name, :string
       add :channel_type, :string
 

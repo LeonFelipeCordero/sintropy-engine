@@ -18,7 +18,6 @@ defmodule SintropyEngineWeb.ChannelJSON do
   defp data(%Channel{} = channel) do
     %{
       id: channel.id,
-      channel_id: channel.channel_id,
       name: channel.name,
       channel_type: channel.channel_type
     }

@@ -6,15 +6,13 @@ defmodule SintropyEngineWeb.ChannelControllerTest do
 
   @create_attrs %{
     name: "some name",
-    channel_id: "7488a646-e31f-11e4-aace-600308960662",
     channel_type: :QUEUE
   }
   @update_attrs %{
     name: "some updated name",
-    channel_id: "7488a646-e31f-11e4-aace-600308960668",
     channel_type: :STREAM
   }
-  @invalid_attrs %{name: nil, channel_id: nil, channel_type: nil}
+  @invalid_attrs %{name: nil, channel_type: nil}
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -36,7 +34,6 @@ defmodule SintropyEngineWeb.ChannelControllerTest do
 
       assert %{
                "id" => ^id,
-               "channel_id" => "7488a646-e31f-11e4-aace-600308960662",
                "channel_type" => "QUEUE",
                "name" => "some name"
              } = json_response(conn, 200)["data"]
@@ -59,7 +56,6 @@ defmodule SintropyEngineWeb.ChannelControllerTest do
 
       assert %{
                "id" => ^id,
-               "channel_id" => "7488a646-e31f-11e4-aace-600308960668",
                "channel_type" => "STREAM",
                "name" => "some updated name"
              } = json_response(conn, 200)["data"]
