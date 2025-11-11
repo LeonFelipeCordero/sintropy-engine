@@ -17,29 +17,27 @@ defmodule SintropyEngine.ChannelsTest do
     }
 
     test "list_channels/0 returns all channels" do
-      channel = channel_fixture()
+      channel = channel_standard_queue()
       assert Channels.list_channels() == [channel]
     end
 
     test "get_channel!/1 returns the channel with given id" do
-      channel = channel_fixture()
+      channel = channel_standard_queue()
       assert Channels.get_channel!(channel.id) == channel
     end
 
     test "find_channel_by_id/1 returns the channel with given name" do
-      channel = channel_fixture()
+      channel = channel_standard_queue()
       assert Channels.find_channel_by_name(channel.name) == channel
     end
 
     test "find_channel_by_id/1 returns nil when channel not found by name" do
-      channel_fixture()
+      channel_standard_queue()
       assert Channels.find_channel_by_name("fake name") == nil
     end
 
     test "create_channel/1 with valid data creates a channel with type queue standard" do
-      assert {:ok, %Channel{} = channel} =
-               Enum.into(%{queue: %{consumption_type: :STANDARD}}, @valid_attrs)
-               |> Channels.create_channel()
+      channel = channel_standard_queue()
 
       assert channel.name == "some_name"
       assert channel.channel_type == :QUEUE
@@ -49,9 +47,7 @@ defmodule SintropyEngine.ChannelsTest do
     end
 
     test "create_channel/1 with valid data creates a channel with type queue fifo" do
-      assert {:ok, %Channel{} = channel} =
-               Enum.into(%{queue: %{consumption_type: :FIFO}}, @valid_attrs)
-               |> Channels.create_channel()
+      channel = channel_fifo_queue()
 
       assert channel.name == "some_name"
       assert channel.channel_type == :QUEUE
@@ -61,10 +57,7 @@ defmodule SintropyEngine.ChannelsTest do
     end
 
     test "create_channel/1 with valid data creates a channel with type stream" do
-      assert {:ok, %Channel{} = channel} =
-               Enum.into(%{channel_type: :STREAM}, @valid_attrs)
-               |> Map.delete(:queue)
-               |> Channels.create_channel()
+      channel = channel_stream()
 
       assert channel.name == "some_name"
       assert channel.channel_type == :STREAM
@@ -90,7 +83,7 @@ defmodule SintropyEngine.ChannelsTest do
     end
 
     test "update_channel/2 with valid data updates the channel" do
-      channel = channel_fixture()
+      channel = channel_standard_queue()
 
       update_attrs = %{
         name: "some_updated_name",
@@ -103,7 +96,7 @@ defmodule SintropyEngine.ChannelsTest do
     end
 
     test "update_channel/2 with invalid data returns error changeset" do
-      channel = channel_fixture()
+      channel = channel_standard_queue()
 
       update_attrs = %{
         name: nil,
@@ -115,13 +108,13 @@ defmodule SintropyEngine.ChannelsTest do
     end
 
     test "delete_channel/1 deletes the channel" do
-      channel = channel_fixture()
+      channel = channel_standard_queue()
       assert {:ok, %Channel{}} = Channels.delete_channel(channel)
       assert_raise Ecto.NoResultsError, fn -> Channels.get_channel!(channel.id) end
     end
 
     test "change_channel/1 returns a channel changeset" do
-      channel = channel_fixture()
+      channel = channel_standard_queue()
       assert %Ecto.Changeset{} = Channels.change_channel(channel)
     end
 

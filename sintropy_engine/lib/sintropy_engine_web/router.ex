@@ -25,6 +25,7 @@ defmodule SintropyEngineWeb.Router do
     pipe_through :api
 
     resources "/channels", ChannelController, except: [:new, :edit]
+    resources "/producers", ProducerController, except: [:new, :edit]
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

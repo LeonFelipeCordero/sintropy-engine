@@ -83,7 +83,7 @@ defmodule SintropyEngineWeb.ChannelControllerTest do
   end
 
   defp create_channel(_) do
-    channel = channel_fixture()
+    channel = channel_standard_queue()
 
     %{channel: channel}
   end

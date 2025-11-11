@@ -15,7 +15,7 @@ defmodule SintropyEngine.Repo.Migrations.CreateChannels do
 
       add(
         :channel_id,
-        references(:channels, on_delete: :delete_all, type: :uuid),
+        references(:channels, on_delete: :delete_all, type: :binary_id),
         primary_key: true
       )
 
@@ -27,13 +27,14 @@ defmodule SintropyEngine.Repo.Migrations.CreateChannels do
 
       add(
         :channel_id,
-        references(:channels, on_delete: :delete_all, type: :uuid),
+        references(:channels, on_delete: :delete_all, type: :binary_id),
         primary_key: true
       )
 
       timestamps(type: :utc_datetime)
     end
 
+    create index(:channels, [:name])
     create index(:routing_keys, [:channel_id, :routing_key])
   end
 end
