@@ -9,5 +9,31 @@ defmodule SintropyEngine.Repo.Migrations.CreateChannels do
 
       timestamps(type: :utc_datetime)
     end
+
+    create table(:routing_keys, primary_key: false) do
+      add :routing_key, :string, primary_key: true
+
+      add(
+        :channel_id,
+        references(:channels, on_delete: :delete_all, type: :uuid),
+        primary_key: true
+      )
+
+      timestamps(type: :utc_datetime)
+    end
+
+    create table(:queues, primary_key: false) do
+      add :consumption_type, :string
+
+      add(
+        :channel_id,
+        references(:channels, on_delete: :delete_all, type: :uuid),
+        primary_key: true
+      )
+
+      timestamps(type: :utc_datetime)
+    end
+
+    create index(:routing_keys, [:channel_id, :routing_key])
   end
 end

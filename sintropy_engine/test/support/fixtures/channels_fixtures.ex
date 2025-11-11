@@ -12,7 +12,9 @@ defmodule SintropyEngine.ChannelsFixtures do
       attrs
       |> Enum.into(%{
         channel_type: :QUEUE,
-        name: "some_name"
+        name: "some_name",
+        routing_keys: [%{routing_key: "test.1"}],
+        queue: %{consumption_type: :STANDARD}
       })
       |> SintropyEngine.Channels.create_channel()
 

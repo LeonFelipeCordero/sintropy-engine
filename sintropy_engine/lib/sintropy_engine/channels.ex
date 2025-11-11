@@ -19,6 +19,7 @@ defmodule SintropyEngine.Channels do
   """
   def list_channels do
     Repo.all(Channel)
+    |> Repo.preload([:routing_keys, :queue])
   end
 
   @doc """
@@ -35,9 +36,15 @@ defmodule SintropyEngine.Channels do
       ** (Ecto.NoResultsError)
 
   """
-  def get_channel!(id), do: Repo.get!(Channel, id)
+  def get_channel!(id) do
+    Repo.get!(Channel, id)
+    |> Repo.preload([:routing_keys, :queue])
+  end
 
-  def find_channel_by_name(name), do: Repo.get_by(Channel, name: name)
+  def find_channel_by_name(name) do
+    Repo.get_by(Channel, name: name)
+    |> Repo.preload([:routing_keys, :queue])
+  end
 
   @doc """
   Creates a channel.

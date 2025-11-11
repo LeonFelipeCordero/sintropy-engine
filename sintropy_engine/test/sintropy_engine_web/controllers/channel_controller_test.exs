@@ -6,11 +6,13 @@ defmodule SintropyEngineWeb.ChannelControllerTest do
 
   @create_attrs %{
     name: "some_name",
-    channel_type: :QUEUE
+    channel_type: :QUEUE,
+    routing_keys: [%{routing_key: "test.1"}],
+    queue: %{consumption_type: :STANDARD}
   }
   @update_attrs %{
     name: "some_updated_name",
-    channel_type: :STREAM
+    channel_type: :QUEUE
   }
   @invalid_attrs %{name: nil, channel_type: nil}
 
@@ -56,7 +58,7 @@ defmodule SintropyEngineWeb.ChannelControllerTest do
 
       assert %{
                "id" => ^id,
-               "channel_type" => "STREAM",
+               "channel_type" => "QUEUE",
                "name" => "some_updated_name"
              } = json_response(conn, 200)["data"]
     end
