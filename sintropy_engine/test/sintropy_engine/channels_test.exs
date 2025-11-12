@@ -1,11 +1,10 @@
 defmodule SintropyEngine.ChannelsTest do
   use SintropyEngine.DataCase
 
+  alias SintropyEngine.Channels.Channel
   alias SintropyEngine.Channels
 
   describe "channels" do
-    alias SintropyEngine.Channels.Channel
-
     import SintropyEngine.ChannelsFixtures
 
     @invalid_attrs %{name: nil, channel_type: nil, routing_keys: [], queue: nil}
@@ -56,6 +55,16 @@ defmodule SintropyEngine.ChannelsTest do
       assert channel.queue.consumption_type == :FIFO
     end
 
+    test "create_channel/1 queue wihtout consumption type fails to create channel" do
+      assert {:error, %Ecto.Changeset{}} =
+               %{
+                 channel_type: :QUEUE,
+                 name: "some_name",
+                 routing_keys: [%{routing_key: "test.1"}]
+               }
+               |> Channels.create_channel()
+    end
+
     test "create_channel/1 with valid data creates a channel with type stream" do
       channel = channel_stream()
 
@@ -64,6 +73,17 @@ defmodule SintropyEngine.ChannelsTest do
       assert length(channel.routing_keys) == 1
       assert List.first(channel.routing_keys).routing_key == "test.1"
       assert !Ecto.assoc_loaded?(channel.queue)
+    end
+
+    test "create_channel/1 stream with consumption type fails to create channel" do
+      assert {:error, %Ecto.Changeset{}} =
+               %{
+                 channel_type: :STREAM,
+                 name: "some_name",
+                 routing_keys: [%{routing_key: "test.1"}],
+                 queue: %{consumption_type: :FIFO}
+               }
+               |> Channels.create_channel()
     end
 
     test "create_channel/1 with invalid data returns error changeset" do

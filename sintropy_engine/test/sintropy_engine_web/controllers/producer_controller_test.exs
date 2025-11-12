@@ -2,6 +2,7 @@ defmodule SintropyEngineWeb.ProducerControllerTest do
   use SintropyEngineWeb.ConnCase
 
   import SintropyEngine.ProducersFixtures
+  alias SintropyEngine.ChannelsFixtures
   alias SintropyEngine.Producers.Producer
 
   @create_attrs %{
@@ -25,7 +26,13 @@ defmodule SintropyEngineWeb.ProducerControllerTest do
 
   describe "create producer" do
     test "renders producer when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/producers", producer: @create_attrs)
+      channel = ChannelsFixtures.channel_standard_queue()
+
+      conn =
+        post(conn, ~p"/api/producers",
+          producer: Enum.into(@create_attrs, %{channel_id: channel.id})
+        )
+
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get(conn, ~p"/api/producers/#{id}")
@@ -80,8 +87,6 @@ defmodule SintropyEngineWeb.ProducerControllerTest do
   end
 
   defp create_producer(_) do
-    producer = producer_fixture()
-
-    %{producer: producer}
+    producer_fixture()
   end
 end
