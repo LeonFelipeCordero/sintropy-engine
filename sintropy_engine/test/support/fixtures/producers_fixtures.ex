@@ -22,4 +22,13 @@ defmodule SintropyEngine.ProducersFixtures do
 
     %{channel: channel, producer: producer}
   end
+
+  def producer_without_existing_channel_fixture(attrs \\ %{}) do
+    attrs
+    |> Enum.into(%{
+      name: "some_name",
+      channel_id: Ecto.UUID.generate()
+    })
+    |> SintropyEngine.Producers.create_producer()
+  end
 end

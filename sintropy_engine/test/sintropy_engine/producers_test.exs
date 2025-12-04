@@ -30,6 +30,10 @@ defmodule SintropyEngine.ProducersTest do
       assert {:error, %Ecto.Changeset{}} = Producers.create_producer(@invalid_attrs)
     end
 
+    test "create_producer/1 with non existing channel should fail" do
+      assert {:error, %Ecto.Changeset{}} = producer_without_existing_channel_fixture()
+    end
+
     test "update_producer/2 with valid data updates the producer" do
       %{producer: producer} = producer_fixture()
       update_attrs = %{name: "some_updated_name"}

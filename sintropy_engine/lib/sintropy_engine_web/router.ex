@@ -26,6 +26,7 @@ defmodule SintropyEngineWeb.Router do
 
     resources "/channels", ChannelController, except: [:new, :edit]
     resources "/producers", ProducerController, except: [:new, :edit]
+    resources "/messages", MessageController, except: [:new, :edit]
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
