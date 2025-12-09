@@ -18,7 +18,7 @@ defmodule SintropyEngine.MessagesFixtures do
         headers: "some headers",
         last_delivered: ~U[2025-11-11 11:29:00Z],
         mesage: "some mesage",
-        routing_key: "some routing_key",
+        routing_key: Enum.at(channel.routing_keys, 0).routing_key,
         status: :READY,
         timestamp: ~U[2025-11-11 11:29:00Z],
         channel_id: channel.id,
@@ -38,7 +38,7 @@ defmodule SintropyEngine.MessagesFixtures do
       headers: "some headers",
       last_delivered: ~U[2025-11-11 11:29:00Z],
       mesage: "some mesage",
-      routing_key: "some routing_key",
+      routing_key: Enum.at(channel.routing_keys, 0).routing_key,
       status: :READY,
       timestamp: ~U[2025-11-11 11:29:00Z],
       channel_id: channel.id,
@@ -48,7 +48,7 @@ defmodule SintropyEngine.MessagesFixtures do
   end
 
   def message_wiht_not_existing_channel_fixture(attrs \\ %{}) do
-    %{channel: _, producer: producer} = producer_fixture()
+    %{channel: channel, producer: producer} = producer_fixture()
 
     attrs
     |> Enum.into(%{
@@ -56,10 +56,28 @@ defmodule SintropyEngine.MessagesFixtures do
       headers: "some headers",
       last_delivered: ~U[2025-11-11 11:29:00Z],
       mesage: "some mesage",
-      routing_key: "some routing_key",
+      routing_key: Enum.at(channel.routing_keys, 0).routing_key,
       status: :READY,
       timestamp: ~U[2025-11-11 11:29:00Z],
       channel_id: Ecto.UUID.generate(),
+      producer_id: producer.id
+    })
+    |> SintropyEngine.Messages.create_message()
+  end
+
+  def message_wiht_not_existing_routing_key_fixture(attrs \\ %{}) do
+    %{channel: channel, producer: producer} = producer_fixture()
+
+    attrs
+    |> Enum.into(%{
+      delivered_times: 42,
+      headers: "some headers",
+      last_delivered: ~U[2025-11-11 11:29:00Z],
+      mesage: "some mesage",
+      routing_key: "test_12345",
+      status: :READY,
+      timestamp: ~U[2025-11-11 11:29:00Z],
+      channel_id: channel.id,
       producer_id: producer.id
     })
     |> SintropyEngine.Messages.create_message()

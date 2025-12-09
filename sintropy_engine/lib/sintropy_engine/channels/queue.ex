@@ -1,4 +1,4 @@
-defmodule SintropyEngine.Channel.Queue do
+defmodule SintropyEngine.Channels.Queue do
   use Ecto.Schema
   import Ecto.Changeset
 

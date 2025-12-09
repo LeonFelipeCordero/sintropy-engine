@@ -31,12 +31,13 @@ defmodule SintropyEngine.MessagesTest do
 
     test "create_message/1 with valid data creates a message" do
       %{channel: channel, producer: producer} = producer_fixture()
+      routing_key = Enum.at(channel.routing_keys, 0).routing_key
 
       valid_attrs = %{
         status: :READY,
         timestamp: ~U[2025-11-11 11:29:00Z],
         headers: "some headers",
-        routing_key: "some routing_key",
+        routing_key: routing_key,
         mesage: "some mesage",
         last_delivered: ~U[2025-11-11 11:29:00Z],
         delivered_times: 42,
@@ -48,7 +49,7 @@ defmodule SintropyEngine.MessagesTest do
       assert message.status == :READY
       assert message.timestamp == ~U[2025-11-11 11:29:00Z]
       assert message.headers == "some headers"
-      assert message.routing_key == "some routing_key"
+      assert message.routing_key == routing_key
       assert message.mesage == "some mesage"
       assert message.last_delivered == ~U[2025-11-11 11:29:00Z]
       assert message.delivered_times == 42
@@ -67,7 +68,7 @@ defmodule SintropyEngine.MessagesTest do
     end
 
     test "create_message/1 with non existing routing key returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Messages.create_message()
+      assert {:error, %Ecto.Changeset{}} = message_wiht_not_existing_routing_key_fixture()
     end
 
     test "update_message/2 with valid data updates the message" do
@@ -77,7 +78,6 @@ defmodule SintropyEngine.MessagesTest do
         status: :IN_FLIGHT,
         timestamp: ~U[2025-11-12 11:29:00Z],
         headers: "some updated headers",
-        routing_key: "some updated routing_key",
         mesage: "some updated mesage",
         last_delivered: ~U[2025-11-12 11:29:00Z],
         delivered_times: 43
@@ -87,7 +87,6 @@ defmodule SintropyEngine.MessagesTest do
       assert message.status == :IN_FLIGHT
       assert message.timestamp == ~U[2025-11-12 11:29:00Z]
       assert message.headers == "some updated headers"
-      assert message.routing_key == "some updated routing_key"
       assert message.mesage == "some updated mesage"
       assert message.last_delivered == ~U[2025-11-12 11:29:00Z]
       assert message.delivered_times == 43

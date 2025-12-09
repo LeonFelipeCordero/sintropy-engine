@@ -2,8 +2,8 @@ defmodule SintropyEngine.Channels.Channel do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias SintropyEngine.Channel.RoutingKey
-  alias SintropyEngine.Channel.Queue
+  alias SintropyEngine.Channels.RoutingKey
+  alias SintropyEngine.Channels.Queue
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

@@ -9,7 +9,6 @@ defmodule SintropyEngineWeb.MessageControllerTest do
     status: :READY,
     timestamp: ~U[2025-11-11 11:29:00Z],
     headers: "some headers",
-    routing_key: "some routing_key",
     mesage: "some mesage",
     last_delivered: ~U[2025-11-11 11:29:00Z],
     delivered_times: 42
@@ -18,7 +17,6 @@ defmodule SintropyEngineWeb.MessageControllerTest do
     status: :IN_FLIGHT,
     timestamp: ~U[2025-11-12 11:29:00Z],
     headers: "some updated headers",
-    routing_key: "some updated routing_key",
     mesage: "some updated mesage",
     last_delivered: ~U[2025-11-12 11:29:00Z],
     delivered_times: 43
@@ -47,10 +45,16 @@ defmodule SintropyEngineWeb.MessageControllerTest do
   describe "create message" do
     test "renders message when data is valid", %{conn: conn} do
       %{channel: channel, producer: producer} = producer_fixture()
+      routing_key = Enum.at(channel.routing_keys, 0).routing_key
 
       conn =
         post(conn, ~p"/api/messages",
-          message: Enum.into(@create_attrs, %{channel_id: channel.id, producer_id: producer.id})
+          message:
+            Enum.into(@create_attrs, %{
+              channel_id: channel.id,
+              producer_id: producer.id,
+              routing_key: routing_key
+            })
         )
 
       assert %{"id" => id} = json_response(conn, 201)["data"]
@@ -63,7 +67,7 @@ defmodule SintropyEngineWeb.MessageControllerTest do
                "headers" => "some headers",
                "last_delivered" => "2025-11-11T11:29:00Z",
                "mesage" => "some mesage",
-               "routing_key" => "some routing_key",
+               "routing_key" => ^routing_key,
                "status" => "READY",
                "timestamp" => "2025-11-11T11:29:00Z"
              } = json_response(conn, 200)["data"]
@@ -90,7 +94,6 @@ defmodule SintropyEngineWeb.MessageControllerTest do
                "headers" => "some updated headers",
                "last_delivered" => "2025-11-12T11:29:00Z",
                "mesage" => "some updated mesage",
-               "routing_key" => "some updated routing_key",
                "status" => "IN_FLIGHT",
                "timestamp" => "2025-11-12T11:29:00Z"
              } = json_response(conn, 200)["data"]

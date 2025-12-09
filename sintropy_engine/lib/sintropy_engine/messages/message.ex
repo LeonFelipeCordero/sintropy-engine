@@ -2,6 +2,7 @@ defmodule SintropyEngine.Messages.Message do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias SintropyEngine.Channels
   alias SintropyEngine.Channels.Channel
   alias SintropyEngine.Producers.Producer
 
@@ -49,5 +50,17 @@ defmodule SintropyEngine.Messages.Message do
     ])
     |> foreign_key_constraint(:channel_id, message: "Message needs a channel")
     |> foreign_key_constraint(:producer_id, message: "Message needs a producer")
+    |> validate_routing_key()
+  end
+
+  defp validate_routing_key(changeset) do
+    routing_key = get_field(changeset, :routing_key)
+    channel_id = get_field(changeset, :channel_id)
+
+    if routing_key && channel_id && is_nil(Channels.get_routing_key(channel_id, routing_key)) do
+      add_error(changeset, :routing_key, "Routing key does not exist for this channel")
+    else
+      changeset
+    end
   end
 end

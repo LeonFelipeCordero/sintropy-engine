@@ -1,4 +1,4 @@
-defmodule SintropyEngine.Channel.RoutingKey do
+defmodule SintropyEngine.Channels.RoutingKey do
   use Ecto.Schema
   import Ecto.Changeset
 

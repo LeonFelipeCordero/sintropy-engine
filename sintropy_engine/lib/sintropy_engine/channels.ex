@@ -7,6 +7,7 @@ defmodule SintropyEngine.Channels do
   alias SintropyEngine.Repo
 
   alias SintropyEngine.Channels.Channel
+  alias SintropyEngine.Channels.RoutingKey
 
   @doc """
   Returns the list of channels.
@@ -20,6 +21,14 @@ defmodule SintropyEngine.Channels do
   def list_channels do
     Repo.all(Channel)
     |> Repo.preload([:routing_keys, :queue])
+  end
+
+  def get_routing_key(channel_id, routing_key) do
+    from(
+      r in RoutingKey,
+      where: r.channel_id == ^channel_id and r.routing_key == ^routing_key
+    )
+    |> Repo.one()
   end
 
   @doc """
