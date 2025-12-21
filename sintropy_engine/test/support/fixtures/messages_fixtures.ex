@@ -14,13 +14,13 @@ defmodule SintropyEngine.MessagesFixtures do
     {:ok, message} =
       attrs
       |> Enum.into(%{
-        delivered_times: 42,
+        delivered_times: 0,
         headers: "some headers",
-        last_delivered: ~U[2025-11-11 11:29:00Z],
-        mesage: "some mesage",
+        last_delivered: nil,
+        message: "some message",
         routing_key: Enum.at(channel.routing_keys, 0).routing_key,
         status: :READY,
-        timestamp: ~U[2025-11-11 11:29:00Z],
+        timestamp: DateTime.now!("Etc/UTC"),
         channel_id: channel.id,
         producer_id: producer.id
       })
@@ -34,13 +34,13 @@ defmodule SintropyEngine.MessagesFixtures do
 
     attrs
     |> Enum.into(%{
-      delivered_times: 42,
+      delivered_times: 0,
       headers: "some headers",
-      last_delivered: ~U[2025-11-11 11:29:00Z],
-      mesage: "some mesage",
+      last_delivered: nil,
+      message: "some message",
       routing_key: Enum.at(channel.routing_keys, 0).routing_key,
       status: :READY,
-      timestamp: ~U[2025-11-11 11:29:00Z],
+      timestamp: DateTime.now!("Etc/UTC"),
       channel_id: channel.id,
       producer_id: Ecto.UUID.generate()
     })
@@ -52,13 +52,13 @@ defmodule SintropyEngine.MessagesFixtures do
 
     attrs
     |> Enum.into(%{
-      delivered_times: 42,
+      delivered_times: 0,
       headers: "some headers",
-      last_delivered: ~U[2025-11-11 11:29:00Z],
-      mesage: "some mesage",
+      last_delivered: nil,
+      message: "some message",
       routing_key: Enum.at(channel.routing_keys, 0).routing_key,
       status: :READY,
-      timestamp: ~U[2025-11-11 11:29:00Z],
+      timestamp: DateTime.now!("Etc/UTC"),
       channel_id: Ecto.UUID.generate(),
       producer_id: producer.id
     })
@@ -70,13 +70,13 @@ defmodule SintropyEngine.MessagesFixtures do
 
     attrs
     |> Enum.into(%{
-      delivered_times: 42,
+      delivered_times: 0,
       headers: "some headers",
-      last_delivered: ~U[2025-11-11 11:29:00Z],
-      mesage: "some mesage",
+      last_delivered: nil,
+      message: "some message",
       routing_key: "test_12345",
       status: :READY,
-      timestamp: ~U[2025-11-11 11:29:00Z],
+      timestamp: DateTime.now!("Etc/UTC"),
       channel_id: channel.id,
       producer_id: producer.id
     })

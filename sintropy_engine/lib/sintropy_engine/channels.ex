@@ -119,4 +119,10 @@ defmodule SintropyEngine.Channels do
   def change_channel(%Channel{} = channel, attrs \\ %{}) do
     Channel.changeset(channel, attrs)
   end
+
+  def create_routing_key(attrs) do
+    %RoutingKey{}
+    |> RoutingKey.full_changeset(attrs)
+    |> Repo.insert()
+  end
 end

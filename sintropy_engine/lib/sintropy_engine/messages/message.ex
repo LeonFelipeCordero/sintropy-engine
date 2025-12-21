@@ -11,7 +11,7 @@ defmodule SintropyEngine.Messages.Message do
   schema "messages" do
     field :timestamp, :utc_datetime
     field :routing_key, :string
-    field :mesage, :string
+    field :message, :string
     field :headers, :string
     field :status, Ecto.Enum, values: [:READY, :IN_FLIGHT, :FAILED]
     field :last_delivered, :utc_datetime
@@ -29,7 +29,7 @@ defmodule SintropyEngine.Messages.Message do
     |> cast(attrs, [
       :timestamp,
       :routing_key,
-      :mesage,
+      :message,
       :headers,
       :status,
       :last_delivered,
@@ -40,10 +40,9 @@ defmodule SintropyEngine.Messages.Message do
     |> validate_required([
       :timestamp,
       :routing_key,
-      :mesage,
+      :message,
       :headers,
       :status,
-      :last_delivered,
       :delivered_times,
       :channel_id,
       :producer_id

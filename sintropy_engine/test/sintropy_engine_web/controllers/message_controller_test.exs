@@ -9,7 +9,7 @@ defmodule SintropyEngineWeb.MessageControllerTest do
     status: :READY,
     timestamp: ~U[2025-11-11 11:29:00Z],
     headers: "some headers",
-    mesage: "some mesage",
+    message: "some message",
     last_delivered: ~U[2025-11-11 11:29:00Z],
     delivered_times: 42
   }
@@ -17,7 +17,7 @@ defmodule SintropyEngineWeb.MessageControllerTest do
     status: :IN_FLIGHT,
     timestamp: ~U[2025-11-12 11:29:00Z],
     headers: "some updated headers",
-    mesage: "some updated mesage",
+    message: "some updated message",
     last_delivered: ~U[2025-11-12 11:29:00Z],
     delivered_times: 43
   }
@@ -26,7 +26,7 @@ defmodule SintropyEngineWeb.MessageControllerTest do
     timestamp: nil,
     headers: nil,
     routing_key: nil,
-    mesage: nil,
+    message: nil,
     last_delivered: nil,
     delivered_times: nil
   }
@@ -66,7 +66,7 @@ defmodule SintropyEngineWeb.MessageControllerTest do
                "delivered_times" => 42,
                "headers" => "some headers",
                "last_delivered" => "2025-11-11T11:29:00Z",
-               "mesage" => "some mesage",
+               "message" => "some message",
                "routing_key" => ^routing_key,
                "status" => "READY",
                "timestamp" => "2025-11-11T11:29:00Z"
@@ -93,7 +93,7 @@ defmodule SintropyEngineWeb.MessageControllerTest do
                "delivered_times" => 43,
                "headers" => "some updated headers",
                "last_delivered" => "2025-11-12T11:29:00Z",
-               "mesage" => "some updated mesage",
+               "message" => "some updated message",
                "status" => "IN_FLIGHT",
                "timestamp" => "2025-11-12T11:29:00Z"
              } = json_response(conn, 200)["data"]

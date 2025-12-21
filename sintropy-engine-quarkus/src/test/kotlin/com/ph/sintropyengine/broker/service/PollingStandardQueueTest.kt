@@ -2,6 +2,7 @@ package com.ph.sintropyengine.broker.service
 
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
+import com.ph.sintropyengine.broker.model.ConsumptionType
 import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.utils.Patterns.routing
 import io.quarkus.test.junit.QuarkusTest
@@ -261,7 +262,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `concurrent processing of messages`() = runTest {
-        val testData = createTestData()
+        val testData = createTestData(ConsumptionType.STANDARD)
 
         val mutexConsumer = Mutex()
         val polledMessages = testData.toMap()
@@ -356,7 +357,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `single processing of routing pair is always in chronological order`() = runTest {
-        val testData = createTestData()
+        val testData = createTestData(ConsumptionType.STANDARD)
 
         val mutexConsumer = Mutex()
         val polledMessages = testData.toMap()

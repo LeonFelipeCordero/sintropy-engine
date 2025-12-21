@@ -2,12 +2,11 @@ package com.ph.sintropyengine.broker.service
 
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
-import com.ph.sintropyengine.broker.model.ConsumptionType.*
+import com.ph.sintropyengine.broker.model.ConsumptionType.FIFO
 import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.utils.Patterns.routing
 import io.quarkus.test.junit.QuarkusTest
 import jakarta.inject.Inject
-import java.time.OffsetDateTime
 import java.util.UUID
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -284,7 +283,7 @@ class PollingFifoQueueTest : IntegrationTestBase() {
 
     @Test
     fun `concurrent processing of messages`() = runTest {
-        val testData = createTestData()
+        val testData = createTestData(FIFO)
 
         val mutexConsumer = Mutex()
         val polledMessages = testData.toMap()
@@ -379,7 +378,7 @@ class PollingFifoQueueTest : IntegrationTestBase() {
 
     @Test
     fun `single processing of routing pair is always in chronological order`() = runTest {
-        val testData = createTestData()
+        val testData = createTestData(FIFO)
 
         val mutexConsumer = Mutex()
         val polledMessages = testData.toMap()
@@ -466,6 +465,4 @@ class PollingFifoQueueTest : IntegrationTestBase() {
                 .isEqualTo(allEventLog.filter { it.routing() == key }.sortedBy { it.timestamp })
         }
     }
-
-
 }

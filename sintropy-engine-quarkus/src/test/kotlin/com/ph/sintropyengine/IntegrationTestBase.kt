@@ -167,11 +167,10 @@ open class IntegrationTestBase {
                 continue
             }
 
-            val routingInMessages = messages.map { it.routing() }
-                .toSet(); if (routingInMessages.size > 1 || routingInMessages.first() != routing(
-                    channelId,
-                    routingKey
-                )
+            val routingInMessages = messages.map { it.routing() }.toSet()
+
+            if (routingInMessages.size > 1 ||
+                routingInMessages.first() != routing(channelId, routingKey)
             ) {
                 throw IllegalStateException(
                     "Polling got a message form another pair [${routing(channelId, routingKey)}]"
@@ -188,22 +187,22 @@ open class IntegrationTestBase {
         }
     }
 
-    protected fun createTestData(): TestData {
+    protected fun createTestData(consumptionType: ConsumptionType): TestData {
         val channel1 = channelRepository.save(
             Fixtures.createChannel(
-                consumptionType = FIFO,
+                consumptionType = consumptionType,
                 routingKeys = mutableListOf("test.1.0", "test.1.1", "test.1.2"),
             )
         )
         val channel2 = channelRepository.save(
             Fixtures.createChannel(
-                consumptionType = FIFO,
+                consumptionType = consumptionType,
                 routingKeys = mutableListOf("test.2.0", "test.2.1"),
             )
         )
         val channel3 = channelRepository.save(
             Fixtures.createChannel(
-                consumptionType = FIFO,
+                consumptionType = consumptionType,
                 routingKeys = mutableListOf("test.3.0"),
             )
         )

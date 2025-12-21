@@ -20,7 +20,7 @@ defmodule SintropyEngineWeb.MessageJSON do
       id: message.id,
       timestamp: message.timestamp,
       routing_key: message.routing_key,
-      mesage: message.mesage,
+      message: message.message,
       headers: message.headers,
       status: message.status,
       last_delivered: message.last_delivered,

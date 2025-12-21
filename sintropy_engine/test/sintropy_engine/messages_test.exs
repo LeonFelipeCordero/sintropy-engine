@@ -14,7 +14,7 @@ defmodule SintropyEngine.MessagesTest do
       timestamp: nil,
       headers: nil,
       routing_key: nil,
-      mesage: nil,
+      message: nil,
       last_delivered: nil,
       delivered_times: nil
     }
@@ -38,7 +38,7 @@ defmodule SintropyEngine.MessagesTest do
         timestamp: ~U[2025-11-11 11:29:00Z],
         headers: "some headers",
         routing_key: routing_key,
-        mesage: "some mesage",
+        message: "some message",
         last_delivered: ~U[2025-11-11 11:29:00Z],
         delivered_times: 42,
         channel_id: channel.id,
@@ -50,7 +50,7 @@ defmodule SintropyEngine.MessagesTest do
       assert message.timestamp == ~U[2025-11-11 11:29:00Z]
       assert message.headers == "some headers"
       assert message.routing_key == routing_key
-      assert message.mesage == "some mesage"
+      assert message.message == "some message"
       assert message.last_delivered == ~U[2025-11-11 11:29:00Z]
       assert message.delivered_times == 42
     end
@@ -71,6 +71,21 @@ defmodule SintropyEngine.MessagesTest do
       assert {:error, %Ecto.Changeset{}} = message_wiht_not_existing_routing_key_fixture()
     end
 
+    test "create_message/1 creates an event log record automatically" do
+      message = message_fixture()
+
+      event_log = Messages.get_event_log!(message.id)
+
+      assert event_log.id == message.id
+      assert event_log.timestamp == message.timestamp
+      assert event_log.routing_key == message.routing_key
+      assert event_log.message == message.message
+      assert event_log.headers == message.headers
+      assert event_log.processed == false
+      assert event_log.channel_id == message.channel_id
+      assert event_log.producer_id == message.producer_id
+    end
+
     test "update_message/2 with valid data updates the message" do
       message = message_fixture()
 
@@ -78,7 +93,7 @@ defmodule SintropyEngine.MessagesTest do
         status: :IN_FLIGHT,
         timestamp: ~U[2025-11-12 11:29:00Z],
         headers: "some updated headers",
-        mesage: "some updated mesage",
+        message: "some updated message",
         last_delivered: ~U[2025-11-12 11:29:00Z],
         delivered_times: 43
       }
@@ -87,7 +102,7 @@ defmodule SintropyEngine.MessagesTest do
       assert message.status == :IN_FLIGHT
       assert message.timestamp == ~U[2025-11-12 11:29:00Z]
       assert message.headers == "some updated headers"
-      assert message.mesage == "some updated mesage"
+      assert message.message == "some updated message"
       assert message.last_delivered == ~U[2025-11-12 11:29:00Z]
       assert message.delivered_times == 43
     end
@@ -102,6 +117,15 @@ defmodule SintropyEngine.MessagesTest do
       message = message_fixture()
       assert {:ok, %Message{}} = Messages.delete_message(message)
       assert_raise Ecto.NoResultsError, fn -> Messages.get_message!(message.id) end
+    end
+
+    test "delete_message/1 marks event log item as processed" do
+      message = message_fixture()
+      assert {:ok, %Message{}} = Messages.delete_message(message)
+
+      event_log = Messages.get_event_log!(message.id)
+
+      assert event_log.processed == true
     end
 
     test "change_message/1 returns a message changeset" do
