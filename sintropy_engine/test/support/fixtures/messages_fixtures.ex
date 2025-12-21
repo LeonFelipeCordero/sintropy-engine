@@ -14,9 +14,7 @@ defmodule SintropyEngine.MessagesFixtures do
     {:ok, message} =
       attrs
       |> Enum.into(%{
-        delivered_times: 0,
         headers: "some headers",
-        last_delivered: nil,
         message: "some message",
         routing_key: Enum.at(channel.routing_keys, 0).routing_key,
         status: :READY,
@@ -34,9 +32,7 @@ defmodule SintropyEngine.MessagesFixtures do
 
     attrs
     |> Enum.into(%{
-      delivered_times: 0,
       headers: "some headers",
-      last_delivered: nil,
       message: "some message",
       routing_key: Enum.at(channel.routing_keys, 0).routing_key,
       status: :READY,
@@ -52,9 +48,7 @@ defmodule SintropyEngine.MessagesFixtures do
 
     attrs
     |> Enum.into(%{
-      delivered_times: 0,
       headers: "some headers",
-      last_delivered: nil,
       message: "some message",
       routing_key: Enum.at(channel.routing_keys, 0).routing_key,
       status: :READY,
@@ -70,9 +64,7 @@ defmodule SintropyEngine.MessagesFixtures do
 
     attrs
     |> Enum.into(%{
-      delivered_times: 0,
       headers: "some headers",
-      last_delivered: nil,
       message: "some message",
       routing_key: "test_12345",
       status: :READY,

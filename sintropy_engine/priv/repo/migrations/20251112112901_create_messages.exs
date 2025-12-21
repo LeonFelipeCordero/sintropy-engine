@@ -8,9 +8,9 @@ defmodule SintropyEngine.Repo.Migrations.CreateMessages do
       add :routing_key, :string
       add :message, :text
       add :headers, :text
-      add :status, :string
-      add :last_delivered, :utc_datetime
-      add :delivered_times, :integer
+      add :status, :string, default: ":READY"
+      add :last_delivered, :utc_datetime, default: nil
+      add :delivered_times, :integer, default: 0
 
       add :channel_id, references(:channels, on_delete: :nothing, type: :binary_id)
       add :producer_id, references(:producers, on_delete: :nothing, type: :binary_id)
@@ -24,7 +24,7 @@ defmodule SintropyEngine.Repo.Migrations.CreateMessages do
       add :routing_key, :string
       add :message, :text
       add :headers, :text
-      add :processed, :boolean
+      add :processed, :boolean, default: false
 
       add :channel_id, references(:channels, on_delete: :nothing, type: :binary_id)
       add :producer_id, references(:producers, on_delete: :nothing, type: :binary_id)

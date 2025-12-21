@@ -13,9 +13,9 @@ defmodule SintropyEngine.Messages.Message do
     field :routing_key, :string
     field :message, :string
     field :headers, :string
-    field :status, Ecto.Enum, values: [:READY, :IN_FLIGHT, :FAILED]
-    field :last_delivered, :utc_datetime
-    field :delivered_times, :integer
+    field :status, Ecto.Enum, values: [:READY, :IN_FLIGHT, :FAILED], default: :READY
+    field :last_delivered, :utc_datetime, default: nil
+    field :delivered_times, :integer, default: 0
 
     belongs_to :channel, Channel
     belongs_to :producer, Producer
