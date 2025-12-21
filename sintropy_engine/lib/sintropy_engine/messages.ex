@@ -133,6 +133,23 @@ defmodule SintropyEngine.Messages do
     Message.changeset(message, attrs)
   end
 
+ @doc """
+  Returns list of message that matches the given keys:
+  * If the oldest message is in flight,it will not be polled until 15 min has passed.
+  * If the message is marked as failed, it will not be polled.
+  * If the message has been polled more than 3 times, it not be polled.
+  * When the messages is dequeue, it's not available for polling.
+
+  Messages doesn't preserved an order, and if a given messages is on the flight,
+  and other consumers try to poll, they will get the next message in the queue.
+
+  ## Examples
+      Poll 1 message
+      iex> poll_standard(channel_id, routing_key)
+      Poll 5 messages at once
+      iex> poll_standard(channel_id, routing_key, 5)
+
+  """
   def poll_standard(channel_id, routing_key, polling_count \\ 1) do
     query = """
         with result as (select id
@@ -159,7 +176,24 @@ defmodule SintropyEngine.Messages do
     poll(channel_id, routing_key, polling_count, query)
   end
 
-  def poll_fifo(channel_id, routing_key, polling_count \\ 1) do
+  @doc """
+  Returns list of message that matches the given keys:
+  * If the oldest message is in flight,it will not be polled until 15 min has passed.
+  * If the message is marked as failed, it will not be polled.
+  * If the message has been polled more than 3 times, it not be polled.
+  * When the messages is dequeue, it's not available for polling.
+
+  Messages preserve an order as arrival (FiFo), no other messages would be polled
+  util the message in flight is deuqued.
+
+  ## Examples
+      Poll 1 message
+      iex> poll_standard(channel_id, routing_key)
+      Poll 5 messages at once
+      iex> poll_standard(channel_id, routing_key, 5)
+
+  """
+ def poll_fifo(channel_id, routing_key, polling_count \\ 1) do
     query = """
       with result as (select id
               from messages
@@ -187,7 +221,7 @@ defmodule SintropyEngine.Messages do
     poll(channel_id, routing_key, polling_count, query)
   end
 
-  def poll(channel_id, routing_key, polling_count, query) do
+  defp poll(channel_id, routing_key, polling_count, query) do
     hash = :erlang.phash2({channel_id, routing_key})
     params = [channel_id, routing_key, hash, polling_count]
 
