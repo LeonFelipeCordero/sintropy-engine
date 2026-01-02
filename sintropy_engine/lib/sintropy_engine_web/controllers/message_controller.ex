@@ -2,7 +2,9 @@ defmodule SintropyEngineWeb.MessageController do
   use SintropyEngineWeb, :controller
 
   alias SintropyEngine.Messages
+  alias SintropyEngine.Channels
   alias SintropyEngine.Messages.Message
+  alias Ecto.UUID
 
   action_fallback SintropyEngineWeb.FallbackController
 
@@ -38,6 +40,29 @@ defmodule SintropyEngineWeb.MessageController do
 
     with {:ok, %Message{}} <- Messages.delete_message(message) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  def poll(conn, %{"channel_id" => channel_id, "routing_key" => routing_key} = params) do
+    polling_count = Map.get(params, "polling_count", 1)
+
+    channel = Channels.get_channel!(channel_id)
+
+    if channel.channel_type != :QUEUE do
+      conn
+      |> put_status(:bad_request)
+      |> json(%{error: "Polling is only available for QUEUE channels"})
+    else
+      channel_uuid = UUID.dump!(channel.id)
+
+      messages =
+        case channel.queue.consumption_type do
+          :STANDARD -> Messages.poll_standard(channel_uuid, routing_key, polling_count)
+          :FIFO -> Messages.poll_fifo(channel_uuid, routing_key, polling_count)
+          _ -> []
+        end
+
+      render(conn, :index, messages: messages)
     end
   end
 end

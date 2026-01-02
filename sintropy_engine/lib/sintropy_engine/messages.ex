@@ -133,7 +133,7 @@ defmodule SintropyEngine.Messages do
     Message.changeset(message, attrs)
   end
 
- @doc """
+  @doc """
   Returns list of message that matches the given keys:
   * If the oldest message is in flight,it will not be polled until 15 min has passed.
   * If the message is marked as failed, it will not be polled.
@@ -193,7 +193,7 @@ defmodule SintropyEngine.Messages do
       iex> poll_standard(channel_id, routing_key, 5)
 
   """
- def poll_fifo(channel_id, routing_key, polling_count \\ 1) do
+  def poll_fifo(channel_id, routing_key, polling_count \\ 1) do
     query = """
       with result as (select id
               from messages
