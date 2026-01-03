@@ -1,18 +1,22 @@
 defmodule SintropyEngine.SingleChannelFifoPollingE2eTest do
   use SintropyEngineWeb.ConnCase
 
+  import SintropyEngine.E2eFixtures
+
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    conn = put_req_header(conn, "accept", "application/json")
+    channel_id = create_fifo_channel(conn)
+    producer_id = create_create_producer(conn, channel_id)
+
+    {:ok, conn: conn, channel_id: channel_id, producer_id: producer_id}
   end
 
   describe "E2E test for testing a FIFO channel" do
-    import SintropyEngine.E2eFixtures
-
     test "full E2E flow: create channel, publish message, poll, and dequeue via API", %{
-      conn: conn
+      conn: conn,
+      channel_id: channel_id,
+      producer_id: producer_id
     } do
-      channel_id = create_fifo_channel(conn)
-      producer_id = create_create_producer(conn, channel_id)
 
       message_attrs = %{
         channel_id: channel_id,
@@ -54,9 +58,11 @@ defmodule SintropyEngine.SingleChannelFifoPollingE2eTest do
       end
     end
 
-    test "publish two messages and poll both in a single call", %{conn: conn} do
-      channel_id = create_fifo_channel(conn)
-      producer_id = create_create_producer(conn, channel_id)
+    test "publish two messages and poll both in a single call", %{
+      conn: conn,
+      channel_id: channel_id,
+      producer_id: producer_id
+    } do
 
       message_attrs_1 = %{
         channel_id: channel_id,
