@@ -20,6 +20,7 @@ import jakarta.inject.Inject
 import java.util.UUID
 import kotlin.random.Random
 import kotlinx.coroutines.delay
+import org.junit.jupiter.api.BeforeAll
 
 private val logger = KotlinLogging.logger {}
 

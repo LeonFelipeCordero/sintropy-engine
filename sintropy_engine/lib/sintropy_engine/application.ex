@@ -12,6 +12,8 @@ defmodule SintropyEngine.Application do
       SintropyEngine.Repo,
       {DNSCluster, query: Application.get_env(:sintropy_engine, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: SintropyEngine.PubSub},
+      # Start replication consumer for streaming messages
+      SintropyEngine.Replication.PGReplicationConsumer,
       # Start a worker by calling: SintropyEngine.Worker.start_link(arg)
       # {SintropyEngine.Worker, arg},
       # Start to serve requests, typically the last entry
