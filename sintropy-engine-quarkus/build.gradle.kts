@@ -44,7 +44,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}")
 
     testImplementation("io.mockk:mockk:1.14.6")
-    testImplementation("org.testcontainers:testcontainers:1.21.4")
+    testImplementation("org.testcontainers:testcontainers:2.0.3")
     testImplementation("org.testcontainers:postgresql:1.21.4")
     testImplementation("org.testcontainers:junit-jupiter:1.21.4")
     testImplementation("io.quarkus:quarkus-junit5")
