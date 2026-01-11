@@ -9,7 +9,7 @@ import java.util.*
 @Path("/producers")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class ProducerResource(
+class ProducerApi(
     private val producerService: ProducerService
 ) {
 

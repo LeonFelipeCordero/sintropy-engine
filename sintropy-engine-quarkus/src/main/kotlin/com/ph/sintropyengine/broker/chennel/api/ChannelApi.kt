@@ -17,16 +17,9 @@ import java.util.UUID
 @Path("/channels")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class ChannelResource(
+class ChannelApi(
     private val channelService: ChannelService
 ) {
-
-    data class CreateChannelRequest(
-        val name: String,
-        val channelType: ChannelType,
-        val routingKeys: List<String>,
-        val consumptionType: ConsumptionType?,
-    )
 
     @POST
     fun createChannel(request: CreateChannelRequest): Response {
@@ -70,8 +63,19 @@ class ChannelResource(
 
     @POST
     @Path("/{id}/routing-keys")
-    fun addRoutingKey(@PathParam("id") id: UUID, routingKey: String): Response {
-        channelService.addRoutingKey(id, routingKey)
+    fun addRoutingKey(@PathParam("id") id: UUID, routingKeyRequest: CreateNewRoutingKeyRequest): Response {
+        channelService.addRoutingKey(id, routingKeyRequest.routingKey)
         return Response.noContent().build()
     }
 }
+
+data class CreateChannelRequest(
+    val name: String,
+    val channelType: ChannelType,
+    val routingKeys: List<String>,
+    val consumptionType: ConsumptionType?,
+)
+
+data class CreateNewRoutingKeyRequest(
+    val routingKey: String
+)

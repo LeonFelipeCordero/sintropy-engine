@@ -1,5 +1,6 @@
 package com.ph.sintropyengine.broker.chennel.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.UUID
 
 // TODO create different data classes for queue and stream that extend from Channel which will be an interface
@@ -13,6 +14,7 @@ data class Channel(
 
     fun containsRoutingKey(routingKey: String): Boolean = routingKeys.contains(routingKey)
 
+    @JsonIgnore
     fun getConsumptionOrFail(): ConsumptionType {
         if (channelType != ChannelType.QUEUE) {
             throw IllegalStateException("ChannelType is not QUEUE, there force it can't have consumption type")

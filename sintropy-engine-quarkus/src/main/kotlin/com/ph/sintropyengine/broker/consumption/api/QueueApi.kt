@@ -17,7 +17,7 @@ import java.util.UUID
 @Path("/queues")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class QueueResource(
+class QueueApi(
     private val channelService: ChannelService,
     private val pollingFifoQueue: PollingFifoQueue,
     private val pollingStandardQueue: PollingStandardQueue
