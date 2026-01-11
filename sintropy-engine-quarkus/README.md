@@ -1,18 +1,48 @@
-# sintropy-engine
+# Sintropy Engine
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+Sintropy Engine is a message broker built with Quarkus and Kotlin. It provides a reliable and scalable platform for asynchronous communication between services.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+## Prerequisites
+
+To build and run this project, you will need the following tools:
+
+- **Java 21:** The project is built with Java 21.
+- **Kotlin:** The primary language for this project is Kotlin.
+- **Gradle:** Gradle is used for building the project and managing dependencies.
+- **Docker:** Docker is required for running the local development environment.
+
+## Local Development Setup
+
+The local development environment uses Docker to run a PostgreSQL database with the `wal2json` plugin enabled.
+
+To start the local database, run the following command:
+
+```shell script
+docker-compose -f development/docker-compose.yaml up -d
+```
+
+This will start a PostgreSQL database on port 5432. The default credentials are:
+
+- **Username:** `postgres`
+- **Password:** `postgres`
 
 ## Running the application in dev mode
 
-You can run your application in dev mode that enables live coding using:
+You can run your application in dev mode, which enables live coding, using the following command:
 
 ```shell script
 ./gradlew quarkusDev -Dapi.version=1.44
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+> **_NOTE:_** Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+
+## Running Tests
+
+To run the test suite, use the following command:
+
+```shell script
+./gradlew test -Dapi.version=1.44
+```
 
 ## Packaging and running the application
 
@@ -51,16 +81,12 @@ Or, if you don't have GraalVM installed, you can run the native executable build
 
 You can then execute your native executable with: `./build/sintropy-engine-1.0-SNAPSHOT-runner`
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/gradle-tooling>.
+## Contributing
 
-## Related Guides
+Contributions are welcome! If you would like to contribute to the project, please follow these steps:
 
-- Mutiny ([guide](https://quarkus.io/guides/mutiny-primer)): Write reactive applications with the modern Reactive
-  Programming library Mutiny
-- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and
-  Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on
-  it.
-- YAML Configuration ([guide](https://quarkus.io/guides/config-yaml)): Use YAML to configure your Quarkus application
-- OpenTelemetry ([guide](https://quarkus.io/guides/opentelemetry)): Use OpenTelemetry to trace services
-- Kotlin ([guide](https://quarkus.io/guides/kotlin)): Write your services in Kotlin
-- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix.
+3.  Make your changes and commit them with a descriptive message.
+4.  Push your changes to your fork.
+5.  Create a pull request to the main repository.

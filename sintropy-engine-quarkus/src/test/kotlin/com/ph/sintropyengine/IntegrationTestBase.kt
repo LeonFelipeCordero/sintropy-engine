@@ -8,7 +8,6 @@ import com.ph.sintropyengine.broker.model.ConsumptionType.*
 import com.ph.sintropyengine.broker.model.Message
 import com.ph.sintropyengine.broker.model.Producer
 import com.ph.sintropyengine.broker.repository.ChannelRepository
-import com.ph.sintropyengine.broker.repository.ConsumerRepository
 import com.ph.sintropyengine.broker.repository.MessageRepository
 import com.ph.sintropyengine.broker.repository.ProducerRepository
 import com.ph.sintropyengine.broker.service.PollingQueue
@@ -20,7 +19,6 @@ import jakarta.inject.Inject
 import java.util.UUID
 import kotlin.random.Random
 import kotlinx.coroutines.delay
-import org.junit.jupiter.api.BeforeAll
 
 private val logger = KotlinLogging.logger {}
 
@@ -34,9 +32,6 @@ open class IntegrationTestBase {
     protected lateinit var channelRepository: ChannelRepository
 
     @Inject
-    protected lateinit var consumerRepository: ConsumerRepository
-
-    @Inject
     protected lateinit var producerRepository: ProducerRepository
 
     @Inject
@@ -44,19 +39,9 @@ open class IntegrationTestBase {
 
     protected fun clean() {
         messageRepository.deleteAll()
-//        consumerRepository.deleteAll()
         producerRepository.deleteAll()
         channelRepository.deleteAll()
     }
-
-    /**
-     * Create a new channel and new consumer with unique ID
-     */
-//    protected fun createChannelAndConsumer(): Pair<Channel, Consumer> {
-//        val channel = createChannel()
-//        val consumer = consumerRepository.save(Fixtures.createConsumer(channel.channelId!!))
-//        return Pair(channel, consumer)
-//    }
 
     /**
      * Create a new channel with unique IDs
