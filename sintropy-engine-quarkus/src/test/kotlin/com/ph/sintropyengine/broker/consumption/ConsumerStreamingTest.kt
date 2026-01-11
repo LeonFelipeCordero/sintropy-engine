@@ -131,7 +131,7 @@ class ConsumerStreamingTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `should get a message and it should not be in message table and should be processed in event log`() = runTest {
+    fun `should get a message and it should not be in message table and should be processed in message log`() = runTest {
         val latch = CountDownLatch(5)
         val producer = createProducer(channel)
 
@@ -179,8 +179,8 @@ class ConsumerStreamingTest : IntegrationTestBase() {
         val messages = messageRepository.findAll()
         Assertions.assertThat(messages).hasSize(0)
 
-        val evetLogs = messageRepository.findAllEventLog()
-        Assertions.assertThat(evetLogs).hasSize(5)
-        Assertions.assertThat(evetLogs.map { it.processed }.toSet().first()).isTrue
+        val messageLogs = messageRepository.findAllMessageLog()
+        Assertions.assertThat(messageLogs).hasSize(5)
+        Assertions.assertThat(messageLogs.map { it.processed }.toSet().first()).isTrue
     }
 }

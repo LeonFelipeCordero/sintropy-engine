@@ -63,7 +63,7 @@ class ProducerServiceTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `should create a message and it trigger and insert in event log`() {
+    fun `should create a message and it trigger and insert in message log`() {
         val (channel, producer) = createChannelWithProducer()
 
         producerService.publishMessage(
@@ -71,21 +71,21 @@ class ProducerServiceTest : IntegrationTestBase() {
         )
 
         val messages = messageRepository.findAll()
-        val eventLogs = messageRepository.findAllEventLog()
+        val messageLogs = messageRepository.findAllMessageLog()
         Assertions.assertThat(messages).hasSize(1)
-        Assertions.assertThat(eventLogs).hasSize(1)
+        Assertions.assertThat(messageLogs).hasSize(1)
         val message = messages.first()
-        val eventLog = eventLogs.first()
-        Assertions.assertThat(message.messageId).isEqualTo(eventLog.messageId)
-        Assertions.assertThat(message.timestamp).isEqualTo(eventLog.timestamp)
-        Assertions.assertThat(message.channelId).isEqualTo(eventLog.channelId)
-        Assertions.assertThat(message.producerId).isEqualTo(eventLog.producerId)
-        Assertions.assertThat(message.routingKey).isEqualTo(eventLog.routingKey)
+        val messageLog = messageLogs.first()
+        Assertions.assertThat(message.messageId).isEqualTo(messageLog.messageId)
+        Assertions.assertThat(message.timestamp).isEqualTo(messageLog.timestamp)
+        Assertions.assertThat(message.channelId).isEqualTo(messageLog.channelId)
+        Assertions.assertThat(message.producerId).isEqualTo(messageLog.producerId)
+        Assertions.assertThat(message.routingKey).isEqualTo(messageLog.routingKey)
 
         Assertions.assertThat(message.status).isEqualTo(MessageStatus.READY)
         Assertions.assertThat(message.lastDelivered).isNull()
         Assertions.assertThat(message.deliveredTimes).isZero
 
-        Assertions.assertThat(eventLog.processed).isFalse
+        Assertions.assertThat(messageLog.processed).isFalse
     }
 }

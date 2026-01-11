@@ -1,6 +1,6 @@
 package com.ph.sintropyengine.broker.consumption.repository
 
-import com.ph.sintropyengine.broker.consumption.model.EventLog
+import com.ph.sintropyengine.broker.consumption.model.MessageLog
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
 import com.ph.sintropyengine.jooq.generated.Tables
@@ -109,8 +109,38 @@ class MessageRepository(
             .where(Tables.MESSAGES.MESSAGE_ID.eq(messageId))
             .fetchOneInto(Message::class.java)
 
+    fun findMessageLogById(messageId: UUID): MessageLog? =
+        context.selectFrom(Tables.MESSAGE_LOG)
+            .where(Tables.MESSAGE_LOG.MESSAGE_ID.eq(messageId))
+            .fetchOneInto(MessageLog::class.java)
+
+    // TODO: This MUST have pagination, for how to keep going let's do it in one call
+    fun findMessageLogFromToByChannelIdAndRoutingKey(
+        channelId: UUID,
+        routingKey: String,
+        from: OffsetDateTime,
+        to: OffsetDateTime?
+    ): List<MessageLog> {
+        val query = context.selectFrom(Tables.MESSAGE_LOG)
+            .where(Tables.MESSAGE_LOG.CHANNEL_ID.eq(channelId))
+            .and(Tables.MESSAGE_LOG.ROUTING_KEY.eq(routingKey))
+            .and(Tables.MESSAGE_LOG.TIMESTAMP.greaterOrEqual(from))
+
+        to?.run {
+            query.and(Tables.MESSAGE_LOG.TIMESTAMP.lessOrEqual(to))
+        }
+
+        return query.fetchInto(MessageLog::class.java)
+    }
+
+    fun findAllMessagesByChannelIdAndRoutingKey(channelId: UUID, routingKey: String) =
+        context.selectFrom(Tables.MESSAGE_LOG)
+            .where(Tables.MESSAGE_LOG.CHANNEL_ID.eq(channelId))
+            .and(Tables.MESSAGE_LOG.ROUTING_KEY.eq(routingKey))
+            .fetchInto(MessageLog::class.java)
+
     fun findAll(): List<Message> = context.selectFrom(Tables.MESSAGES).fetchInto(Message::class.java)
-    fun findAllEventLog(): List<EventLog> = context.selectFrom(Tables.EVENT_LOG).fetchInto(EventLog::class.java)
+    fun findAllMessageLog(): List<MessageLog> = context.selectFrom(Tables.MESSAGE_LOG).fetchInto(MessageLog::class.java)
 
 
     /**
@@ -118,7 +148,7 @@ class MessageRepository(
      */
     fun deleteAll() {
         context.delete(Tables.MESSAGES).execute()
-        context.delete(Tables.EVENT_LOG).execute()
+        context.delete(Tables.MESSAGE_LOG).execute()
     }
 
     /**

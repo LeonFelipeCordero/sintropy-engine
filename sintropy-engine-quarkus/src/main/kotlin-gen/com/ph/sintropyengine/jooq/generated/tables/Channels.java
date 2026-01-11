@@ -8,8 +8,7 @@ import com.ph.sintropyengine.jooq.generated.Indexes;
 import com.ph.sintropyengine.jooq.generated.Keys;
 import com.ph.sintropyengine.jooq.generated.Public;
 import com.ph.sintropyengine.jooq.generated.enums.ChannelType;
-import com.ph.sintropyengine.jooq.generated.tables.Consumers.ConsumersPath;
-import com.ph.sintropyengine.jooq.generated.tables.EventLog.EventLogPath;
+import com.ph.sintropyengine.jooq.generated.tables.MessageLog.MessageLogPath;
 import com.ph.sintropyengine.jooq.generated.tables.Messages.MessagesPath;
 import com.ph.sintropyengine.jooq.generated.tables.Producers.ProducersPath;
 import com.ph.sintropyengine.jooq.generated.tables.Queues.QueuesPath;
@@ -168,30 +167,17 @@ public class Channels extends TableImpl<ChannelsRecord> {
         return Keys.CHANNELS_PKEY;
     }
 
-    private transient ConsumersPath _consumers;
+    private transient MessageLogPath _messageLog;
 
     /**
-     * Get the implicit to-many join path to the <code>public.consumers</code>
+     * Get the implicit to-many join path to the <code>public.message_log</code>
      * table
      */
-    public ConsumersPath consumers() {
-        if (_consumers == null)
-            _consumers = new ConsumersPath(this, null, Keys.CONSUMERS__CONSUMERS_CHANNEL_ID_FKEY.getInverseKey());
+    public MessageLogPath messageLog() {
+        if (_messageLog == null)
+            _messageLog = new MessageLogPath(this, null, Keys.MESSAGE_LOG__MESSAGE_LOG_CHANNEL_ID_FKEY.getInverseKey());
 
-        return _consumers;
-    }
-
-    private transient EventLogPath _eventLog;
-
-    /**
-     * Get the implicit to-many join path to the <code>public.event_log</code>
-     * table
-     */
-    public EventLogPath eventLog() {
-        if (_eventLog == null)
-            _eventLog = new EventLogPath(this, null, Keys.EVENT_LOG__EVENT_LOG_CHANNEL_ID_FKEY.getInverseKey());
-
-        return _eventLog;
+        return _messageLog;
     }
 
     private transient MessagesPath _messages;

@@ -5,15 +5,13 @@ package com.ph.sintropyengine.jooq.generated;
 
 
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
-import com.ph.sintropyengine.jooq.generated.tables.Consumers;
-import com.ph.sintropyengine.jooq.generated.tables.EventLog;
+import com.ph.sintropyengine.jooq.generated.tables.MessageLog;
 import com.ph.sintropyengine.jooq.generated.tables.Messages;
 import com.ph.sintropyengine.jooq.generated.tables.Producers;
 import com.ph.sintropyengine.jooq.generated.tables.Queues;
 import com.ph.sintropyengine.jooq.generated.tables.RoutingKeys;
 import com.ph.sintropyengine.jooq.generated.tables.records.ChannelsRecord;
-import com.ph.sintropyengine.jooq.generated.tables.records.ConsumersRecord;
-import com.ph.sintropyengine.jooq.generated.tables.records.EventLogRecord;
+import com.ph.sintropyengine.jooq.generated.tables.records.MessageLogRecord;
 import com.ph.sintropyengine.jooq.generated.tables.records.MessagesRecord;
 import com.ph.sintropyengine.jooq.generated.tables.records.ProducersRecord;
 import com.ph.sintropyengine.jooq.generated.tables.records.QueuesRecord;
@@ -38,8 +36,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<ChannelsRecord> CHANNELS_PKEY = Internal.createUniqueKey(Channels.CHANNELS, DSL.name("channels_pkey"), new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
-    public static final UniqueKey<ConsumersRecord> CONSUMERS_PKEY = Internal.createUniqueKey(Consumers.CONSUMERS, DSL.name("consumers_pkey"), new TableField[] { Consumers.CONSUMERS.CONSUMER_ID }, true);
-    public static final UniqueKey<EventLogRecord> EVENT_LOG_MESSAGE_ID_TIMESTAMP_PK = Internal.createUniqueKey(EventLog.EVENT_LOG, DSL.name("event_log_message_id_timestamp_pk"), new TableField[] { EventLog.EVENT_LOG.MESSAGE_ID, EventLog.EVENT_LOG.TIMESTAMP, EventLog.EVENT_LOG.CHANNEL_ID }, true);
+    public static final UniqueKey<MessageLogRecord> MESSAGE_LOG_MESSAGE_ID_TIMESTAMP_PK = Internal.createUniqueKey(MessageLog.MESSAGE_LOG, DSL.name("message_log_message_id_timestamp_pk"), new TableField[] { MessageLog.MESSAGE_LOG.MESSAGE_ID, MessageLog.MESSAGE_LOG.TIMESTAMP, MessageLog.MESSAGE_LOG.CHANNEL_ID }, true);
     public static final UniqueKey<MessagesRecord> MESSAGES_MESSAGE_ID_PK = Internal.createUniqueKey(Messages.MESSAGES, DSL.name("messages_message_id_pk"), new TableField[] { Messages.MESSAGES.MESSAGE_ID }, true);
     public static final UniqueKey<ProducersRecord> PRODUCERS_PKEY = Internal.createUniqueKey(Producers.PRODUCERS, DSL.name("producers_pkey"), new TableField[] { Producers.PRODUCERS.PRODUCER_ID }, true);
     public static final UniqueKey<QueuesRecord> QUEUES_PKEY = Internal.createUniqueKey(Queues.QUEUES, DSL.name("queues_pkey"), new TableField[] { Queues.QUEUES.CHANNEL_ID }, true);
@@ -49,9 +46,8 @@ public class Keys {
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final ForeignKey<ConsumersRecord, ChannelsRecord> CONSUMERS__CONSUMERS_CHANNEL_ID_FKEY = Internal.createForeignKey(Consumers.CONSUMERS, DSL.name("consumers_channel_id_fkey"), new TableField[] { Consumers.CONSUMERS.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
-    public static final ForeignKey<EventLogRecord, ChannelsRecord> EVENT_LOG__EVENT_LOG_CHANNEL_ID_FKEY = Internal.createForeignKey(EventLog.EVENT_LOG, DSL.name("event_log_channel_id_fkey"), new TableField[] { EventLog.EVENT_LOG.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
-    public static final ForeignKey<EventLogRecord, ProducersRecord> EVENT_LOG__EVENT_LOG_PRODUCER_ID_FKEY = Internal.createForeignKey(EventLog.EVENT_LOG, DSL.name("event_log_producer_id_fkey"), new TableField[] { EventLog.EVENT_LOG.PRODUCER_ID }, Keys.PRODUCERS_PKEY, new TableField[] { Producers.PRODUCERS.PRODUCER_ID }, true);
+    public static final ForeignKey<MessageLogRecord, ChannelsRecord> MESSAGE_LOG__MESSAGE_LOG_CHANNEL_ID_FKEY = Internal.createForeignKey(MessageLog.MESSAGE_LOG, DSL.name("message_log_channel_id_fkey"), new TableField[] { MessageLog.MESSAGE_LOG.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
+    public static final ForeignKey<MessageLogRecord, ProducersRecord> MESSAGE_LOG__MESSAGE_LOG_PRODUCER_ID_FKEY = Internal.createForeignKey(MessageLog.MESSAGE_LOG, DSL.name("message_log_producer_id_fkey"), new TableField[] { MessageLog.MESSAGE_LOG.PRODUCER_ID }, Keys.PRODUCERS_PKEY, new TableField[] { Producers.PRODUCERS.PRODUCER_ID }, true);
     public static final ForeignKey<MessagesRecord, ChannelsRecord> MESSAGES__MESSAGES_CHANNEL_ID_FKEY = Internal.createForeignKey(Messages.MESSAGES, DSL.name("messages_channel_id_fkey"), new TableField[] { Messages.MESSAGES.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
     public static final ForeignKey<MessagesRecord, ProducersRecord> MESSAGES__MESSAGES_PRODUCER_ID_FKEY = Internal.createForeignKey(Messages.MESSAGES, DSL.name("messages_producer_id_fkey"), new TableField[] { Messages.MESSAGES.PRODUCER_ID }, Keys.PRODUCERS_PKEY, new TableField[] { Producers.PRODUCERS.PRODUCER_ID }, true);
     public static final ForeignKey<ProducersRecord, ChannelsRecord> PRODUCERS__PRODUCERS_CHANNEL_ID_FKEY = Internal.createForeignKey(Producers.PRODUCERS, DSL.name("producers_channel_id_fkey"), new TableField[] { Producers.PRODUCERS.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);

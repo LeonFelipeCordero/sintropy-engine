@@ -5,7 +5,6 @@ package com.ph.sintropyengine.jooq.generated;
 
 
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
-import com.ph.sintropyengine.jooq.generated.tables.Consumers;
 import com.ph.sintropyengine.jooq.generated.tables.Messages;
 import com.ph.sintropyengine.jooq.generated.tables.Producers;
 
@@ -26,8 +25,6 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     public static final Index CHANNELS_NAME_IDX = Internal.createIndex(DSL.name("channels_name_idx"), Channels.CHANNELS, new OrderField[] { Channels.CHANNELS.NAME }, true);
-    public static final Index CONSUMERS_CHANNEL_ID_IDX = Internal.createIndex(DSL.name("consumers_channel_id_idx"), Consumers.CONSUMERS, new OrderField[] { Consumers.CONSUMERS.CHANNEL_ID }, false);
-    public static final Index CONSUMERS_ROUTING_KEY = Internal.createIndex(DSL.name("consumers_routing_key"), Consumers.CONSUMERS, new OrderField[] { Consumers.CONSUMERS.ROUTING_KEY }, false);
     public static final Index MESSAGES_POLLING_1IDX = Internal.createIndex(DSL.name("messages_polling_1idx"), Messages.MESSAGES, new OrderField[] { Messages.MESSAGES.CHANNEL_ID, Messages.MESSAGES.ROUTING_KEY, Messages.MESSAGES.STATUS, Messages.MESSAGES.LAST_DELIVERED, Messages.MESSAGES.DELIVERED_TIMES }, false);
     public static final Index PRODUCERS_CHANNEL_ID_IDX = Internal.createIndex(DSL.name("producers_channel_id_idx"), Producers.PRODUCERS, new OrderField[] { Producers.PRODUCERS.CHANNEL_ID }, false);
     public static final Index PRODUCERS_NAME_IDX = Internal.createIndex(DSL.name("producers_name_idx"), Producers.PRODUCERS, new OrderField[] { Producers.PRODUCERS.NAME }, true);

@@ -5,8 +5,7 @@ package com.ph.sintropyengine.jooq.generated;
 
 
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
-import com.ph.sintropyengine.jooq.generated.tables.Consumers;
-import com.ph.sintropyengine.jooq.generated.tables.EventLog;
+import com.ph.sintropyengine.jooq.generated.tables.MessageLog;
 import com.ph.sintropyengine.jooq.generated.tables.Messages;
 import com.ph.sintropyengine.jooq.generated.tables.Producers;
 import com.ph.sintropyengine.jooq.generated.tables.Queues;
@@ -25,14 +24,9 @@ public class Tables {
     public static final Channels CHANNELS = Channels.CHANNELS;
 
     /**
-     * The table <code>public.consumers</code>.
+     * The table <code>public.message_log</code>.
      */
-    public static final Consumers CONSUMERS = Consumers.CONSUMERS;
-
-    /**
-     * The table <code>public.event_log</code>.
-     */
-    public static final EventLog EVENT_LOG = EventLog.EVENT_LOG;
+    public static final MessageLog MESSAGE_LOG = MessageLog.MESSAGE_LOG;
 
     /**
      * The table <code>public.messages</code>.

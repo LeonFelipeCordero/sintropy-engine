@@ -22,7 +22,7 @@ create table messages
 create index messages_polling_1idx
     on messages (channel_id, routing_key, status, last_delivered, delivered_times);
 
-create table event_log
+create table message_log
 (
     message_id  uuid         not null,
     timestamp   timestamptz  not null,
@@ -36,23 +36,23 @@ create table event_log
     created_at  timestamptz  not null,
     updated_at  timestamptz  not null,
 
-    constraint event_log_message_id_timestamp_pk primary key (message_id, timestamp, channel_id)
+    constraint message_log_message_id_timestamp_pk primary key (message_id, timestamp, channel_id)
 );
 
-create or replace function messages_to_event_log()
+create or replace function messages_to_message_log()
     returns trigger as
 $$
 begin
-    insert into event_log(message_id,
-                          timestamp,
-                          channel_id,
-                          producer_id,
-                          routing_key,
-                          message,
-                          headers,
-                          processed,
-                          created_at,
-                          updated_at)
+    insert into message_log(message_id,
+                            timestamp,
+                            channel_id,
+                            producer_id,
+                            routing_key,
+                            message,
+                            headers,
+                            processed,
+                            created_at,
+                            updated_at)
     values (new.message_id,
             new.timestamp,
             new.channel_id,
@@ -68,18 +68,18 @@ begin
 end;
 $$ language plpgsql;
 
-create trigger insert_into_event_log
+create trigger insert_into_message_log
     after insert
     on messages
     for each row
-execute function messages_to_event_log();
+execute function messages_to_message_log();
 
 
-create or replace function mark_event_log_item_as_processed()
+create or replace function mark_message_log_item_as_processed()
     returns trigger as
 $$
 begin
-    update event_log
+    update message_log
     set processed  = true,
         updated_at = now()
     where message_id = old.message_id;
@@ -88,9 +88,9 @@ begin
 end;
 $$ language plpgsql;
 
-create trigger mark_as_deliver_in_event_log
+create trigger mark_as_delivered_in_message_log
     after delete
     on messages
     for each row
-execute function mark_event_log_item_as_processed();
+execute function mark_message_log_item_as_processed();
 

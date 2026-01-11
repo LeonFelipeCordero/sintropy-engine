@@ -8,7 +8,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 import org.jooq.JSONB
 
-data class EventLog(
+data class MessageLog(
     val messageId: UUID,
     val timestamp: OffsetDateTime,
     val channelId: UUID,

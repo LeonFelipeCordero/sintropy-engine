@@ -251,7 +251,7 @@ class PollingFifoQueueTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `should dequeue a message that is processed and mark it in the event log`() {
+    fun `should dequeue a message that is processed and mark it in the message log`() {
         val message = publishMessage(FIFO)
 
         pollingQueue.poll(message.channelId, message.routingKey)
@@ -259,11 +259,11 @@ class PollingFifoQueueTest : IntegrationTestBase() {
         pollingQueue.dequeue(message.messageId)
 
         val messages = messageRepository.findAll()
-        val eventLogs = messageRepository.findAllEventLog()
+        val messageLogs = messageRepository.findAllMessageLog()
 
         assertThat(messages).hasSize(0)
-        assertThat(eventLogs).hasSize(1)
-        assertThat(eventLogs.first().processed).isTrue
+        assertThat(messageLogs).hasSize(1)
+        assertThat(messageLogs.first().processed).isTrue
     }
 
     @Test
@@ -365,15 +365,15 @@ class PollingFifoQueueTest : IntegrationTestBase() {
 
         allWork.join()
 
-        val allEventLog = messageRepository.findAllEventLog().filter { it.processed }
-        assertThat(allEventLog).hasSize(messagesCount)
+        val allMessageLog = messageRepository.findAllMessageLog().filter { it.processed }
+        assertThat(allMessageLog).hasSize(messagesCount)
         assertThat(polledMessages.flatMap { (_, value) -> value }).hasSize(messagesCount)
 
         polledMessages.forEach { (key, messages) ->
             assertThat(messages)
                 .usingRecursiveComparison()
                 .ignoringFields("status", "lastDelivered", "deliveredTimes")
-                .isEqualTo(allEventLog.filter { it.routing() == key }.sortedBy { it.timestamp })
+                .isEqualTo(allMessageLog.filter { it.routing() == key }.sortedBy { it.timestamp })
         }
     }
 
@@ -455,15 +455,15 @@ class PollingFifoQueueTest : IntegrationTestBase() {
 
         allWork.join()
 
-        val allEventLog = messageRepository.findAllEventLog().filter { it.processed }
-        assertThat(allEventLog).hasSize(messagesCount)
+        val allMessageLog = messageRepository.findAllMessageLog().filter { it.processed }
+        assertThat(allMessageLog).hasSize(messagesCount)
         assertThat(polledMessages.flatMap { (_, value) -> value }).hasSize(messagesCount)
 
         polledMessages.forEach { (key, messages) ->
             assertThat(messages)
                 .usingRecursiveComparison()
                 .ignoringFields("status", "lastDelivered", "deliveredTimes")
-                .isEqualTo(allEventLog.filter { it.routing() == key }.sortedBy { it.timestamp })
+                .isEqualTo(allMessageLog.filter { it.routing() == key }.sortedBy { it.timestamp })
         }
     }
 }

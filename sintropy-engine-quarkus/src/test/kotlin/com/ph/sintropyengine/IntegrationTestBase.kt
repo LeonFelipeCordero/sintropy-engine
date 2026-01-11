@@ -9,6 +9,7 @@ import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.producer.model.Producer
 import com.ph.sintropyengine.broker.chennel.repository.ChannelRepository
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
+import com.ph.sintropyengine.broker.consumption.service.MessageService
 import com.ph.sintropyengine.broker.producer.repository.ProducerRepository
 import com.ph.sintropyengine.broker.consumption.service.PollingQueue
 import com.ph.sintropyengine.broker.producer.service.ProducerService
@@ -36,6 +37,9 @@ open class IntegrationTestBase {
 
     @Inject
     protected lateinit var producerService: ProducerService
+
+    @Inject
+    protected lateinit var messageService: MessageService
 
     protected fun clean() {
         messageRepository.deleteAll()

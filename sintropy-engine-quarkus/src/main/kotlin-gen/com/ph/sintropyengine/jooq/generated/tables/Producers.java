@@ -8,7 +8,7 @@ import com.ph.sintropyengine.jooq.generated.Indexes;
 import com.ph.sintropyengine.jooq.generated.Keys;
 import com.ph.sintropyengine.jooq.generated.Public;
 import com.ph.sintropyengine.jooq.generated.tables.Channels.ChannelsPath;
-import com.ph.sintropyengine.jooq.generated.tables.EventLog.EventLogPath;
+import com.ph.sintropyengine.jooq.generated.tables.MessageLog.MessageLogPath;
 import com.ph.sintropyengine.jooq.generated.tables.Messages.MessagesPath;
 import com.ph.sintropyengine.jooq.generated.tables.records.ProducersRecord;
 
@@ -181,17 +181,17 @@ public class Producers extends TableImpl<ProducersRecord> {
         return _channels;
     }
 
-    private transient EventLogPath _eventLog;
+    private transient MessageLogPath _messageLog;
 
     /**
-     * Get the implicit to-many join path to the <code>public.event_log</code>
+     * Get the implicit to-many join path to the <code>public.message_log</code>
      * table
      */
-    public EventLogPath eventLog() {
-        if (_eventLog == null)
-            _eventLog = new EventLogPath(this, null, Keys.EVENT_LOG__EVENT_LOG_PRODUCER_ID_FKEY.getInverseKey());
+    public MessageLogPath messageLog() {
+        if (_messageLog == null)
+            _messageLog = new MessageLogPath(this, null, Keys.MESSAGE_LOG__MESSAGE_LOG_PRODUCER_ID_FKEY.getInverseKey());
 
-        return _eventLog;
+        return _messageLog;
     }
 
     private transient MessagesPath _messages;
