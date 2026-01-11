@@ -1,16 +1,15 @@
 package com.ph.sintropyengine
 
-import com.ph.sintropyengine.broker.model.Channel
-import com.ph.sintropyengine.broker.model.ChannelType
-import com.ph.sintropyengine.broker.model.ChannelType.*
-import com.ph.sintropyengine.broker.model.ConsumptionType
-import com.ph.sintropyengine.broker.model.Consumer
-import com.ph.sintropyengine.broker.model.ConsumptionType.*
-import com.ph.sintropyengine.broker.model.Message
-import com.ph.sintropyengine.broker.model.MessagePreStore
-import com.ph.sintropyengine.broker.model.MessageStatus
-import com.ph.sintropyengine.broker.model.Producer
-import com.ph.sintropyengine.broker.resource.PublishMessageRequest
+import com.ph.sintropyengine.broker.chennel.model.Channel
+import com.ph.sintropyengine.broker.chennel.model.ChannelType
+import com.ph.sintropyengine.broker.chennel.model.ChannelType.*
+import com.ph.sintropyengine.broker.chennel.model.ConsumptionType
+import com.ph.sintropyengine.broker.chennel.model.ConsumptionType.*
+import com.ph.sintropyengine.broker.consumption.model.Message
+import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
+import com.ph.sintropyengine.broker.consumption.model.MessageStatus
+import com.ph.sintropyengine.broker.producer.model.Producer
+import com.ph.sintropyengine.broker.producer.api.PublishMessageRequest
 import java.util.UUID
 import org.jooq.JSONB
 
@@ -34,20 +33,6 @@ object Fixtures {
             channelType = channelType,
             routingKeys = routingKeys.toMutableList(),
             consumptionType = consumptionType,
-        )
-    }
-
-    fun createConsumer(
-        channelId: UUID,
-        routingKey: String = DEFAULT_ROUTING_KEY,
-        consumerId: UUID? = null,
-        connectionId: String = UUID.randomUUID().toString(),
-    ): Consumer {
-        return Consumer(
-            consumerId = consumerId,
-            channelId = channelId,
-            routingKey = routingKey,
-            connectionId = connectionId,
         )
     }
 
