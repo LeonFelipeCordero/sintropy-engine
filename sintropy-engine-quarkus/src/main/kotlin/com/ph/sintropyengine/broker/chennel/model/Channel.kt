@@ -11,7 +11,6 @@ data class Channel(
     val routingKeys: MutableList<String>,
     val consumptionType: ConsumptionType? = null,
 ) {
-
     fun containsRoutingKey(routingKey: String): Boolean = routingKeys.contains(routingKey)
 
     @JsonIgnore
@@ -30,15 +29,15 @@ data class Channel(
 
 data class Queue(
     val channelId: UUID,
-    val consumptionType: ConsumptionType
+    val consumptionType: ConsumptionType,
 )
 
 enum class ChannelType {
     QUEUE,
-    STREAM
+    STREAM,
 }
 
 enum class ConsumptionType {
     STANDARD,
-    FIFO
+    FIFO,
 }

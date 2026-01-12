@@ -2,30 +2,29 @@ package com.ph.sintropyengine
 
 import com.ph.sintropyengine.broker.chennel.model.Channel
 import com.ph.sintropyengine.broker.chennel.model.ChannelType
-import com.ph.sintropyengine.broker.chennel.model.ChannelType.*
+import com.ph.sintropyengine.broker.chennel.model.ChannelType.QUEUE
 import com.ph.sintropyengine.broker.chennel.model.ConsumptionType
-import com.ph.sintropyengine.broker.chennel.model.ConsumptionType.*
-import com.ph.sintropyengine.broker.consumption.model.Message
-import com.ph.sintropyengine.broker.producer.model.Producer
+import com.ph.sintropyengine.broker.chennel.model.ConsumptionType.STANDARD
 import com.ph.sintropyengine.broker.chennel.repository.ChannelRepository
+import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.consumption.service.MessageRecoveryService
-import com.ph.sintropyengine.broker.producer.repository.ProducerRepository
 import com.ph.sintropyengine.broker.consumption.service.PollingQueue
+import com.ph.sintropyengine.broker.producer.model.Producer
+import com.ph.sintropyengine.broker.producer.repository.ProducerRepository
 import com.ph.sintropyengine.broker.producer.service.ProducerService
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.quarkus.test.common.QuarkusTestResource
 import jakarta.inject.Inject
+import kotlinx.coroutines.delay
 import java.util.UUID
 import kotlin.random.Random
-import kotlinx.coroutines.delay
 
 private val logger = KotlinLogging.logger {}
 
 @QuarkusTestResource(PostgresqlDBTestResource::class)
 open class IntegrationTestBase {
-
     @Inject
     protected lateinit var messageRepository: MessageRepository
 
@@ -52,7 +51,7 @@ open class IntegrationTestBase {
      */
     protected fun createChannel(
         channelType: ChannelType = QUEUE,
-        consumptionType: ConsumptionType = STANDARD
+        consumptionType: ConsumptionType = STANDARD,
     ): Channel {
         val channel = Fixtures.createChannel(channelType = channelType, consumptionType = consumptionType)
         return channelRepository.save(channel)
@@ -61,8 +60,7 @@ open class IntegrationTestBase {
     /**
      * Create a new producer with unique IDs for the given channel
      */
-    protected fun createProducer(channel: Channel): Producer =
-        producerRepository.save(Fixtures.createProducer(channel.channelId!!))
+    protected fun createProducer(channel: Channel): Producer = producerRepository.save(Fixtures.createProducer(channel.channelId!!))
 
     /**
      * Create a new channel and a new producer with unique IDs
@@ -81,15 +79,14 @@ open class IntegrationTestBase {
         channel: Channel,
         producer: Producer,
         routingKey: String = channel.routingKeys.first(),
-    ): Message {
-        return messageRepository.save(
+    ): Message =
+        messageRepository.save(
             Fixtures.createMessagePreStore(
                 channelId = channel.channelId!!,
                 producerId = producer.producerId!!,
                 routingKey = routingKey,
-            )
+            ),
         )
-    }
 
     /**
      * Publishes a messages to freshly created channels from freshly created producers
@@ -102,36 +99,43 @@ open class IntegrationTestBase {
             Fixtures.createMessagePreStore(
                 channel.channelId!!,
                 producer.producerId!!,
-                channel.routingKeys.first()
-            )
+                channel.routingKeys.first(),
+            ),
         )
     }
 
     protected fun launchProducers(testData: TestData) {
         logger.debug { "launching new producer..." }
-        val message = when (Random.nextInt(1, 4)) {
-            1 -> Fixtures.createMessageRequest(
-                channelName = testData.channel1().name,
-                routingKey = testData.channel1().routingKeys[Random.nextInt(0, 3)],
-                producerName = testData.producer1().name,
-            )
+        val message =
+            when (Random.nextInt(1, 4)) {
+                1 -> {
+                    Fixtures.createMessageRequest(
+                        channelName = testData.channel1().name,
+                        routingKey = testData.channel1().routingKeys[Random.nextInt(0, 3)],
+                        producerName = testData.producer1().name,
+                    )
+                }
 
-            2 -> Fixtures.createMessageRequest(
-                channelName = testData.channel2().name,
-                routingKey = testData.channel2().routingKeys[Random.nextInt(0, 2)],
-                producerName = testData.producer2().name
-            )
+                2 -> {
+                    Fixtures.createMessageRequest(
+                        channelName = testData.channel2().name,
+                        routingKey = testData.channel2().routingKeys[Random.nextInt(0, 2)],
+                        producerName = testData.producer2().name,
+                    )
+                }
 
-            3 -> Fixtures.createMessageRequest(
-                channelName = testData.channel3().name,
-                routingKey = testData.channel3().routingKeys.first(),
-                producerName = testData.producer3().name
-            )
+                3 -> {
+                    Fixtures.createMessageRequest(
+                        channelName = testData.channel3().name,
+                        routingKey = testData.channel3().routingKeys.first(),
+                        producerName = testData.producer3().name,
+                    )
+                }
 
-            else -> {
-                throw IllegalStateException("Failure setting test data")
+                else -> {
+                    throw IllegalStateException("Failure setting test data")
+                }
             }
-        }
         producerService.publishMessage(message)
     }
 
@@ -139,7 +143,7 @@ open class IntegrationTestBase {
         channelId: UUID,
         routingKey: String,
         channel: kotlinx.coroutines.channels.Channel<Message>,
-        pollingQueue: PollingQueue
+        pollingQueue: PollingQueue,
     ) {
         logger.info { "launching new consumer for [${routing(channelId, routingKey)}]" }
         var counter = 0
@@ -163,7 +167,7 @@ open class IntegrationTestBase {
                 routingInMessages.first() != routing(channelId, routingKey)
             ) {
                 throw IllegalStateException(
-                    "Polling got a message form another pair [${routing(channelId, routingKey)}]"
+                    "Polling got a message form another pair [${routing(channelId, routingKey)}]",
                 )
             }
 
@@ -178,24 +182,27 @@ open class IntegrationTestBase {
     }
 
     protected fun createTestData(consumptionType: ConsumptionType): TestData {
-        val channel1 = channelRepository.save(
-            Fixtures.createChannel(
-                consumptionType = consumptionType,
-                routingKeys = mutableListOf("test.1.0", "test.1.1", "test.1.2"),
+        val channel1 =
+            channelRepository.save(
+                Fixtures.createChannel(
+                    consumptionType = consumptionType,
+                    routingKeys = mutableListOf("test.1.0", "test.1.1", "test.1.2"),
+                ),
             )
-        )
-        val channel2 = channelRepository.save(
-            Fixtures.createChannel(
-                consumptionType = consumptionType,
-                routingKeys = mutableListOf("test.2.0", "test.2.1"),
+        val channel2 =
+            channelRepository.save(
+                Fixtures.createChannel(
+                    consumptionType = consumptionType,
+                    routingKeys = mutableListOf("test.2.0", "test.2.1"),
+                ),
             )
-        )
-        val channel3 = channelRepository.save(
-            Fixtures.createChannel(
-                consumptionType = consumptionType,
-                routingKeys = mutableListOf("test.3.0"),
+        val channel3 =
+            channelRepository.save(
+                Fixtures.createChannel(
+                    consumptionType = consumptionType,
+                    routingKeys = mutableListOf("test.3.0"),
+                ),
             )
-        )
         val producer1 = producerRepository.save(Fixtures.createProducer(channel1.channelId!!))
         val producer2 = producerRepository.save(Fixtures.createProducer(channel2.channelId!!))
         val producer3 = producerRepository.save(Fixtures.createProducer(channel3.channelId!!))
@@ -203,14 +210,14 @@ open class IntegrationTestBase {
         return TestData(
             channelProducer1 = ChannelProducer(channel1, producer1),
             channelProducer2 = ChannelProducer(channel2, producer2),
-            channelProducer3 = ChannelProducer(channel3, producer3)
+            channelProducer3 = ChannelProducer(channel3, producer3),
         )
     }
 }
 
 data class ChannelProducer(
     val channel: Channel,
-    val producer: Producer
+    val producer: Producer,
 )
 
 data class TestData(
@@ -219,20 +226,31 @@ data class TestData(
     private val channelProducer3: ChannelProducer,
 ) {
     fun channel1() = channelProducer1.channel
+
     fun channel2() = channelProducer2.channel
+
     fun channel3() = channelProducer3.channel
+
     fun producer1() = channelProducer1.producer
+
     fun producer2() = channelProducer2.producer
+
     fun producer3() = channelProducer3.producer
+
     fun routing10() = routing(channelProducer1.channel.channelId!!, channelProducer1.channel.routingKeys[0])
+
     fun routing11() = routing(channelProducer1.channel.channelId!!, channelProducer1.channel.routingKeys[1])
+
     fun routing12() = routing(channelProducer1.channel.channelId!!, channelProducer1.channel.routingKeys[2])
+
     fun routing20() = routing(channelProducer2.channel.channelId!!, channelProducer2.channel.routingKeys[0])
+
     fun routing21() = routing(channelProducer2.channel.channelId!!, channelProducer2.channel.routingKeys[1])
+
     fun routing30() = routing(channelProducer3.channel.channelId!!, channelProducer3.channel.routingKeys[0])
 
-    fun toMap(): MutableMap<String, MutableList<Message>> {
-        return mutableMapOf(
+    fun toMap(): MutableMap<String, MutableList<Message>> =
+        mutableMapOf(
             routing10() to mutableListOf(),
             routing11() to mutableListOf(),
             routing12() to mutableListOf(),
@@ -240,5 +258,4 @@ data class TestData(
             routing21() to mutableListOf(),
             routing30() to mutableListOf(),
         )
-    }
 }

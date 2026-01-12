@@ -2,8 +2,8 @@ package com.ph.sintropyengine.broker.consumption.service.replication
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ph.sintropyengine.broker.chennel.model.ChannelType
-import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.chennel.service.ChannelService
+import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.consumption.service.ConnectionRouter
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -28,9 +28,8 @@ class PGReplicationController(
     private val connectionRouter: ConnectionRouter,
     private val objectMapper: ObjectMapper,
     private val messageRepository: MessageRepository,
-    private val channelService: ChannelService
+    private val channelService: ChannelService,
 ) {
-
     @Inject
     private lateinit var openConnections: OpenConnections
 
@@ -48,8 +47,9 @@ class PGReplicationController(
             while (true) {
                 val message = replicationConsumer.channel().receive()
 
-                val channel = channelService.findById(message.channelId)
-                    ?: throw IllegalStateException("No channel found for ${message.channelId}")
+                val channel =
+                    channelService.findById(message.channelId)
+                        ?: throw IllegalStateException("No channel found for ${message.channelId}")
 
                 if (channel.channelType == ChannelType.QUEUE) {
                     logger.debug { "Skipping message ${message.messageId} because channel is for queue polling" }

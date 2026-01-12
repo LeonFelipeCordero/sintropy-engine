@@ -7,12 +7,12 @@ import jakarta.enterprise.context.ApplicationScoped
 @ConfigMapping(prefix = "quarkus.datasource")
 interface DatabaseProperties {
     fun jdbc(): JDBCProperties
+
     fun username(): String
+
     fun password(): String
 
-    fun jdbcUrl(): String {
-        return jdbc().url()
-    }
+    fun jdbcUrl(): String = jdbc().url()
 }
 
 interface JDBCProperties {

@@ -12,25 +12,26 @@ import java.util.UUID
 class ChannelService(
     private val channelRepository: ChannelRepository,
 ) {
-
     @Transactional
     fun createChannel(
         name: String,
         channelType: ChannelType,
         routingKeys: List<String>,
-        consumptionType: ConsumptionType? = null
+        consumptionType: ConsumptionType? = null,
     ): Channel {
         require(routingKeys.isNotEmpty()) { "At least one routing key must be provided" }
 
-        channelRepository.findByName(name)
+        channelRepository
+            .findByName(name)
             ?.let { throw IllegalStateException("Channel with name $name already exists") }
 
-        val channel = Channel(
-            name = name,
-            channelType = channelType,
-            routingKeys = routingKeys.toMutableList(),
-            consumptionType = consumptionType
-        )
+        val channel =
+            Channel(
+                name = name,
+                channelType = channelType,
+                routingKeys = routingKeys.toMutableList(),
+                consumptionType = consumptionType,
+            )
         return channelRepository.save(channel)
     }
 
@@ -46,7 +47,10 @@ class ChannelService(
     }
 
     @Transactional
-    fun addRoutingKey(id: UUID, routingKey: String) {
+    fun addRoutingKey(
+        id: UUID,
+        routingKey: String,
+    ) {
         val channel = channelRepository.findById(id) ?: throw IllegalStateException("Channel with id $id not found")
 
         if (channel.containsRoutingKey(routingKey)) {

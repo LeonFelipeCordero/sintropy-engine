@@ -3,10 +3,10 @@ package com.ph.sintropyengine.broker.producer.service
 import com.ph.sintropyengine.broker.chennel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
-import com.ph.sintropyengine.broker.producer.model.Producer
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
-import com.ph.sintropyengine.broker.producer.repository.ProducerRepository
 import com.ph.sintropyengine.broker.producer.api.PublishMessageRequest
+import com.ph.sintropyengine.broker.producer.model.Producer
+import com.ph.sintropyengine.broker.producer.repository.ProducerRepository
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 import java.lang.IllegalStateException
@@ -16,11 +16,13 @@ import java.util.UUID
 class ProducerService(
     private val channelService: ChannelService,
     private val producerRepository: ProducerRepository,
-    private val messageRepository: MessageRepository
+    private val messageRepository: MessageRepository,
 ) {
-
     @Transactional
-    fun createProducer(name: String, channelName: String): Producer {
+    fun createProducer(
+        name: String,
+        channelName: String,
+    ): Producer {
         val channel =
             channelService.findByName(channelName) ?: throw IllegalStateException("Channel $channelName not found")
 
@@ -43,25 +45,28 @@ class ProducerService(
 
     @Transactional
     fun publishMessage(request: PublishMessageRequest): Message {
-        val channel = channelService.findByName(request.channelName)
-            ?: throw IllegalStateException("Channel ${request.channelName} not found")
+        val channel =
+            channelService.findByName(request.channelName)
+                ?: throw IllegalStateException("Channel ${request.channelName} not found")
 
-        val producer = producerRepository.findByName(request.producerName)
-            ?: throw IllegalStateException("Producer ${request.producerName} not found")
+        val producer =
+            producerRepository.findByName(request.producerName)
+                ?: throw IllegalStateException("Producer ${request.producerName} not found")
 
         if (!channel.containsRoutingKey(request.routingKey)) {
             throw IllegalStateException(
-                "Channel ${request.channelName} does not have routing-key ${request.routingKey}"
+                "Channel ${request.channelName} does not have routing-key ${request.routingKey}",
             )
         }
 
-        val message = MessagePreStore(
-            channelId = channel.channelId!!,
-            producerId = producer.producerId!!,
-            routingKey = request.routingKey,
-            message = request.message,
-            headers = request.headers
-        )
+        val message =
+            MessagePreStore(
+                channelId = channel.channelId!!,
+                producerId = producer.producerId!!,
+                routingKey = request.routingKey,
+                message = request.message,
+                headers = request.headers,
+            )
         return messageRepository.save(message)
     }
 }

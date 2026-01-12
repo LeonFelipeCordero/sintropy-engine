@@ -17,9 +17,8 @@ private val logger = KotlinLogging.logger {}
 class MessageRecoveryService(
     private val messageRepository: MessageRepository,
     private val channelService: ChannelService,
-    private var openConnections: OpenConnections
+    private var openConnections: OpenConnections,
 ) {
-
     fun retriggerMessage(message: UUID): MessageLog {
         val message =
             messageRepository.findMessageLogById(message)
@@ -37,8 +36,10 @@ class MessageRecoveryService(
         to: OffsetDateTime?,
         batchStreamInput: BatchStreamInput,
     ) {
-        val channel = (channelService.findByName(channelName)
-            ?: throw IllegalStateException("Channel with name $channelName was not found"))
+        val channel = (
+            channelService.findByName(channelName)
+                ?: throw IllegalStateException("Channel with name $channelName was not found")
+        )
 
         if (!channel.containsRoutingKey(routingKey)) {
             throw IllegalStateException("Routing key $routingKey does not exist for channel $channelName")
@@ -46,8 +47,10 @@ class MessageRecoveryService(
 
         logger.info { "Streaming messages for routing key [${channel.routing(routingKey)}] form $from and to $to" }
 
-        val connection = openConnections.findByConnectionId(batchStreamInput.connectionId)
-            .orElseThrow { throw IllegalStateException("Connection with id ${batchStreamInput.connectionId} was not found") }
+        val connection =
+            openConnections
+                .findByConnectionId(batchStreamInput.connectionId)
+                .orElseThrow { throw IllegalStateException("Connection with id ${batchStreamInput.connectionId} was not found") }
 
         var page = 0
         var batchMessages =
@@ -57,7 +60,7 @@ class MessageRecoveryService(
                 from = from,
                 to = to,
                 pageSize = batchStreamInput.batchSize,
-                page = page
+                page = page,
             )
         if (batchMessages.isNotEmpty()) {
             connection.sendTextAndAwait(batchMessages)
@@ -66,14 +69,15 @@ class MessageRecoveryService(
         }
 
         while (batchMessages.isNotEmpty()) {
-            batchMessages = messageRepository.findMessageLogFromToByChannelIdAndRoutingKey(
-                channelId = channel.channelId,
-                routingKey = routingKey,
-                from = from,
-                to = to,
-                pageSize = batchStreamInput.batchSize,
-                page = page
-            )
+            batchMessages =
+                messageRepository.findMessageLogFromToByChannelIdAndRoutingKey(
+                    channelId = channel.channelId,
+                    routingKey = routingKey,
+                    from = from,
+                    to = to,
+                    pageSize = batchStreamInput.batchSize,
+                    page = page,
+                )
             connection.sendTextAndAwait(batchMessages)
             page += 1
             Thread.sleep(batchStreamInput.delayInMs.toLong())
@@ -83,10 +87,12 @@ class MessageRecoveryService(
     fun streamFromAll(
         channelName: String,
         routingKey: String,
-        batchStreamInput: BatchStreamInput
+        batchStreamInput: BatchStreamInput,
     ) {
-        val channel = (channelService.findByName(channelName)
-            ?: throw IllegalStateException("Channel with name $channelName was not found"))
+        val channel = (
+            channelService.findByName(channelName)
+                ?: throw IllegalStateException("Channel with name $channelName was not found")
+        )
 
         if (!channel.containsRoutingKey(routingKey)) {
             throw IllegalStateException("Routing key $routingKey does not exist for channel $channelName")
@@ -94,8 +100,10 @@ class MessageRecoveryService(
 
         logger.info { "Streaming ALL messages for routing key [${channel.routing(routingKey)}]" }
 
-        val connection = openConnections.findByConnectionId(batchStreamInput.connectionId)
-            .orElseThrow { throw IllegalStateException("Connection with id ${batchStreamInput.connectionId} was not found") }
+        val connection =
+            openConnections
+                .findByConnectionId(batchStreamInput.connectionId)
+                .orElseThrow { throw IllegalStateException("Connection with id ${batchStreamInput.connectionId} was not found") }
 
         var page = 0
         var batchMessages =
@@ -103,7 +111,7 @@ class MessageRecoveryService(
                 channelId = channel.channelId!!,
                 routingKey = routingKey,
                 pageSize = batchStreamInput.batchSize,
-                page = page
+                page = page,
             )
 
         if (batchMessages.isNotEmpty()) {
@@ -113,12 +121,13 @@ class MessageRecoveryService(
         }
 
         while (batchMessages.isNotEmpty()) {
-            batchMessages = messageRepository.findAllMessagesByChannelIdAndRoutingKey(
-                channelId = channel.channelId,
-                routingKey = routingKey,
-                pageSize = batchStreamInput.batchSize,
-                page = page
-            )
+            batchMessages =
+                messageRepository.findAllMessagesByChannelIdAndRoutingKey(
+                    channelId = channel.channelId,
+                    routingKey = routingKey,
+                    pageSize = batchStreamInput.batchSize,
+                    page = page,
+                )
             connection.sendTextAndAwait(batchMessages)
             page += 1
             Thread.sleep(batchStreamInput.delayInMs.toLong())

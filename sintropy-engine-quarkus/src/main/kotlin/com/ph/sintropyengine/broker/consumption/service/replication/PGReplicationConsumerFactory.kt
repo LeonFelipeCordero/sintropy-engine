@@ -10,10 +10,8 @@ private val logger = KotlinLogging.logger {}
 @ApplicationScoped
 class PGReplicationConsumerFactory(
     private val databaseProperties: DatabaseProperties,
-    private val featureFlags: FeatureFlags
+    private val featureFlags: FeatureFlags,
 ) {
-
-
     fun getStreamConsumer(): PGReplicationConsumer {
         if (featureFlags.withFullReplication()) {
             logger.info { "Using full replication consumer" }
@@ -23,5 +21,4 @@ class PGReplicationConsumerFactory(
         logger.info { "Using FAKE replication consumer" }
         return PGReplicationConsumerFaker()
     }
-
 }

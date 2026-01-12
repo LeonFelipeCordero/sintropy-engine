@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.ph.sintropyengine.broker.shared.utils.JsonbDeserializer
 import com.ph.sintropyengine.broker.shared.utils.JsonbSerializer
+import org.jooq.JSONB
 import java.time.OffsetDateTime
 import java.util.UUID
-import org.jooq.JSONB
 
 data class Message(
     val messageId: UUID,
@@ -28,7 +28,7 @@ data class Message(
 enum class MessageStatus {
     READY,
     IN_FLIGHT,
-    FAILED
+    FAILED,
 }
 
 data class MessagePreStore(

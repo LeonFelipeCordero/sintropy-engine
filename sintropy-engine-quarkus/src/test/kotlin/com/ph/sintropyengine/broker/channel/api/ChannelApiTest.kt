@@ -7,16 +7,15 @@ import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.hasItem
 import org.hamcrest.Matchers.hasSize
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
 @QuarkusTest
 class ChannelApiTest : IntegrationTestBase() {
-
     @BeforeEach
     fun setUp() {
         clean()
@@ -24,12 +23,13 @@ class ChannelApiTest : IntegrationTestBase() {
 
     @Test
     fun `POST channels - should create channel successfully`() {
-        val request = mapOf(
-            "name" to "test-channel",
-            "channelType" to ChannelType.QUEUE.name,
-            "routingKeys" to listOf("test.routing.key"),
-            "consumptionType" to ConsumptionType.STANDARD.name
-        )
+        val request =
+            mapOf(
+                "name" to "test-channel",
+                "channelType" to ChannelType.QUEUE.name,
+                "routingKeys" to listOf("test.routing.key"),
+                "consumptionType" to ConsumptionType.STANDARD.name,
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -48,11 +48,12 @@ class ChannelApiTest : IntegrationTestBase() {
 
     @Test
     fun `POST channels - should create stream channel without consumption type`() {
-        val request = mapOf(
-            "name" to "test-stream",
-            "channelType" to ChannelType.STREAM.name,
-            "routingKeys" to listOf("stream.key")
-        )
+        val request =
+            mapOf(
+                "name" to "test-stream",
+                "channelType" to ChannelType.STREAM.name,
+                "routingKeys" to listOf("stream.key"),
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -69,12 +70,13 @@ class ChannelApiTest : IntegrationTestBase() {
 
     @Test
     fun `POST channels - should fail when channel name already exists`() {
-        val request = mapOf(
-            "name" to "duplicate-channel",
-            "channelType" to ChannelType.QUEUE.name,
-            "routingKeys" to listOf("test.key"),
-            "consumptionType" to ConsumptionType.STANDARD.name
-        )
+        val request =
+            mapOf(
+                "name" to "duplicate-channel",
+                "channelType" to ChannelType.QUEUE.name,
+                "routingKeys" to listOf("test.key"),
+                "consumptionType" to ConsumptionType.STANDARD.name,
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -95,12 +97,13 @@ class ChannelApiTest : IntegrationTestBase() {
 
     @Test
     fun `POST channels - should fail when routing keys are empty`() {
-        val request = mapOf(
-            "name" to "no-routing-keys-channel",
-            "channelType" to ChannelType.QUEUE.name,
-            "routingKeys" to emptyList<String>(),
-            "consumptionType" to ConsumptionType.STANDARD.name
-        )
+        val request =
+            mapOf(
+                "name" to "no-routing-keys-channel",
+                "channelType" to ChannelType.QUEUE.name,
+                "routingKeys" to emptyList<String>(),
+                "consumptionType" to ConsumptionType.STANDARD.name,
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -235,12 +238,13 @@ class ChannelApiTest : IntegrationTestBase() {
 
     @Test
     fun `POST channels - should create FIFO channel successfully`() {
-        val request = mapOf(
-            "name" to "fifo-channel",
-            "channelType" to ChannelType.QUEUE.name,
-            "routingKeys" to listOf("fifo.key"),
-            "consumptionType" to ConsumptionType.FIFO.name
-        )
+        val request =
+            mapOf(
+                "name" to "fifo-channel",
+                "channelType" to ChannelType.QUEUE.name,
+                "routingKeys" to listOf("fifo.key"),
+                "consumptionType" to ConsumptionType.FIFO.name,
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -254,12 +258,13 @@ class ChannelApiTest : IntegrationTestBase() {
 
     @Test
     fun `POST channels - should create channel with multiple routing keys`() {
-        val request = mapOf(
-            "name" to "multi-routing-channel",
-            "channelType" to ChannelType.QUEUE.name,
-            "routingKeys" to listOf("key.one", "key.two", "key.three"),
-            "consumptionType" to ConsumptionType.STANDARD.name
-        )
+        val request =
+            mapOf(
+                "name" to "multi-routing-channel",
+                "channelType" to ChannelType.QUEUE.name,
+                "routingKeys" to listOf("key.one", "key.two", "key.three"),
+                "consumptionType" to ConsumptionType.STANDARD.name,
+            )
 
         given()
             .contentType(ContentType.JSON)

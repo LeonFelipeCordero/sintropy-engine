@@ -12,7 +12,6 @@ private val logger = KotlinLogging.logger {}
 
 @WebSocket(path = "/ws/streaming/{channelName}/{routingKey}")
 class MessageStreamingApi {
-
     @Inject
     private lateinit var connectionRouter: ConnectionRouter
 

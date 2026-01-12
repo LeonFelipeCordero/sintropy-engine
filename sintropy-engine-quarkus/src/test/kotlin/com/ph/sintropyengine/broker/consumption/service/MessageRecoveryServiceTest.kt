@@ -10,7 +10,6 @@ import java.util.UUID
 
 @QuarkusTest
 class MessageRecoveryServiceTest : IntegrationTestBase() {
-
     @BeforeEach
     fun setUp() {
         clean()

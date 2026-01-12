@@ -2,13 +2,12 @@ package com.ph.sintropyengine.broker.consumption.service
 
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
-import com.ph.sintropyengine.broker.chennel.service.ChannelService
 import com.ph.sintropyengine.broker.chennel.model.ConsumptionType
+import com.ph.sintropyengine.broker.chennel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import io.quarkus.test.junit.QuarkusTest
 import jakarta.inject.Inject
-import java.util.UUID
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -21,10 +20,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 @QuarkusTest
 class PollingStandardQueueTest : IntegrationTestBase() {
-
     @Inject
     private lateinit var pollingQueue: PollingStandardQueue
 
@@ -50,48 +49,51 @@ class PollingStandardQueueTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `should not return anything if the message is consumed`() = runTest {
-        val message = publishMessage()
+    fun `should not return anything if the message is consumed`() =
+        runTest {
+            val message = publishMessage()
 
-        pollingQueue.poll(message.channelId, message.routingKey)
-        val polledMessage = pollingQueue.poll(message.channelId, message.routingKey)
+            pollingQueue.poll(message.channelId, message.routingKey)
+            val polledMessage = pollingQueue.poll(message.channelId, message.routingKey)
 
-        assertThat(polledMessage).isEmpty()
-    }
-
-    @Test
-    fun `should queue two messages and poll one by one`() = runTest {
-        val (channel, producer) = createChannelWithProducer()
-        val message1 = publishMessage(channel, producer)
-        val message2 = publishMessage(channel, producer)
-
-        val polledMessage1 = pollingQueue.poll(message1.channelId, message1.routingKey)
-        val polledMessage2 = pollingQueue.poll(message1.channelId, message1.routingKey)
-
-        assertThat(polledMessage1).hasSize(1)
-        assertThat(polledMessage2).hasSize(1)
-        assertThat(message1)
-            .usingRecursiveComparison()
-            .ignoringFields("status", "lastDelivered", "deliveredTimes")
-            .isEqualTo(polledMessage1.first())
-        assertThat(message2)
-            .usingRecursiveComparison()
-            .ignoringFields("status", "lastDelivered", "deliveredTimes")
-            .isEqualTo(polledMessage2.first())
-    }
+            assertThat(polledMessage).isEmpty()
+        }
 
     @Test
-    fun `should queue a message and try to poll five`() = runTest {
-        val message = publishMessage()
+    fun `should queue two messages and poll one by one`() =
+        runTest {
+            val (channel, producer) = createChannelWithProducer()
+            val message1 = publishMessage(channel, producer)
+            val message2 = publishMessage(channel, producer)
 
-        val polledMessage = pollingQueue.poll(message.channelId, message.routingKey, pollingCount = 5)
+            val polledMessage1 = pollingQueue.poll(message1.channelId, message1.routingKey)
+            val polledMessage2 = pollingQueue.poll(message1.channelId, message1.routingKey)
 
-        assertThat(polledMessage).hasSize(1)
-        assertThat(message)
-            .usingRecursiveComparison()
-            .ignoringFields("status", "lastDelivered", "deliveredTimes")
-            .isEqualTo(polledMessage.first())
-    }
+            assertThat(polledMessage1).hasSize(1)
+            assertThat(polledMessage2).hasSize(1)
+            assertThat(message1)
+                .usingRecursiveComparison()
+                .ignoringFields("status", "lastDelivered", "deliveredTimes")
+                .isEqualTo(polledMessage1.first())
+            assertThat(message2)
+                .usingRecursiveComparison()
+                .ignoringFields("status", "lastDelivered", "deliveredTimes")
+                .isEqualTo(polledMessage2.first())
+        }
+
+    @Test
+    fun `should queue a message and try to poll five`() =
+        runTest {
+            val message = publishMessage()
+
+            val polledMessage = pollingQueue.poll(message.channelId, message.routingKey, pollingCount = 5)
+
+            assertThat(polledMessage).hasSize(1)
+            assertThat(message)
+                .usingRecursiveComparison()
+                .ignoringFields("status", "lastDelivered", "deliveredTimes")
+                .isEqualTo(polledMessage.first())
+        }
 
     @Test
     fun `should poll from an empty queue and do not fail`() {
@@ -147,27 +149,29 @@ class PollingStandardQueueTest : IntegrationTestBase() {
             listOf(
                 message1.messageId,
                 message2.messageId,
-                message3.messageId
-            )
+                message3.messageId,
+            ),
         )
     }
 
     @Test
     fun `should not poll messages from other routing key`() {
         val (channel, producer) = createChannelWithProducer()
-        val message1 = publishMessage(
-            channel,
-            producer,
-            channel.routingKeys.first(),
-        )
+        val message1 =
+            publishMessage(
+                channel,
+                producer,
+                channel.routingKeys.first(),
+            )
 
         val secondRoutingKey = "test.2"
         channelService.addRoutingKey(channel.channelId!!, secondRoutingKey)
-        val message2 = publishMessage(
-            channel,
-            producer,
-            secondRoutingKey,
-        )
+        val message2 =
+            publishMessage(
+                channel,
+                producer,
+                secondRoutingKey,
+            )
 
         val polledMessage1 = pollingQueue.poll(message1.channelId, message1.routingKey, pollingCount = 2)
         val polledMessage2 = pollingQueue.poll(message1.channelId, secondRoutingKey, pollingCount = 2)
@@ -182,7 +186,6 @@ class PollingStandardQueueTest : IntegrationTestBase() {
             .usingRecursiveComparison()
             .ignoringFields("status", "lastDelivered", "deliveredTimes")
             .isEqualTo(message2)
-
     }
 
     @Test
@@ -203,7 +206,6 @@ class PollingStandardQueueTest : IntegrationTestBase() {
             .usingRecursiveComparison()
             .ignoringFields("status", "lastDelivered", "deliveredTimes")
             .isEqualTo(message2)
-
     }
 
     @Test
@@ -260,191 +262,197 @@ class PollingStandardQueueTest : IntegrationTestBase() {
             .withMessageContainingAll("Message with id", "not found")
     }
 
-
     @Test
-    fun `concurrent processing of messages`() = runTest {
-        val testData = createTestData(ConsumptionType.STANDARD)
+    fun `concurrent processing of messages`() =
+        runTest {
+            val testData = createTestData(ConsumptionType.STANDARD)
 
-        val mutexConsumer = Mutex()
-        val polledMessages = testData.toMap()
+            val mutexConsumer = Mutex()
+            val polledMessages = testData.toMap()
 
-        val messagesCount = 1000
-        val allWork = launch {
-            val producersJobs = List(messagesCount) {
-                launch { launchProducers(testData) }
-            }
-
-            producersJobs.joinAll()
-
-            val consumersJobs = mutableListOf<Job>()
-            val pollingChannel = Channel<Message>(capacity = messagesCount)
-            repeat(10) {
-                consumersJobs.addAll(
-                    listOf(
-                        launch {
-                            launchConsumers(
-                                testData.channel1().channelId!!,
-                                testData.channel1().routingKeys[0],
-                                pollingChannel,
-                                pollingQueue
-                            )
-                        },
-                        launch {
-                            launchConsumers(
-                                testData.channel1().channelId!!,
-                                testData.channel1().routingKeys[1],
-                                pollingChannel,
-                                pollingQueue
-                            )
-                        },
-                        launch {
-                            launchConsumers(
-                                testData.channel1().channelId!!,
-                                testData.channel1().routingKeys[2],
-                                pollingChannel,
-                                pollingQueue
-                            )
-                        },
-                        launch {
-                            launchConsumers(
-                                testData.channel2().channelId!!,
-                                testData.channel2().routingKeys[0],
-                                pollingChannel,
-                                pollingQueue
-                            )
-                        },
-                        launch {
-                            launchConsumers(
-                                testData.channel2().channelId!!,
-                                testData.channel2().routingKeys[1],
-                                pollingChannel,
-                                pollingQueue
-                            )
-                        },
-                        launch {
-                            launchConsumers(
-                                testData.channel3().channelId!!,
-                                testData.channel3().routingKeys[0],
-                                pollingChannel,
-                                pollingQueue
-                            )
+            val messagesCount = 1000
+            val allWork =
+                launch {
+                    val producersJobs =
+                        List(messagesCount) {
+                            launch { launchProducers(testData) }
                         }
-                    )
-                )
-            }
 
-            consumersJobs.joinAll()
-            repeat(messagesCount) {
-                val message = pollingChannel.receive()
-                mutexConsumer.withLock {
-                    polledMessages[message.routing()]!!.add(message)
+                    producersJobs.joinAll()
+
+                    val consumersJobs = mutableListOf<Job>()
+                    val pollingChannel = Channel<Message>(capacity = messagesCount)
+                    repeat(10) {
+                        consumersJobs.addAll(
+                            listOf(
+                                launch {
+                                    launchConsumers(
+                                        testData.channel1().channelId!!,
+                                        testData.channel1().routingKeys[0],
+                                        pollingChannel,
+                                        pollingQueue,
+                                    )
+                                },
+                                launch {
+                                    launchConsumers(
+                                        testData.channel1().channelId!!,
+                                        testData.channel1().routingKeys[1],
+                                        pollingChannel,
+                                        pollingQueue,
+                                    )
+                                },
+                                launch {
+                                    launchConsumers(
+                                        testData.channel1().channelId!!,
+                                        testData.channel1().routingKeys[2],
+                                        pollingChannel,
+                                        pollingQueue,
+                                    )
+                                },
+                                launch {
+                                    launchConsumers(
+                                        testData.channel2().channelId!!,
+                                        testData.channel2().routingKeys[0],
+                                        pollingChannel,
+                                        pollingQueue,
+                                    )
+                                },
+                                launch {
+                                    launchConsumers(
+                                        testData.channel2().channelId!!,
+                                        testData.channel2().routingKeys[1],
+                                        pollingChannel,
+                                        pollingQueue,
+                                    )
+                                },
+                                launch {
+                                    launchConsumers(
+                                        testData.channel3().channelId!!,
+                                        testData.channel3().routingKeys[0],
+                                        pollingChannel,
+                                        pollingQueue,
+                                    )
+                                },
+                            ),
+                        )
+                    }
+
+                    consumersJobs.joinAll()
+                    repeat(messagesCount) {
+                        val message = pollingChannel.receive()
+                        mutexConsumer.withLock {
+                            polledMessages[message.routing()]!!.add(message)
+                        }
+                    }
                 }
+
+            allWork.join()
+
+            val allMessageLog = messageRepository.findAllMessageLog().filter { it.processed }
+            assertThat(allMessageLog).hasSize(messagesCount)
+            assertThat(polledMessages.flatMap { (_, value) -> value }).hasSize(messagesCount)
+
+            polledMessages.forEach { (key, messages) ->
+                assertThat(messages)
+                    .usingRecursiveComparison()
+                    .ignoringFields("status", "lastDelivered", "deliveredTimes")
+                    .isEqualTo(allMessageLog.filter { it.routing() == key }.sortedBy { it.timestamp })
             }
         }
-
-        allWork.join()
-
-        val allMessageLog = messageRepository.findAllMessageLog().filter { it.processed }
-        assertThat(allMessageLog).hasSize(messagesCount)
-        assertThat(polledMessages.flatMap { (_, value) -> value }).hasSize(messagesCount)
-
-        polledMessages.forEach { (key, messages) ->
-            assertThat(messages)
-                .usingRecursiveComparison()
-                .ignoringFields("status", "lastDelivered", "deliveredTimes")
-                .isEqualTo(allMessageLog.filter { it.routing() == key }.sortedBy { it.timestamp })
-        }
-    }
 
     @Test
-    fun `single processing of routing pair is always in chronological order`() = runTest {
-        val testData = createTestData(ConsumptionType.STANDARD)
+    fun `single processing of routing pair is always in chronological order`() =
+        runTest {
+            val testData = createTestData(ConsumptionType.STANDARD)
 
-        val mutexConsumer = Mutex()
-        val polledMessages = testData.toMap()
+            val mutexConsumer = Mutex()
+            val polledMessages = testData.toMap()
 
-        val messagesCount = 1000
-        val allWork = launch {
-            val producersJobs = List(messagesCount) {
-                launch { launchProducers(testData) }
-            }
+            val messagesCount = 1000
+            val allWork =
+                launch {
+                    val producersJobs =
+                        List(messagesCount) {
+                            launch { launchProducers(testData) }
+                        }
 
-            producersJobs.joinAll()
+                    producersJobs.joinAll()
 
-            delay(1000)
+                    delay(1000)
 
-            val pollingChannel = Channel<Message>(capacity = messagesCount)
-            val consumersJobs = listOf(
-                launch {
-                    launchConsumers(
-                        testData.channel1().channelId!!,
-                        testData.channel1().routingKeys[0],
-                        pollingChannel,
-                        pollingQueue
-                    )
-                },
-                launch {
-                    launchConsumers(
-                        testData.channel1().channelId!!,
-                        testData.channel1().routingKeys[1],
-                        pollingChannel,
-                        pollingQueue
-                    )
-                },
-                launch {
-                    launchConsumers(
-                        testData.channel1().channelId!!,
-                        testData.channel1().routingKeys[2],
-                        pollingChannel,
-                        pollingQueue
-                    )
-                },
-                launch {
-                    launchConsumers(
-                        testData.channel2().channelId!!,
-                        testData.channel2().routingKeys[0],
-                        pollingChannel,
-                        pollingQueue
-                    )
-                },
-                launch {
-                    launchConsumers(
-                        testData.channel2().channelId!!,
-                        testData.channel2().routingKeys[1],
-                        pollingChannel,
-                        pollingQueue
-                    )
-                },
-                launch {
-                    launchConsumers(
-                        testData.channel3().channelId!!,
-                        testData.channel3().routingKeys[0],
-                        pollingChannel,
-                        pollingQueue
-                    )
+                    val pollingChannel = Channel<Message>(capacity = messagesCount)
+                    val consumersJobs =
+                        listOf(
+                            launch {
+                                launchConsumers(
+                                    testData.channel1().channelId!!,
+                                    testData.channel1().routingKeys[0],
+                                    pollingChannel,
+                                    pollingQueue,
+                                )
+                            },
+                            launch {
+                                launchConsumers(
+                                    testData.channel1().channelId!!,
+                                    testData.channel1().routingKeys[1],
+                                    pollingChannel,
+                                    pollingQueue,
+                                )
+                            },
+                            launch {
+                                launchConsumers(
+                                    testData.channel1().channelId!!,
+                                    testData.channel1().routingKeys[2],
+                                    pollingChannel,
+                                    pollingQueue,
+                                )
+                            },
+                            launch {
+                                launchConsumers(
+                                    testData.channel2().channelId!!,
+                                    testData.channel2().routingKeys[0],
+                                    pollingChannel,
+                                    pollingQueue,
+                                )
+                            },
+                            launch {
+                                launchConsumers(
+                                    testData.channel2().channelId!!,
+                                    testData.channel2().routingKeys[1],
+                                    pollingChannel,
+                                    pollingQueue,
+                                )
+                            },
+                            launch {
+                                launchConsumers(
+                                    testData.channel3().channelId!!,
+                                    testData.channel3().routingKeys[0],
+                                    pollingChannel,
+                                    pollingQueue,
+                                )
+                            },
+                        )
+
+                    consumersJobs.joinAll()
+                    repeat(messagesCount) {
+                        val message = pollingChannel.receive()
+                        mutexConsumer.withLock {
+                            polledMessages[message.routing()]!!.add(message)
+                        }
+                    }
                 }
-            )
 
-            consumersJobs.joinAll()
-            repeat(messagesCount) {
-                val message = pollingChannel.receive()
-                mutexConsumer.withLock {
-                    polledMessages[message.routing()]!!.add(message)
-                }
+            allWork.join()
+
+            val allMessageLog = messageRepository.findAllMessageLog().filter { it.processed }
+            assertThat(allMessageLog).hasSize(messagesCount)
+            assertThat(polledMessages.flatMap { (_, value) -> value }).hasSize(messagesCount)
+
+            polledMessages.forEach { (key, messages) ->
+                assertThat(messages)
+                    .usingRecursiveComparison()
+                    .ignoringFields("status", "lastDelivered", "deliveredTimes")
+                    .isEqualTo(allMessageLog.filter { it.routing() == key }.sortedBy { it.timestamp })
             }
         }
-
-        allWork.join()
-
-        val allMessageLog = messageRepository.findAllMessageLog().filter { it.processed }
-        assertThat(allMessageLog).hasSize(messagesCount)
-        assertThat(polledMessages.flatMap { (_, value) -> value }).hasSize(messagesCount)
-
-        polledMessages.forEach { (key, messages) ->
-            assertThat(messages)
-                .usingRecursiveComparison()
-                .ignoringFields("status", "lastDelivered", "deliveredTimes")
-                .isEqualTo(allMessageLog.filter { it.routing() == key }.sortedBy { it.timestamp })
-        }
-    }
 }

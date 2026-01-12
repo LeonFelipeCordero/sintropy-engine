@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat
 
 @ApplicationScoped
 class ObjectMapperConfig {
-
     @Produces
     fun objectMapper() = CustomObjectMapper()
 }

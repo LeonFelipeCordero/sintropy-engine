@@ -6,15 +6,14 @@ import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.hasSize
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
 @QuarkusTest
 class ProducerApiTest : IntegrationTestBase() {
-
     @BeforeEach
     fun setUp() {
         clean()
@@ -24,10 +23,11 @@ class ProducerApiTest : IntegrationTestBase() {
     fun `POST producers - should create producer successfully`() {
         val channel = createChannel()
 
-        val request = mapOf(
-            "name" to "test-producer",
-            "channelName" to channel.name
-        )
+        val request =
+            mapOf(
+                "name" to "test-producer",
+                "channelName" to channel.name,
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -43,10 +43,11 @@ class ProducerApiTest : IntegrationTestBase() {
 
     @Test
     fun `POST producers - should fail when channel does not exist`() {
-        val request = mapOf(
-            "name" to "orphan-producer",
-            "channelName" to "non-existent-channel"
-        )
+        val request =
+            mapOf(
+                "name" to "orphan-producer",
+                "channelName" to "non-existent-channel",
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -152,13 +153,14 @@ class ProducerApiTest : IntegrationTestBase() {
         val channel = createChannel()
         val producer = createProducer(channel)
 
-        val request = mapOf(
-            "channelName" to channel.name,
-            "producerName" to producer.name,
-            "routingKey" to channel.routingKeys.first(),
-            "message" to Fixtures.DEFAULT_MESSAGE,
-            "headers" to Fixtures.DEFAULT_ATTRIBUTES
-        )
+        val request =
+            mapOf(
+                "channelName" to channel.name,
+                "producerName" to producer.name,
+                "routingKey" to channel.routingKeys.first(),
+                "message" to Fixtures.DEFAULT_MESSAGE,
+                "headers" to Fixtures.DEFAULT_ATTRIBUTES,
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -178,13 +180,14 @@ class ProducerApiTest : IntegrationTestBase() {
         val channel = createChannel()
         val producer = createProducer(channel)
 
-        val request = mapOf(
-            "channelName" to "non-existent-channel",
-            "producerName" to producer.name,
-            "routingKey" to "some.key",
-            "message" to Fixtures.DEFAULT_MESSAGE,
-            "headers" to Fixtures.DEFAULT_ATTRIBUTES
-        )
+        val request =
+            mapOf(
+                "channelName" to "non-existent-channel",
+                "producerName" to producer.name,
+                "routingKey" to "some.key",
+                "message" to Fixtures.DEFAULT_MESSAGE,
+                "headers" to Fixtures.DEFAULT_ATTRIBUTES,
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -199,13 +202,14 @@ class ProducerApiTest : IntegrationTestBase() {
     fun `POST messages - should fail when producer does not exist`() {
         val channel = createChannel()
 
-        val request = mapOf(
-            "channelName" to channel.name,
-            "producerName" to "non-existent-producer",
-            "routingKey" to channel.routingKeys.first(),
-            "message" to Fixtures.DEFAULT_MESSAGE,
-            "headers" to Fixtures.DEFAULT_ATTRIBUTES
-        )
+        val request =
+            mapOf(
+                "channelName" to channel.name,
+                "producerName" to "non-existent-producer",
+                "routingKey" to channel.routingKeys.first(),
+                "message" to Fixtures.DEFAULT_MESSAGE,
+                "headers" to Fixtures.DEFAULT_ATTRIBUTES,
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -221,13 +225,14 @@ class ProducerApiTest : IntegrationTestBase() {
         val channel = createChannel()
         val producer = createProducer(channel)
 
-        val request = mapOf(
-            "channelName" to channel.name,
-            "producerName" to producer.name,
-            "routingKey" to "invalid.routing.key",
-            "message" to Fixtures.DEFAULT_MESSAGE,
-            "headers" to Fixtures.DEFAULT_ATTRIBUTES
-        )
+        val request =
+            mapOf(
+                "channelName" to channel.name,
+                "producerName" to producer.name,
+                "routingKey" to "invalid.routing.key",
+                "message" to Fixtures.DEFAULT_MESSAGE,
+                "headers" to Fixtures.DEFAULT_ATTRIBUTES,
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -243,13 +248,14 @@ class ProducerApiTest : IntegrationTestBase() {
         val channel = createChannel()
         val producer = createProducer(channel)
 
-        val request = mapOf(
-            "channelName" to channel.name,
-            "producerName" to producer.name,
-            "routingKey" to channel.routingKeys.first(),
-            "message" to Fixtures.DEFAULT_MESSAGE,
-            "headers" to Fixtures.DEFAULT_ATTRIBUTES
-        )
+        val request =
+            mapOf(
+                "channelName" to channel.name,
+                "producerName" to producer.name,
+                "routingKey" to channel.routingKeys.first(),
+                "message" to Fixtures.DEFAULT_MESSAGE,
+                "headers" to Fixtures.DEFAULT_ATTRIBUTES,
+            )
 
         given()
             .contentType(ContentType.JSON)
@@ -272,15 +278,17 @@ class ProducerApiTest : IntegrationTestBase() {
     fun `POST producers - should create multiple producers for same channel`() {
         val channel = createChannel()
 
-        val request1 = mapOf(
-            "name" to "producer-one",
-            "channelName" to channel.name
-        )
+        val request1 =
+            mapOf(
+                "name" to "producer-one",
+                "channelName" to channel.name,
+            )
 
-        val request2 = mapOf(
-            "name" to "producer-two",
-            "channelName" to channel.name
-        )
+        val request2 =
+            mapOf(
+                "name" to "producer-two",
+                "channelName" to channel.name,
+            )
 
         given()
             .contentType(ContentType.JSON)

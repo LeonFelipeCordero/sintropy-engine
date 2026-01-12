@@ -10,11 +10,14 @@ import java.util.UUID
 private val logger = KotlinLogging.logger {}
 
 interface PollingQueue {
-
     val messageRepository: MessageRepository
 
     @Transactional
-    fun poll(channelId: UUID, routingKey: String, pollingCount: Int = 1): List<Message>
+    fun poll(
+        channelId: UUID,
+        routingKey: String,
+        pollingCount: Int = 1,
+    ): List<Message>
 
     @Transactional
     fun markAsFailed(messageId: UUID) {
@@ -32,7 +35,6 @@ interface PollingQueue {
             messageRepository.dequeue(messageId)
 
             logger.info { "dequeue message $messageId" }
-
         } ?: throw IllegalStateException("Message with id $messageId not found")
     }
 }

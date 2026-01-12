@@ -4,14 +4,13 @@ import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
 import com.ph.sintropyengine.broker.consumption.model.MessageStatus
 import io.quarkus.test.junit.QuarkusTest
-import java.util.UUID
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 @QuarkusTest
 class ProducerServiceTest : IntegrationTestBase() {
-
     @BeforeEach
     fun setUp() {
         clean()
@@ -29,9 +28,10 @@ class ProducerServiceTest : IntegrationTestBase() {
     fun `should store a message`() {
         val (channel, producer) = createChannelWithProducer()
 
-        val createdMessage = producerService.publishMessage(
-            Fixtures.createMessageRequest(channel.name, producer.name)
-        )
+        val createdMessage =
+            producerService.publishMessage(
+                Fixtures.createMessageRequest(channel.name, producer.name),
+            )
 
         val all = messageRepository.findAll()
         Assertions.assertThat(all).hasSize(1)
@@ -40,7 +40,8 @@ class ProducerServiceTest : IntegrationTestBase() {
 
     @Test
     fun `should fail if message doesn't exist`() {
-        Assertions.assertThatExceptionOfType(IllegalStateException::class.java)
+        Assertions
+            .assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy {
                 producerService.publishMessage(Fixtures.createMessageRequest(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
             }.withMessageContainingAll("Channel", "not found")
@@ -50,14 +51,15 @@ class ProducerServiceTest : IntegrationTestBase() {
     fun `should fail if routing key is incorrect`() {
         val (channel, producer) = createChannelWithProducer()
 
-        Assertions.assertThatExceptionOfType(IllegalStateException::class.java)
+        Assertions
+            .assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy {
                 producerService.publishMessage(
                     Fixtures.createMessageRequest(
                         channel.name,
                         producer.name,
-                        "test.2"
-                    )
+                        "test.2",
+                    ),
                 )
             }.withMessageContainingAll("Channel", "does not have routing-key test.2")
     }
@@ -67,7 +69,7 @@ class ProducerServiceTest : IntegrationTestBase() {
         val (channel, producer) = createChannelWithProducer()
 
         producerService.publishMessage(
-            Fixtures.createMessageRequest(channel.name, producer.name)
+            Fixtures.createMessageRequest(channel.name, producer.name),
         )
 
         val messages = messageRepository.findAll()

@@ -11,7 +11,7 @@ private val logger = KotlinLogging.logger {}
 
 @Singleton
 class ConnectionRouter(
-    private val channelService: ChannelService
+    private val channelService: ChannelService,
 ) {
     private val mutex = Mutex()
 
@@ -19,7 +19,11 @@ class ConnectionRouter(
 
     private val connectionsTable: MutableMap<String, String> = mutableMapOf()
 
-    suspend fun add(connectionId: String, channelName: String, routingKey: String) {
+    suspend fun add(
+        connectionId: String,
+        channelName: String,
+        routingKey: String,
+    ) {
         val channel =
             channelService.findByName(channelName) ?: throw IllegalStateException("Channel $channelName not found")
 
@@ -63,7 +67,5 @@ class ConnectionRouter(
         }
     }
 
-    suspend fun getByRoutingKey(routing: String): List<String> {
-        return mutex.withLock { routingTable[routing] ?: emptyList() }
-    }
+    suspend fun getByRoutingKey(routing: String): List<String> = mutex.withLock { routingTable[routing] ?: emptyList() }
 }

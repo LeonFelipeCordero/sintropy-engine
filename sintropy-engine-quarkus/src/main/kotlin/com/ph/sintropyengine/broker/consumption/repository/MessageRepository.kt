@@ -1,42 +1,48 @@
 package com.ph.sintropyengine.broker.consumption.repository
 
-import com.ph.sintropyengine.broker.consumption.model.MessageLog
 import com.ph.sintropyengine.broker.consumption.model.Message
+import com.ph.sintropyengine.broker.consumption.model.MessageLog
 import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
 import com.ph.sintropyengine.jooq.generated.Tables
 import com.ph.sintropyengine.jooq.generated.enums.MessageStatusType
 import jakarta.enterprise.context.ApplicationScoped
+import org.jooq.DSLContext
+import org.jooq.JSONB
 import java.time.OffsetDateTime
 import java.util.UUID
 import java.util.stream.Stream
-import org.jooq.DSLContext
-import org.jooq.JSONB
 
 @ApplicationScoped
 class MessageRepository(
-    private val context: DSLContext
+    private val context: DSLContext,
 ) {
-
     fun save(message: MessagePreStore): Message =
-        context.insertInto(
-            Tables.MESSAGES,
-            Tables.MESSAGES.CHANNEL_ID,
-            Tables.MESSAGES.PRODUCER_ID,
-            Tables.MESSAGES.ROUTING_KEY,
-            Tables.MESSAGES.MESSAGE,
-            Tables.MESSAGES.HEADERS
-        ).values(
-            message.channelId,
-            message.producerId,
-            message.routingKey,
-            JSONB.jsonb(message.message),
-            JSONB.jsonb(message.headers)
-        ).returning().fetchOneInto(Message::class.java)
+        context
+            .insertInto(
+                Tables.MESSAGES,
+                Tables.MESSAGES.CHANNEL_ID,
+                Tables.MESSAGES.PRODUCER_ID,
+                Tables.MESSAGES.ROUTING_KEY,
+                Tables.MESSAGES.MESSAGE,
+                Tables.MESSAGES.HEADERS,
+            ).values(
+                message.channelId,
+                message.producerId,
+                message.routingKey,
+                JSONB.jsonb(message.message),
+                JSONB.jsonb(message.headers),
+            ).returning()
+            .fetchOneInto(Message::class.java)
             ?: throw IllegalStateException("Something went wrong persisting the message")
 
-    fun pollFromStandardChannelByRoutingKey(channelId: UUID, routingKey: String, pollingCount: Int): List<Message> {
+    fun pollFromStandardChannelByRoutingKey(
+        channelId: UUID,
+        routingKey: String,
+        pollingCount: Int,
+    ): List<Message> {
         val hash = hashCode(channelId, routingKey)
-        val query = """
+        val query =
+            """
             with result as (select message_id
                             from messages
                             where channel_id = :channelId
@@ -57,13 +63,18 @@ class MessageRepository(
             where messages.message_id in (result.message_id)
             returning messages.*;
             ;
-        """.trimIndent()
+            """.trimIndent()
         return context.resultQuery(query, channelId, routingKey, hash, pollingCount).fetchInto(Message::class.java)
     }
 
-    fun pollFromFifoChannelByRoutingKey(channelId: UUID, routingKey: String, pollingCount: Int): List<Message> {
+    fun pollFromFifoChannelByRoutingKey(
+        channelId: UUID,
+        routingKey: String,
+        pollingCount: Int,
+    ): List<Message> {
         val hash = hashCode(channelId, routingKey)
-        val query = """
+        val query =
+            """
             with result as (select message_id
                                from messages
                                where channel_id = :channelId
@@ -86,13 +97,15 @@ class MessageRepository(
                where messages.message_id in (result.message_id)
                returning messages.*;
             ;
-        """.trimIndent()
-        return context.resultQuery(query, channelId, routingKey, channelId, routingKey, hash, pollingCount)
+            """.trimIndent()
+        return context
+            .resultQuery(query, channelId, routingKey, channelId, routingKey, hash, pollingCount)
             .fetchInto(Message::class.java)
     }
 
     fun markAsFailed(messageId: UUID) {
-        context.update(Tables.MESSAGES)
+        context
+            .update(Tables.MESSAGES)
             .set(Tables.MESSAGES.STATUS, MessageStatusType.FAILED)
             .set(Tables.MESSAGES.UPDATED_AT, OffsetDateTime.now())
             .where(Tables.MESSAGES.MESSAGE_ID.eq(messageId))
@@ -100,18 +113,21 @@ class MessageRepository(
     }
 
     fun dequeue(messageId: UUID) {
-        context.delete(Tables.MESSAGES)
+        context
+            .delete(Tables.MESSAGES)
             .where(Tables.MESSAGES.MESSAGE_ID.eq(messageId))
             .execute()
     }
 
     fun findById(messageId: UUID): Message? =
-        context.selectFrom(Tables.MESSAGES)
+        context
+            .selectFrom(Tables.MESSAGES)
             .where(Tables.MESSAGES.MESSAGE_ID.eq(messageId))
             .fetchOneInto(Message::class.java)
 
     fun findMessageLogById(messageId: UUID): MessageLog? =
-        context.selectFrom(Tables.MESSAGE_LOG)
+        context
+            .selectFrom(Tables.MESSAGE_LOG)
             .where(Tables.MESSAGE_LOG.MESSAGE_ID.eq(messageId))
             .fetchOneInto(MessageLog::class.java)
 
@@ -121,12 +137,14 @@ class MessageRepository(
         from: OffsetDateTime,
         to: OffsetDateTime?,
         pageSize: Int,
-        page: Int
+        page: Int,
     ): List<MessageLog> {
-        val query = context.selectFrom(Tables.MESSAGE_LOG)
-            .where(Tables.MESSAGE_LOG.CHANNEL_ID.eq(channelId))
-            .and(Tables.MESSAGE_LOG.ROUTING_KEY.eq(routingKey))
-            .and(Tables.MESSAGE_LOG.TIMESTAMP.greaterOrEqual(from))
+        val query =
+            context
+                .selectFrom(Tables.MESSAGE_LOG)
+                .where(Tables.MESSAGE_LOG.CHANNEL_ID.eq(channelId))
+                .and(Tables.MESSAGE_LOG.ROUTING_KEY.eq(routingKey))
+                .and(Tables.MESSAGE_LOG.TIMESTAMP.greaterOrEqual(from))
 
         to?.run {
             query.and(Tables.MESSAGE_LOG.TIMESTAMP.lessOrEqual(to))
@@ -142,8 +160,9 @@ class MessageRepository(
         channelId: UUID,
         routingKey: String,
         pageSize: Int,
-        page: Int
-    ) = context.selectFrom(Tables.MESSAGE_LOG)
+        page: Int,
+    ) = context
+        .selectFrom(Tables.MESSAGE_LOG)
         .where(Tables.MESSAGE_LOG.CHANNEL_ID.eq(channelId))
         .and(Tables.MESSAGE_LOG.ROUTING_KEY.eq(routingKey))
         .limit(pageSize)
@@ -151,8 +170,8 @@ class MessageRepository(
         .fetchInto(MessageLog::class.java)
 
     fun findAll(): List<Message> = context.selectFrom(Tables.MESSAGES).fetchInto(Message::class.java)
-    fun findAllMessageLog(): List<MessageLog> = context.selectFrom(Tables.MESSAGE_LOG).fetchInto(MessageLog::class.java)
 
+    fun findAllMessageLog(): List<MessageLog> = context.selectFrom(Tables.MESSAGE_LOG).fetchInto(MessageLog::class.java)
 
     /**
      * Testing only
@@ -166,7 +185,8 @@ class MessageRepository(
      * Testing only
      */
     fun setMessageDeliveriesOutOfScope(messageId: UUID) {
-        context.update(Tables.MESSAGES)
+        context
+            .update(Tables.MESSAGES)
             .set(Tables.MESSAGES.STATUS, MessageStatusType.IN_FLIGHT)
             .set(Tables.MESSAGES.LAST_DELIVERED, OffsetDateTime.now().minusMinutes(16))
             .set(Tables.MESSAGES.DELIVERED_TIMES, 4)
@@ -175,7 +195,8 @@ class MessageRepository(
             .execute()
     }
 
-    private fun hashCode(channelId: UUID, routingKey: String): Int {
-        return (channelId.toString() + routingKey).hashCode()
-    }
+    private fun hashCode(
+        channelId: UUID,
+        routingKey: String,
+    ): Int = (channelId.toString() + routingKey).hashCode()
 }

@@ -5,5 +5,6 @@ import kotlinx.coroutines.channels.Channel
 
 interface PGReplicationConsumer {
     suspend fun startConsuming()
+
     fun channel(): Channel<Message>
 }

@@ -12,14 +12,18 @@ private val logger = KotlinLogging.logger {}
 
 @ApplicationScoped
 class PollingStandardQueue(
-    override val messageRepository: MessageRepository
+    override val messageRepository: MessageRepository,
 ) : PollingQueue {
-
     @Transactional
-    override fun poll(channelId: UUID, routingKey: String, pollingCount: Int): List<Message> {
-        val messages = messageRepository
-            .pollFromStandardChannelByRoutingKey(channelId, routingKey, pollingCount)
-            .sortedBy { it.timestamp }
+    override fun poll(
+        channelId: UUID,
+        routingKey: String,
+        pollingCount: Int,
+    ): List<Message> {
+        val messages =
+            messageRepository
+                .pollFromStandardChannelByRoutingKey(channelId, routingKey, pollingCount)
+                .sortedBy { it.timestamp }
 
         logger.info { "polled ${messages.size} messages for [${routing(channelId, routingKey)}]" }
 

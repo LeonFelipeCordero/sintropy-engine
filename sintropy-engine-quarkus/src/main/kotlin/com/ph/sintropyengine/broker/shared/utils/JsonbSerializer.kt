@@ -9,13 +9,18 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import org.jooq.JSONB
 
 class JsonbSerializer : JsonSerializer<JSONB>() {
-    override fun serialize(value: JSONB, gen: JsonGenerator, serializers: SerializerProvider) {
+    override fun serialize(
+        value: JSONB,
+        gen: JsonGenerator,
+        serializers: SerializerProvider,
+    ) {
         gen.writeString(value.data())
     }
 }
 
 class JsonbDeserializer : JsonDeserializer<JSONB>() {
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): JSONB {
-        return JSONB.valueOf(p.text)
-    }
+    override fun deserialize(
+        p: JsonParser,
+        ctxt: DeserializationContext,
+    ): JSONB = JSONB.valueOf(p.text)
 }

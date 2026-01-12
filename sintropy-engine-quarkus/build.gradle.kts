@@ -17,7 +17,7 @@ val quarkusPlatformVersion: String by project
 
 val coroutinesVersion = "1.10.2"
 dependencies {
-    implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
+    implementation(enforcedPlatform("$quarkusPlatformGroupId:$quarkusPlatformArtifactId:$quarkusPlatformVersion"))
     implementation("io.quarkus:quarkus-config-yaml")
 //    implementation("io.quarkus:quarkus-opentelemetry")
     implementation("io.quarkus:quarkus-kotlin")
@@ -41,7 +41,7 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
     testImplementation("io.mockk:mockk:1.14.6")
     testImplementation("org.testcontainers:testcontainers:2.0.3")
@@ -52,7 +52,7 @@ dependencies {
     testImplementation("io.rest-assured:kotlin-extensions")
     testImplementation("org.assertj:assertj-guava:3.26.3")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${coroutinesVersion}")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
 }
 
 group = "com.ph"
