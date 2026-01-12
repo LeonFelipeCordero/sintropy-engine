@@ -28,4 +28,4 @@ syen:
 "%test":
   quarkus:
     log:
-      level: DEBUG
+      level: INFO
