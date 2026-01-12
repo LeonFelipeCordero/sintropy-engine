@@ -110,6 +110,11 @@ public class MessageLog extends TableImpl<MessageLogRecord> {
      */
     public final TableField<MessageLogRecord, OffsetDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false), this, "");
 
+    /**
+     * The column <code>public.message_log.origin_message_id</code>.
+     */
+    public final TableField<MessageLogRecord, UUID> ORIGIN_MESSAGE_ID = createField(DSL.name("origin_message_id"), SQLDataType.UUID, this, "");
+
     private MessageLog(Name alias, Table<MessageLogRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }

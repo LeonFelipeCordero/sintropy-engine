@@ -9,6 +9,7 @@ import com.ph.sintropyengine.jooq.generated.Keys;
 import com.ph.sintropyengine.jooq.generated.Public;
 import com.ph.sintropyengine.jooq.generated.enums.MessageStatusType;
 import com.ph.sintropyengine.jooq.generated.tables.Channels.ChannelsPath;
+import com.ph.sintropyengine.jooq.generated.tables.Messages.MessagesPath;
 import com.ph.sintropyengine.jooq.generated.tables.Producers.ProducersPath;
 import com.ph.sintropyengine.jooq.generated.tables.records.MessagesRecord;
 
@@ -123,6 +124,11 @@ public class Messages extends TableImpl<MessagesRecord> {
      */
     public final TableField<MessagesRecord, OffsetDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
 
+    /**
+     * The column <code>public.messages.origin_message_id</code>.
+     */
+    public final TableField<MessagesRecord, UUID> ORIGIN_MESSAGE_ID = createField(DSL.name("origin_message_id"), SQLDataType.UUID, this, "");
+
     private Messages(Name alias, Table<MessagesRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }
@@ -192,7 +198,7 @@ public class Messages extends TableImpl<MessagesRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.MESSAGES_POLLING_1IDX);
+        return Arrays.asList(Indexes.MESSAGES_ORIGIN_IDX, Indexes.MESSAGES_POLLING_1IDX);
     }
 
     @Override
@@ -202,7 +208,7 @@ public class Messages extends TableImpl<MessagesRecord> {
 
     @Override
     public List<ForeignKey<MessagesRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.MESSAGES__MESSAGES_CHANNEL_ID_FKEY, Keys.MESSAGES__MESSAGES_PRODUCER_ID_FKEY);
+        return Arrays.asList(Keys.MESSAGES__MESSAGES_CHANNEL_ID_FKEY, Keys.MESSAGES__MESSAGES_ORIGIN_MESSAGE_ID_FKEY, Keys.MESSAGES__MESSAGES_PRODUCER_ID_FKEY);
     }
 
     private transient ChannelsPath _channels;
@@ -215,6 +221,18 @@ public class Messages extends TableImpl<MessagesRecord> {
             _channels = new ChannelsPath(this, Keys.MESSAGES__MESSAGES_CHANNEL_ID_FKEY, null);
 
         return _channels;
+    }
+
+    private transient MessagesPath _messages;
+
+    /**
+     * Get the implicit join path to the <code>public.messages</code> table.
+     */
+    public MessagesPath messages() {
+        if (_messages == null)
+            _messages = new MessagesPath(this, Keys.MESSAGES__MESSAGES_ORIGIN_MESSAGE_ID_FKEY, null);
+
+        return _messages;
     }
 
     private transient ProducersPath _producers;

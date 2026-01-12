@@ -29,6 +29,7 @@ public class MessageLog implements Serializable {
     private Boolean processed;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
+    private UUID originMessageId;
 
     public MessageLog() {}
 
@@ -43,6 +44,7 @@ public class MessageLog implements Serializable {
         this.processed = value.processed;
         this.createdAt = value.createdAt;
         this.updatedAt = value.updatedAt;
+        this.originMessageId = value.originMessageId;
     }
 
     public MessageLog(
@@ -55,7 +57,8 @@ public class MessageLog implements Serializable {
         JSONB headers,
         Boolean processed,
         OffsetDateTime createdAt,
-        OffsetDateTime updatedAt
+        OffsetDateTime updatedAt,
+        UUID originMessageId
     ) {
         this.messageId = messageId;
         this.timestamp = timestamp;
@@ -67,6 +70,7 @@ public class MessageLog implements Serializable {
         this.processed = processed;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.originMessageId = originMessageId;
     }
 
     /**
@@ -209,6 +213,20 @@ public class MessageLog implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    /**
+     * Getter for <code>public.message_log.origin_message_id</code>.
+     */
+    public UUID getOriginMessageId() {
+        return this.originMessageId;
+    }
+
+    /**
+     * Setter for <code>public.message_log.origin_message_id</code>.
+     */
+    public void setOriginMessageId(UUID originMessageId) {
+        this.originMessageId = originMessageId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -278,6 +296,12 @@ public class MessageLog implements Serializable {
         }
         else if (!this.updatedAt.equals(other.updatedAt))
             return false;
+        if (this.originMessageId == null) {
+            if (other.originMessageId != null)
+                return false;
+        }
+        else if (!this.originMessageId.equals(other.originMessageId))
+            return false;
         return true;
     }
 
@@ -295,6 +319,7 @@ public class MessageLog implements Serializable {
         result = prime * result + ((this.processed == null) ? 0 : this.processed.hashCode());
         result = prime * result + ((this.createdAt == null) ? 0 : this.createdAt.hashCode());
         result = prime * result + ((this.updatedAt == null) ? 0 : this.updatedAt.hashCode());
+        result = prime * result + ((this.originMessageId == null) ? 0 : this.originMessageId.hashCode());
         return result;
     }
 
@@ -312,6 +337,7 @@ public class MessageLog implements Serializable {
         sb.append(", ").append(processed);
         sb.append(", ").append(createdAt);
         sb.append(", ").append(updatedAt);
+        sb.append(", ").append(originMessageId);
 
         sb.append(")");
         return sb.toString();

@@ -191,6 +191,20 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
         return (OffsetDateTime) get(11);
     }
 
+    /**
+     * Setter for <code>public.messages.origin_message_id</code>.
+     */
+    public void setOriginMessageId(UUID value) {
+        set(12, value);
+    }
+
+    /**
+     * Getter for <code>public.messages.origin_message_id</code>.
+     */
+    public UUID getOriginMessageId() {
+        return (UUID) get(12);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -214,7 +228,7 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
     /**
      * Create a detached, initialised MessagesRecord
      */
-    public MessagesRecord(UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, JSONB message, JSONB headers, MessageStatusType status, OffsetDateTime lastDelivered, Integer deliveredTimes, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public MessagesRecord(UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, JSONB message, JSONB headers, MessageStatusType status, OffsetDateTime lastDelivered, Integer deliveredTimes, OffsetDateTime createdAt, OffsetDateTime updatedAt, UUID originMessageId) {
         super(Messages.MESSAGES);
 
         setMessageId(messageId);
@@ -229,6 +243,7 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
         setDeliveredTimes(deliveredTimes);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
+        setOriginMessageId(originMessageId);
         resetChangedOnNotNull();
     }
 
@@ -251,6 +266,7 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
             setDeliveredTimes(value.getDeliveredTimes());
             setCreatedAt(value.getCreatedAt());
             setUpdatedAt(value.getUpdatedAt());
+            setOriginMessageId(value.getOriginMessageId());
             resetChangedOnNotNull();
         }
     }

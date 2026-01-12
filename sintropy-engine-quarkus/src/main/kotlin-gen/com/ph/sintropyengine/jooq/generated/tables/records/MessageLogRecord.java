@@ -162,6 +162,20 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
         return (OffsetDateTime) get(9);
     }
 
+    /**
+     * Setter for <code>public.message_log.origin_message_id</code>.
+     */
+    public void setOriginMessageId(UUID value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>public.message_log.origin_message_id</code>.
+     */
+    public UUID getOriginMessageId() {
+        return (UUID) get(10);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -185,7 +199,7 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
     /**
      * Create a detached, initialised MessageLogRecord
      */
-    public MessageLogRecord(UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, JSONB message, JSONB headers, Boolean processed, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public MessageLogRecord(UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, JSONB message, JSONB headers, Boolean processed, OffsetDateTime createdAt, OffsetDateTime updatedAt, UUID originMessageId) {
         super(MessageLog.MESSAGE_LOG);
 
         setMessageId(messageId);
@@ -198,6 +212,7 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
         setProcessed(processed);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
+        setOriginMessageId(originMessageId);
         resetChangedOnNotNull();
     }
 
@@ -218,6 +233,7 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
             setProcessed(value.getProcessed());
             setCreatedAt(value.getCreatedAt());
             setUpdatedAt(value.getUpdatedAt());
+            setOriginMessageId(value.getOriginMessageId());
             resetChangedOnNotNull();
         }
     }

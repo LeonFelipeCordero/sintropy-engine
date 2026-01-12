@@ -397,4 +397,127 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
                 }.withMessage("Channel link with id $nonExistentId not found")
         }
     }
+
+    @Nested
+    inner class MessageRouting {
+        @Test
+        fun `should route message to linked channel`() {
+            val source = createStandardQueueChannel()
+            val target = createStandardQueueChannel()
+            val producer = createProducer(source)
+
+            createChannelLink(source, target)
+
+            val originalMessage = publishMessage(source, producer)
+
+            val allMessages = messageRepository.findAll()
+            assertThat(allMessages).hasSize(2)
+
+            val routedMessage = allMessages.find { it.channelId == target.channelId }
+            assertThat(routedMessage).isNotNull
+            assertThat(routedMessage?.routingKey).isEqualTo(target.routingKeys.first())
+            assertThat(routedMessage?.message).isEqualTo(originalMessage.message)
+            assertThat(routedMessage?.originMessageId).isEqualTo(originalMessage.messageId)
+        }
+
+        @Test
+        fun `should route message to multiple linked channels`() {
+            val source = createStandardQueueChannel()
+            val target1 = createStandardQueueChannel()
+            val target2 = createStandardQueueChannel()
+            val producer = createProducer(source)
+
+            createChannelLink(source, target1)
+            createChannelLink(source, target2)
+
+            publishMessage(source, producer)
+
+            val allMessages = messageRepository.findAll()
+            assertThat(allMessages).hasSize(3)
+
+            val routedToTarget1 = allMessages.find { it.channelId == target1.channelId }
+            val routedToTarget2 = allMessages.find { it.channelId == target2.channelId }
+
+            assertThat(routedToTarget1).isNotNull
+            assertThat(routedToTarget2).isNotNull
+        }
+
+        @Test
+        fun `should not route when link is disabled`() {
+            val source = createStandardQueueChannel()
+            val target = createStandardQueueChannel()
+            val producer = createProducer(source)
+
+            val link = createChannelLink(source, target)
+            channelLinkRepository.setEnabled(link.channelLinkId!!, false)
+
+            publishMessage(source, producer)
+
+            val allMessages = messageRepository.findAll()
+            assertThat(allMessages).hasSize(1)
+            assertThat(allMessages.first().channelId).isEqualTo(source.channelId)
+        }
+
+        @Test
+        fun `should not route already routed messages - prevent infinite loops`() {
+            val channel1 = createStandardQueueChannel()
+            val channel2 = createStandardQueueChannel()
+            val producer = createProducer(channel1)
+
+            // Create bidirectional links
+            createChannelLink(channel1, channel2)
+            createChannelLink(channel2, channel1)
+
+            publishMessage(channel1, producer)
+
+            // Should only have 2 messages: original + one routed
+            // The routed message should NOT trigger another route back
+            val allMessages = messageRepository.findAll()
+            assertThat(allMessages).hasSize(2)
+        }
+
+        @Test
+        fun `should route with correct target routing key`() {
+            val source = createStandardQueueChannel()
+            val target = createStandardQueueChannel()
+            val producer = createProducer(source)
+
+            val targetRoutingKey = target.routingKeys.first()
+            createChannelLink(source, target, source.routingKeys.first(), targetRoutingKey)
+
+            publishMessage(source, producer)
+
+            val routedMessage = messageRepository.findAll().find { it.channelId == target.channelId }
+            assertThat(routedMessage?.routingKey).isEqualTo(targetRoutingKey)
+        }
+
+        @Test
+        fun `should preserve message content when routing`() {
+            val source = createStandardQueueChannel()
+            val target = createStandardQueueChannel()
+            val producer = createProducer(source)
+
+            createChannelLink(source, target)
+
+            val originalMessage = publishMessage(source, producer)
+
+            val routedMessage = messageRepository.findAll().find { it.channelId == target.channelId }
+            assertThat(routedMessage?.message).isEqualTo(originalMessage.message)
+            assertThat(routedMessage?.headers).isEqualTo(originalMessage.headers)
+        }
+
+        @Test
+        fun `should also log routed messages to message_log`() {
+            val source = createStandardQueueChannel()
+            val target = createStandardQueueChannel()
+            val producer = createProducer(source)
+
+            createChannelLink(source, target)
+
+            publishMessage(source, producer)
+
+            val allMessageLogs = messageRepository.findAllMessageLog()
+            assertThat(allMessageLogs).hasSize(2)
+        }
+    }
 }

@@ -33,6 +33,7 @@ public class Messages implements Serializable {
     private Integer deliveredTimes;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
+    private UUID originMessageId;
 
     public Messages() {}
 
@@ -49,6 +50,7 @@ public class Messages implements Serializable {
         this.deliveredTimes = value.deliveredTimes;
         this.createdAt = value.createdAt;
         this.updatedAt = value.updatedAt;
+        this.originMessageId = value.originMessageId;
     }
 
     public Messages(
@@ -63,7 +65,8 @@ public class Messages implements Serializable {
         OffsetDateTime lastDelivered,
         Integer deliveredTimes,
         OffsetDateTime createdAt,
-        OffsetDateTime updatedAt
+        OffsetDateTime updatedAt,
+        UUID originMessageId
     ) {
         this.messageId = messageId;
         this.timestamp = timestamp;
@@ -77,6 +80,7 @@ public class Messages implements Serializable {
         this.deliveredTimes = deliveredTimes;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.originMessageId = originMessageId;
     }
 
     /**
@@ -247,6 +251,20 @@ public class Messages implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    /**
+     * Getter for <code>public.messages.origin_message_id</code>.
+     */
+    public UUID getOriginMessageId() {
+        return this.originMessageId;
+    }
+
+    /**
+     * Setter for <code>public.messages.origin_message_id</code>.
+     */
+    public void setOriginMessageId(UUID originMessageId) {
+        this.originMessageId = originMessageId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -328,6 +346,12 @@ public class Messages implements Serializable {
         }
         else if (!this.updatedAt.equals(other.updatedAt))
             return false;
+        if (this.originMessageId == null) {
+            if (other.originMessageId != null)
+                return false;
+        }
+        else if (!this.originMessageId.equals(other.originMessageId))
+            return false;
         return true;
     }
 
@@ -347,6 +371,7 @@ public class Messages implements Serializable {
         result = prime * result + ((this.deliveredTimes == null) ? 0 : this.deliveredTimes.hashCode());
         result = prime * result + ((this.createdAt == null) ? 0 : this.createdAt.hashCode());
         result = prime * result + ((this.updatedAt == null) ? 0 : this.updatedAt.hashCode());
+        result = prime * result + ((this.originMessageId == null) ? 0 : this.originMessageId.hashCode());
         return result;
     }
 
@@ -366,6 +391,7 @@ public class Messages implements Serializable {
         sb.append(", ").append(deliveredTimes);
         sb.append(", ").append(createdAt);
         sb.append(", ").append(updatedAt);
+        sb.append(", ").append(originMessageId);
 
         sb.append(")");
         return sb.toString();

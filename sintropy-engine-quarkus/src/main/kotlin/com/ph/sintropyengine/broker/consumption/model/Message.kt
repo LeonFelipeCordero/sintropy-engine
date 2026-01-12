@@ -23,6 +23,7 @@ data class Message(
     val status: MessageStatus,
     val lastDelivered: OffsetDateTime? = null,
     val deliveredTimes: Int,
+    val originMessageId: UUID? = null,
 )
 
 enum class MessageStatus {
