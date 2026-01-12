@@ -1,6 +1,6 @@
 package com.ph.sintropyengine.broker.producer.service
 
-import com.ph.sintropyengine.broker.chennel.service.ChannelService
+import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository

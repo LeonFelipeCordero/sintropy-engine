@@ -1,7 +1,7 @@
 package com.ph.sintropyengine.broker.consumption.api
 
-import com.ph.sintropyengine.broker.chennel.model.ConsumptionType
-import com.ph.sintropyengine.broker.chennel.service.ChannelService
+import com.ph.sintropyengine.broker.channel.model.ConsumptionType
+import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.service.PollingFifoQueue
 import com.ph.sintropyengine.broker.consumption.service.PollingStandardQueue
 import jakarta.ws.rs.Consumes

@@ -1,4 +1,4 @@
-package com.ph.sintropyengine.broker.chennel.model
+package com.ph.sintropyengine.broker.channel.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.UUID

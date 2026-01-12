@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
 import com.ph.sintropyengine.TestWithFullReplicationProfile
-import com.ph.sintropyengine.broker.chennel.model.Channel
-import com.ph.sintropyengine.broker.chennel.model.ChannelType
+import com.ph.sintropyengine.broker.channel.model.Channel
+import com.ph.sintropyengine.broker.channel.model.ChannelType
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.service.ConnectionRouter
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing

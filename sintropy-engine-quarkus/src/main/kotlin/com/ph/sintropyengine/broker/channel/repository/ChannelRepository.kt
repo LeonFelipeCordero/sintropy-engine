@@ -1,9 +1,9 @@
-package com.ph.sintropyengine.broker.chennel.repository
+package com.ph.sintropyengine.broker.channel.repository
 
-import com.ph.sintropyengine.broker.chennel.model.Channel
-import com.ph.sintropyengine.broker.chennel.model.ChannelType
-import com.ph.sintropyengine.broker.chennel.model.ChannelType.QUEUE
-import com.ph.sintropyengine.broker.chennel.model.ConsumptionType
+import com.ph.sintropyengine.broker.channel.model.Channel
+import com.ph.sintropyengine.broker.channel.model.ChannelType
+import com.ph.sintropyengine.broker.channel.model.ChannelType.QUEUE
+import com.ph.sintropyengine.broker.channel.model.ConsumptionType
 import com.ph.sintropyengine.jooq.generated.Tables.CHANNELS
 import com.ph.sintropyengine.jooq.generated.Tables.QUEUES
 import com.ph.sintropyengine.jooq.generated.Tables.ROUTING_KEYS

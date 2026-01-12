@@ -4,6 +4,7 @@
 package com.ph.sintropyengine.jooq.generated;
 
 
+import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks;
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
 import com.ph.sintropyengine.jooq.generated.tables.MessageLog;
 import com.ph.sintropyengine.jooq.generated.tables.Messages;
@@ -17,6 +18,11 @@ import com.ph.sintropyengine.jooq.generated.tables.RoutingKeys;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
+
+    /**
+     * The table <code>public.channel_links</code>.
+     */
+    public static final ChannelLinks CHANNEL_LINKS = ChannelLinks.CHANNEL_LINKS;
 
     /**
      * The table <code>public.channels</code>.

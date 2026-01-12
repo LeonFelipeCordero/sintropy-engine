@@ -1,8 +1,8 @@
 package com.ph.sintropyengine.broker.channel.api
 
 import com.ph.sintropyengine.IntegrationTestBase
-import com.ph.sintropyengine.broker.chennel.model.ChannelType
-import com.ph.sintropyengine.broker.chennel.model.ConsumptionType
+import com.ph.sintropyengine.broker.channel.model.ChannelType
+import com.ph.sintropyengine.broker.channel.model.ConsumptionType
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType

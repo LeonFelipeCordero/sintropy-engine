@@ -1,11 +1,15 @@
 package com.ph.sintropyengine
 
-import com.ph.sintropyengine.broker.chennel.model.Channel
-import com.ph.sintropyengine.broker.chennel.model.ChannelType
-import com.ph.sintropyengine.broker.chennel.model.ChannelType.QUEUE
-import com.ph.sintropyengine.broker.chennel.model.ConsumptionType
-import com.ph.sintropyengine.broker.chennel.model.ConsumptionType.STANDARD
-import com.ph.sintropyengine.broker.chennel.repository.ChannelRepository
+import com.ph.sintropyengine.broker.channel.model.Channel
+import com.ph.sintropyengine.broker.channel.model.ChannelLink
+import com.ph.sintropyengine.broker.channel.model.ChannelType
+import com.ph.sintropyengine.broker.channel.model.ChannelType.QUEUE
+import com.ph.sintropyengine.broker.channel.model.ChannelType.STREAM
+import com.ph.sintropyengine.broker.channel.model.ConsumptionType
+import com.ph.sintropyengine.broker.channel.model.ConsumptionType.FIFO
+import com.ph.sintropyengine.broker.channel.model.ConsumptionType.STANDARD
+import com.ph.sintropyengine.broker.channel.repository.ChannelLinkRepository
+import com.ph.sintropyengine.broker.channel.repository.ChannelRepository
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.consumption.service.MessageRecoveryService
@@ -32,6 +36,9 @@ open class IntegrationTestBase {
     protected lateinit var channelRepository: ChannelRepository
 
     @Inject
+    protected lateinit var channelLinkRepository: ChannelLinkRepository
+
+    @Inject
     protected lateinit var producerRepository: ProducerRepository
 
     @Inject
@@ -43,6 +50,7 @@ open class IntegrationTestBase {
     protected fun clean() {
         messageRepository.deleteAll()
         producerRepository.deleteAll()
+        channelLinkRepository.deleteAll()
         channelRepository.deleteAll()
     }
 
@@ -51,11 +59,44 @@ open class IntegrationTestBase {
      */
     protected fun createChannel(
         channelType: ChannelType = QUEUE,
-        consumptionType: ConsumptionType = STANDARD,
+        consumptionType: ConsumptionType? = if (channelType == QUEUE) STANDARD else null,
     ): Channel {
         val channel = Fixtures.createChannel(channelType = channelType, consumptionType = consumptionType)
         return channelRepository.save(channel)
     }
+
+    /**
+     * Create a Standard Queue channel
+     */
+    protected fun createStandardQueueChannel(): Channel = createChannel(QUEUE, STANDARD)
+
+    /**
+     * Create a FIFO Queue channel
+     */
+    protected fun createFifoQueueChannel(): Channel = createChannel(QUEUE, FIFO)
+
+    /**
+     * Create a Stream channel
+     */
+    protected fun createStreamChannel(): Channel = createChannel(channelType = STREAM)
+
+    /**
+     * Create a link between two channels
+     */
+    protected fun createChannelLink(
+        sourceChannel: Channel,
+        targetChannel: Channel,
+        sourceRoutingKey: String = sourceChannel.routingKeys.first(),
+        targetRoutingKey: String = targetChannel.routingKeys.first(),
+    ): ChannelLink =
+        channelLinkRepository.save(
+            ChannelLink(
+                sourceChannelId = sourceChannel.channelId!!,
+                targetChannelId = targetChannel.channelId!!,
+                sourceRoutingKey = sourceRoutingKey,
+                targetRoutingKey = targetRoutingKey,
+            ),
+        )
 
     /**
      * Create a new producer with unique IDs for the given channel

@@ -1,9 +1,9 @@
-package com.ph.sintropyengine.broker.chennel.service
+package com.ph.sintropyengine.broker.channel.service
 
-import com.ph.sintropyengine.broker.chennel.model.Channel
-import com.ph.sintropyengine.broker.chennel.model.ChannelType
-import com.ph.sintropyengine.broker.chennel.model.ConsumptionType
-import com.ph.sintropyengine.broker.chennel.repository.ChannelRepository
+import com.ph.sintropyengine.broker.channel.model.Channel
+import com.ph.sintropyengine.broker.channel.model.ChannelType
+import com.ph.sintropyengine.broker.channel.model.ConsumptionType
+import com.ph.sintropyengine.broker.channel.repository.ChannelRepository
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 import java.util.UUID

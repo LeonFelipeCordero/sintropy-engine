@@ -4,6 +4,7 @@
 package com.ph.sintropyengine.jooq.generated;
 
 
+import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks;
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
 import com.ph.sintropyengine.jooq.generated.tables.MessageLog;
 import com.ph.sintropyengine.jooq.generated.tables.Messages;
@@ -31,6 +32,11 @@ public class Public extends SchemaImpl {
      * The reference instance of <code>public</code>
      */
     public static final Public PUBLIC = new Public();
+
+    /**
+     * The table <code>public.channel_links</code>.
+     */
+    public final ChannelLinks CHANNEL_LINKS = ChannelLinks.CHANNEL_LINKS;
 
     /**
      * The table <code>public.channels</code>.
@@ -78,6 +84,7 @@ public class Public extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
+            ChannelLinks.CHANNEL_LINKS,
             Channels.CHANNELS,
             MessageLog.MESSAGE_LOG,
             Messages.MESSAGES,

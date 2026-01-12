@@ -1,6 +1,6 @@
 package com.ph.sintropyengine.broker.consumption.service
 
-import com.ph.sintropyengine.broker.chennel.service.ChannelService
+import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.model.MessageLog
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing

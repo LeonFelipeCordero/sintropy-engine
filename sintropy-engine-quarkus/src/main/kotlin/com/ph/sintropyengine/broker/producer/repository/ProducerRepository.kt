@@ -42,8 +42,6 @@ class ProducerRepository(
             .where(Tables.CHANNELS.NAME.eq(channelName))
             .fetchInto(Producer::class.java)
 
-    fun findAll(): List<Producer> = context.selectFrom(Tables.PRODUCERS).fetchInto(Producer::class.java)
-
     fun delete(id: UUID) =
         context
             .deleteFrom(Tables.PRODUCERS)

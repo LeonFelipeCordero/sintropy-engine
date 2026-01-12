@@ -2,7 +2,7 @@ package com.ph.sintropyengine.broker.consumption.service
 
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.Fixtures.DEFAULT_ROUTING_KEY
-import com.ph.sintropyengine.broker.chennel.service.ChannelService
+import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import io.mockk.clearMocks
 import io.mockk.every

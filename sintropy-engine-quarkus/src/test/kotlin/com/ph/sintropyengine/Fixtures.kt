@@ -1,10 +1,10 @@
 package com.ph.sintropyengine
 
-import com.ph.sintropyengine.broker.chennel.model.Channel
-import com.ph.sintropyengine.broker.chennel.model.ChannelType
-import com.ph.sintropyengine.broker.chennel.model.ChannelType.QUEUE
-import com.ph.sintropyengine.broker.chennel.model.ConsumptionType
-import com.ph.sintropyengine.broker.chennel.model.ConsumptionType.STANDARD
+import com.ph.sintropyengine.broker.channel.model.Channel
+import com.ph.sintropyengine.broker.channel.model.ChannelType
+import com.ph.sintropyengine.broker.channel.model.ChannelType.QUEUE
+import com.ph.sintropyengine.broker.channel.model.ConsumptionType
+import com.ph.sintropyengine.broker.channel.model.ConsumptionType.STANDARD
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
 import com.ph.sintropyengine.broker.consumption.model.MessageStatus
@@ -24,7 +24,7 @@ object Fixtures {
         channelId: UUID? = null,
         channelType: ChannelType = QUEUE,
         routingKeys: List<String> = listOf(DEFAULT_ROUTING_KEY),
-        consumptionType: ConsumptionType = STANDARD,
+        consumptionType: ConsumptionType? = if (channelType == QUEUE) STANDARD else null,
     ): Channel =
         Channel(
             channelId = channelId,

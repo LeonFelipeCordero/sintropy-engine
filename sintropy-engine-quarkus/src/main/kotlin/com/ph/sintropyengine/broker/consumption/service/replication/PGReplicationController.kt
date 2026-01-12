@@ -1,8 +1,8 @@
 package com.ph.sintropyengine.broker.consumption.service.replication
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.ph.sintropyengine.broker.chennel.model.ChannelType
-import com.ph.sintropyengine.broker.chennel.service.ChannelService
+import com.ph.sintropyengine.broker.channel.model.ChannelType
+import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.consumption.service.ConnectionRouter
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing

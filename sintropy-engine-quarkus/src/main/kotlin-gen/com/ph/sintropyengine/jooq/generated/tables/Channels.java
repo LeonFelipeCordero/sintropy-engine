@@ -8,6 +8,7 @@ import com.ph.sintropyengine.jooq.generated.Indexes;
 import com.ph.sintropyengine.jooq.generated.Keys;
 import com.ph.sintropyengine.jooq.generated.Public;
 import com.ph.sintropyengine.jooq.generated.enums.ChannelType;
+import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks.ChannelLinksPath;
 import com.ph.sintropyengine.jooq.generated.tables.MessageLog.MessageLogPath;
 import com.ph.sintropyengine.jooq.generated.tables.Messages.MessagesPath;
 import com.ph.sintropyengine.jooq.generated.tables.Producers.ProducersPath;
@@ -165,6 +166,34 @@ public class Channels extends TableImpl<ChannelsRecord> {
     @Override
     public UniqueKey<ChannelsRecord> getPrimaryKey() {
         return Keys.CHANNELS_PKEY;
+    }
+
+    private transient ChannelLinksPath _channelLinksSourceChannelIdFkey;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.channel_links</code> table, via the
+     * <code>channel_links_source_channel_id_fkey</code> key
+     */
+    public ChannelLinksPath channelLinksSourceChannelIdFkey() {
+        if (_channelLinksSourceChannelIdFkey == null)
+            _channelLinksSourceChannelIdFkey = new ChannelLinksPath(this, null, Keys.CHANNEL_LINKS__CHANNEL_LINKS_SOURCE_CHANNEL_ID_FKEY.getInverseKey());
+
+        return _channelLinksSourceChannelIdFkey;
+    }
+
+    private transient ChannelLinksPath _channelLinksTargetChannelIdFkey;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.channel_links</code> table, via the
+     * <code>channel_links_target_channel_id_fkey</code> key
+     */
+    public ChannelLinksPath channelLinksTargetChannelIdFkey() {
+        if (_channelLinksTargetChannelIdFkey == null)
+            _channelLinksTargetChannelIdFkey = new ChannelLinksPath(this, null, Keys.CHANNEL_LINKS__CHANNEL_LINKS_TARGET_CHANNEL_ID_FKEY.getInverseKey());
+
+        return _channelLinksTargetChannelIdFkey;
     }
 
     private transient MessageLogPath _messageLog;

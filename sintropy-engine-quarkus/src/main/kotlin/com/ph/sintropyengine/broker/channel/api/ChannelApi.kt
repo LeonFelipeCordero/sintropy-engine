@@ -1,8 +1,8 @@
-package com.ph.sintropyengine.broker.chennel.api
+package com.ph.sintropyengine.broker.channel.api
 
-import com.ph.sintropyengine.broker.chennel.model.ChannelType
-import com.ph.sintropyengine.broker.chennel.model.ConsumptionType
-import com.ph.sintropyengine.broker.chennel.service.ChannelService
+import com.ph.sintropyengine.broker.channel.model.ChannelType
+import com.ph.sintropyengine.broker.channel.model.ConsumptionType
+import com.ph.sintropyengine.broker.channel.service.ChannelService
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET

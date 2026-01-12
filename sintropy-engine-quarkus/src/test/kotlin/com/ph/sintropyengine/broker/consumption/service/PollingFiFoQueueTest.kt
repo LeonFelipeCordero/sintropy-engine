@@ -2,8 +2,8 @@ package com.ph.sintropyengine.broker.consumption.service
 
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
-import com.ph.sintropyengine.broker.chennel.model.ConsumptionType.FIFO
-import com.ph.sintropyengine.broker.chennel.service.ChannelService
+import com.ph.sintropyengine.broker.channel.model.ConsumptionType.FIFO
+import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import io.quarkus.test.junit.QuarkusTest

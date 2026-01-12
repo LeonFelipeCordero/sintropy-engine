@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
-import com.ph.sintropyengine.broker.chennel.model.Channel
+import com.ph.sintropyengine.broker.channel.model.Channel
 import com.ph.sintropyengine.broker.consumption.api.ReadyToStreamResponse
 import com.ph.sintropyengine.broker.consumption.api.RecoveryStreamRequest
 import com.ph.sintropyengine.broker.consumption.api.StreamingErrorResponse
