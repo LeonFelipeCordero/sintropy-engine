@@ -2,7 +2,7 @@ package com.ph.sintropyengine.broker.consumption.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ph.sintropyengine.broker.consumption.service.BatchStreamInput
-import com.ph.sintropyengine.broker.consumption.service.MessageService
+import com.ph.sintropyengine.broker.consumption.service.MessageRecoveryService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.quarkus.websockets.next.OnClose
 import io.quarkus.websockets.next.OnOpen
@@ -10,7 +10,15 @@ import io.quarkus.websockets.next.OnTextMessage
 import io.quarkus.websockets.next.WebSocket
 import io.quarkus.websockets.next.WebSocketConnection
 import jakarta.inject.Inject
+import jakarta.ws.rs.Consumes
+import jakarta.ws.rs.POST
+import jakarta.ws.rs.Path
+import jakarta.ws.rs.PathParam
+import jakarta.ws.rs.Produces
+import jakarta.ws.rs.core.MediaType
+import jakarta.ws.rs.core.Response
 import java.time.OffsetDateTime
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
@@ -20,11 +28,27 @@ private val logger = KotlinLogging.logger {}
 
 private const val IDLE_TIMEOUT_SECONDS = 30L
 
+
+@Path("/recovery")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+class MessageRecoveryRestApi(
+    private val messageRecoveryService: MessageRecoveryService
+) {
+
+    @POST
+    @Path("/messages/{messageId}/retrigger")
+    fun retriggerMessage(@PathParam("messageId") messageId: UUID): Response {
+        val messageLog = messageRecoveryService.retriggerMessage(messageId)
+        return Response.ok(messageLog).build()
+    }
+}
+
 @WebSocket(path = "/ws/recovery/{channelName}/{routingKey}")
 class MessageRecoveryApi {
 
     @Inject
-    private lateinit var messageService: MessageService
+    private lateinit var messageRecoveryService: MessageRecoveryService
 
     @Inject
     private lateinit var objectMapper: ObjectMapper
@@ -68,13 +92,13 @@ class MessageRecoveryApi {
             )
 
             if (request.streamAll) {
-                messageService.streamFromAll(
+                messageRecoveryService.streamFromAll(
                     channelName = channelName,
                     routingKey = routingKey,
                     batchStreamInput = batchStreamInput
                 )
             } else {
-                messageService.streamFromToByChannelIdAndRoutingKey(
+                messageRecoveryService.streamFromToByChannelIdAndRoutingKey(
                     channelName = channelName,
                     routingKey = routingKey,
                     from = request.from

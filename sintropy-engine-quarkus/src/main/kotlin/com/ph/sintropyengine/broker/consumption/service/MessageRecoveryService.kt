@@ -14,7 +14,7 @@ import java.util.UUID
 private val logger = KotlinLogging.logger {}
 
 @ApplicationScoped
-class MessageService(
+class MessageRecoveryService(
     private val messageRepository: MessageRepository,
     private val channelService: ChannelService,
     private var openConnections: OpenConnections

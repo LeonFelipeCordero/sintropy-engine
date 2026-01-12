@@ -12,13 +12,17 @@ import com.ph.sintropyengine.broker.consumption.model.MessageLog
 import com.ph.sintropyengine.broker.producer.model.Producer
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.websockets.next.BasicWebSocketConnector
+import io.restassured.RestAssured.given
 import jakarta.inject.Inject
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.URI
 import java.time.OffsetDateTime
+import java.util.UUID
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -477,5 +481,32 @@ class MessageRecoveryTest : IntegrationTestBase() {
 
         val closed = closeLatch.await(5, TimeUnit.SECONDS)
         assertThat(closed).isTrue()
+    }
+
+    @Test
+    fun `REST - should retrigger message successfully`() {
+        val message = publishMessage(channel, producer)
+
+        given()
+            .`when`()
+            .post("/recovery/messages/${message.messageId}/retrigger")
+            .then()
+            .statusCode(200)
+            .body("messageId", equalTo(message.messageId.toString()))
+            .body("channelId", equalTo(message.channelId.toString()))
+            .body("producerId", equalTo(message.producerId.toString()))
+            .body("routingKey", equalTo(message.routingKey))
+            .body("message", notNullValue())
+    }
+
+    @Test
+    fun `REST - should return 500 when message does not exist`() {
+        val nonExistentId = UUID.randomUUID()
+
+        given()
+            .`when`()
+            .post("/recovery/messages/$nonExistentId/retrigger")
+            .then()
+            .statusCode(500)
     }
 }
