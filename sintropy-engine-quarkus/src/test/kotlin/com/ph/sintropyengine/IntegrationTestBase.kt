@@ -54,9 +54,6 @@ open class IntegrationTestBase {
         channelRepository.deleteAll()
     }
 
-    /**
-     * Create a new channel with unique IDs
-     */
     protected fun createChannel(
         channelType: ChannelType = QUEUE,
         consumptionType: ConsumptionType? = if (channelType == QUEUE) STANDARD else null,
@@ -65,24 +62,12 @@ open class IntegrationTestBase {
         return channelRepository.save(channel)
     }
 
-    /**
-     * Create a Standard Queue channel
-     */
     protected fun createStandardQueueChannel(): Channel = createChannel(QUEUE, STANDARD)
 
-    /**
-     * Create a FIFO Queue channel
-     */
     protected fun createFifoQueueChannel(): Channel = createChannel(QUEUE, FIFO)
 
-    /**
-     * Create a Stream channel
-     */
     protected fun createStreamChannel(): Channel = createChannel(channelType = STREAM)
 
-    /**
-     * Create a link between two channels
-     */
     protected fun createChannelLink(
         sourceChannel: Channel,
         targetChannel: Channel,
@@ -98,14 +83,8 @@ open class IntegrationTestBase {
             ),
         )
 
-    /**
-     * Create a new producer with unique IDs for the given channel
-     */
     protected fun createProducer(channel: Channel): Producer = producerRepository.save(Fixtures.createProducer(channel.channelId!!))
 
-    /**
-     * Create a new channel and a new producer with unique IDs
-     */
     protected fun createChannelWithProducer(consumptionType: ConsumptionType = STANDARD): Pair<Channel, Producer> {
         val channel = createChannel(consumptionType = consumptionType)
         val producer = createProducer(channel)
