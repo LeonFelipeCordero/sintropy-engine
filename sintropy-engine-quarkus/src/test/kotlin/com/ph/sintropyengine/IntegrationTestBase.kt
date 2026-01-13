@@ -11,6 +11,7 @@ import com.ph.sintropyengine.broker.channel.model.ConsumptionType.STANDARD
 import com.ph.sintropyengine.broker.channel.repository.ChannelLinkRepository
 import com.ph.sintropyengine.broker.channel.repository.ChannelRepository
 import com.ph.sintropyengine.broker.consumption.model.Message
+import com.ph.sintropyengine.broker.consumption.repository.DeadLetterQueueRepository
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.consumption.service.MessageRecoveryService
 import com.ph.sintropyengine.broker.consumption.service.PollingQueue
@@ -33,6 +34,9 @@ open class IntegrationTestBase {
     protected lateinit var messageRepository: MessageRepository
 
     @Inject
+    protected lateinit var dlqRepository: DeadLetterQueueRepository
+
+    @Inject
     protected lateinit var channelRepository: ChannelRepository
 
     @Inject
@@ -48,6 +52,7 @@ open class IntegrationTestBase {
     protected lateinit var messageRecoveryService: MessageRecoveryService
 
     protected fun clean() {
+        dlqRepository.deleteAll()
         messageRepository.deleteAll()
         producerRepository.deleteAll()
         channelLinkRepository.deleteAll()

@@ -6,6 +6,7 @@ package com.ph.sintropyengine.jooq.generated;
 
 import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks;
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
+import com.ph.sintropyengine.jooq.generated.tables.DeadLetterQueue;
 import com.ph.sintropyengine.jooq.generated.tables.MessageLog;
 import com.ph.sintropyengine.jooq.generated.tables.Messages;
 import com.ph.sintropyengine.jooq.generated.tables.Producers;
@@ -42,6 +43,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.channels</code>.
      */
     public final Channels CHANNELS = Channels.CHANNELS;
+
+    /**
+     * The table <code>public.dead_letter_queue</code>.
+     */
+    public final DeadLetterQueue DEAD_LETTER_QUEUE = DeadLetterQueue.DEAD_LETTER_QUEUE;
 
     /**
      * The table <code>public.message_log</code>.
@@ -86,6 +92,7 @@ public class Public extends SchemaImpl {
         return Arrays.asList(
             ChannelLinks.CHANNEL_LINKS,
             Channels.CHANNELS,
+            DeadLetterQueue.DEAD_LETTER_QUEUE,
             MessageLog.MESSAGE_LOG,
             Messages.MESSAGES,
             Producers.PRODUCERS,

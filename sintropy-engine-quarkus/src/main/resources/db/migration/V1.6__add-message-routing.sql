@@ -1,5 +1,5 @@
-ALTER TABLE messages ADD COLUMN origin_message_id UUID REFERENCES messages(message_id) ON DELETE SET NULL;
-CREATE INDEX messages_origin_idx ON messages(origin_message_id);
+ALTER TABLE messages ADD COLUMN origin_message_id UUID;
+CREATE INDEX messages_origin_message_idx ON messages(origin_message_id);
 
 ALTER TABLE message_log ADD COLUMN origin_message_id UUID;
 

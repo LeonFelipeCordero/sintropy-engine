@@ -1,5 +1,6 @@
 package com.ph.sintropyengine.broker.consumption.repository
 
+import com.ph.sintropyengine.broker.consumption.model.DeadLetterMessage
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.model.MessageLog
 import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
@@ -10,7 +11,6 @@ import org.jooq.DSLContext
 import org.jooq.JSONB
 import java.time.OffsetDateTime
 import java.util.UUID
-import java.util.stream.Stream
 
 @ApplicationScoped
 class MessageRepository(
@@ -118,6 +118,37 @@ class MessageRepository(
             .where(Tables.MESSAGES.MESSAGE_ID.eq(messageId))
             .execute()
     }
+
+    fun reinsertFromDlq(dlqEntry: DeadLetterMessage): Message =
+        context
+            .insertInto(
+                Tables.MESSAGES,
+                Tables.MESSAGES.MESSAGE_ID,
+                Tables.MESSAGES.TIMESTAMP,
+                Tables.MESSAGES.CHANNEL_ID,
+                Tables.MESSAGES.PRODUCER_ID,
+                Tables.MESSAGES.ROUTING_KEY,
+                Tables.MESSAGES.MESSAGE,
+                Tables.MESSAGES.HEADERS,
+                Tables.MESSAGES.STATUS,
+                Tables.MESSAGES.LAST_DELIVERED,
+                Tables.MESSAGES.DELIVERED_TIMES,
+                Tables.MESSAGES.ORIGIN_MESSAGE_ID,
+            ).values(
+                dlqEntry.messageId,
+                dlqEntry.timestamp,
+                dlqEntry.channelId,
+                dlqEntry.producerId,
+                dlqEntry.routingKey,
+                dlqEntry.message,
+                dlqEntry.headers,
+                MessageStatusType.READY,
+                null,
+                0,
+                dlqEntry.originMessageId,
+            ).returning()
+            .fetchOneInto(Message::class.java)
+            ?: throw IllegalStateException("Failed to reinsert message from DLQ")
 
     fun findById(messageId: UUID): Message? =
         context

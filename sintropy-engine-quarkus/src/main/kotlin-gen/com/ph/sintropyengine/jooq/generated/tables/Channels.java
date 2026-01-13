@@ -9,6 +9,7 @@ import com.ph.sintropyengine.jooq.generated.Keys;
 import com.ph.sintropyengine.jooq.generated.Public;
 import com.ph.sintropyengine.jooq.generated.enums.ChannelType;
 import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks.ChannelLinksPath;
+import com.ph.sintropyengine.jooq.generated.tables.DeadLetterQueue.DeadLetterQueuePath;
 import com.ph.sintropyengine.jooq.generated.tables.MessageLog.MessageLogPath;
 import com.ph.sintropyengine.jooq.generated.tables.Messages.MessagesPath;
 import com.ph.sintropyengine.jooq.generated.tables.Producers.ProducersPath;
@@ -194,6 +195,19 @@ public class Channels extends TableImpl<ChannelsRecord> {
             _channelLinksTargetChannelIdFkey = new ChannelLinksPath(this, null, Keys.CHANNEL_LINKS__CHANNEL_LINKS_TARGET_CHANNEL_ID_FKEY.getInverseKey());
 
         return _channelLinksTargetChannelIdFkey;
+    }
+
+    private transient DeadLetterQueuePath _deadLetterQueue;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.dead_letter_queue</code> table
+     */
+    public DeadLetterQueuePath deadLetterQueue() {
+        if (_deadLetterQueue == null)
+            _deadLetterQueue = new DeadLetterQueuePath(this, null, Keys.DEAD_LETTER_QUEUE__DEAD_LETTER_QUEUE_CHANNEL_ID_FKEY.getInverseKey());
+
+        return _deadLetterQueue;
     }
 
     private transient MessageLogPath _messageLog;
