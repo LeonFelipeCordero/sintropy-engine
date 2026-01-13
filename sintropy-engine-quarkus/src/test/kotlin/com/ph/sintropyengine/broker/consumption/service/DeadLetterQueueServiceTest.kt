@@ -48,7 +48,7 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
         }
 
         @Test
-        fun `should keep message_log processed as false for failed messages`() {
+        fun `should not keep message_log processed as false for failed messages`() {
             val (channel, producer) = createChannelWithProducer()
             val message = publishMessage(channel, producer)
 
@@ -56,8 +56,7 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
             pollingQueue.markAsFailed(message.messageId)
 
             val messageLog = messageRepository.findMessageLogById(message.messageId)
-            assertThat(messageLog).isNotNull
-            assertThat(messageLog?.processed).isFalse
+            assertThat(messageLog).isNull()
         }
 
         @Test

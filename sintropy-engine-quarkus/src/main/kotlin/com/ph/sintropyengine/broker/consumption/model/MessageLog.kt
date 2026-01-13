@@ -21,4 +21,5 @@ data class MessageLog(
     @param:JsonDeserialize(using = JsonbDeserializer::class)
     val headers: JSONB,
     val processed: Boolean,
+    val originMessageId: UUID? = null,
 )
