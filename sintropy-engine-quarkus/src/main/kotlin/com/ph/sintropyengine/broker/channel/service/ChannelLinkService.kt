@@ -53,6 +53,8 @@ class ChannelLinkService(
 
     fun findById(channelLinkId: UUID): ChannelLink? = channelLinkRepository.findById(channelLinkId)
 
+    fun findAll(): List<ChannelLink> = channelLinkRepository.findAll()
+
     fun getLinksFromChannel(channelName: String): List<ChannelLink> {
         val channel =
             channelRepository.findByName(channelName)

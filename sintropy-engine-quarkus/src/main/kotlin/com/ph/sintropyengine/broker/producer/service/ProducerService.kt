@@ -32,6 +32,10 @@ class ProducerService(
 
     fun findById(consumerId: UUID): Producer? = producerRepository.findById(consumerId)
 
+    fun findByName(name: String): Producer? = producerRepository.findByName(name)
+
+    fun findAll(): List<Producer> = producerRepository.findAll()
+
     fun findByChannel(channelName: String): List<Producer> =
         channelService.findByName(channelName)?.let {
             producerRepository.findByChannel(channelName)
@@ -41,7 +45,13 @@ class ProducerService(
     fun deleteProducer(producerId: UUID) =
         producerRepository.findById(producerId)?.let {
             producerRepository.delete(producerId)
-        } ?: throw IllegalStateException("Consumer $producerId not found")
+        } ?: throw IllegalStateException("Producer $producerId not found")
+
+    @Transactional
+    fun deleteByName(name: String) =
+        producerRepository.findByName(name)?.let {
+            producerRepository.deleteByName(name)
+        } ?: throw IllegalStateException("Producer $name not found")
 
     @Transactional
     fun publishMessage(request: PublishMessageRequest): Message {
@@ -52,6 +62,12 @@ class ProducerService(
         val producer =
             producerRepository.findByName(request.producerName)
                 ?: throw IllegalStateException("Producer ${request.producerName} not found")
+
+        if (producer.channelId != channel.channelId) {
+            throw IllegalStateException(
+                "Producer ${request.producerName} is not linked to channel ${request.channelName}",
+            )
+        }
 
         if (!channel.containsRoutingKey(request.routingKey)) {
             throw IllegalStateException(

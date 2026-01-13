@@ -7,6 +7,7 @@ package com.ph.sintropyengine.jooq.generated;
 import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks;
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
 import com.ph.sintropyengine.jooq.generated.tables.DeadLetterQueue;
+import com.ph.sintropyengine.jooq.generated.tables.IacFiles;
 import com.ph.sintropyengine.jooq.generated.tables.MessageLog;
 import com.ph.sintropyengine.jooq.generated.tables.Messages;
 import com.ph.sintropyengine.jooq.generated.tables.Producers;
@@ -48,6 +49,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.dead_letter_queue</code>.
      */
     public final DeadLetterQueue DEAD_LETTER_QUEUE = DeadLetterQueue.DEAD_LETTER_QUEUE;
+
+    /**
+     * The table <code>public.iac_files</code>.
+     */
+    public final IacFiles IAC_FILES = IacFiles.IAC_FILES;
 
     /**
      * The table <code>public.message_log</code>.
@@ -93,6 +99,7 @@ public class Public extends SchemaImpl {
             ChannelLinks.CHANNEL_LINKS,
             Channels.CHANNELS,
             DeadLetterQueue.DEAD_LETTER_QUEUE,
+            IacFiles.IAC_FILES,
             MessageLog.MESSAGE_LOG,
             Messages.MESSAGES,
             Producers.PRODUCERS,

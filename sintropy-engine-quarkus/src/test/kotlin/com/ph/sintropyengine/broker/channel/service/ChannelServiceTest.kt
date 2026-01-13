@@ -12,9 +12,6 @@ import org.junit.jupiter.api.Test
 
 @QuarkusTest
 class ChannelServiceTest : IntegrationTestBase() {
-    @Inject
-    private lateinit var channelService: ChannelService
-
     @BeforeEach
     fun setUp() {
         clean()

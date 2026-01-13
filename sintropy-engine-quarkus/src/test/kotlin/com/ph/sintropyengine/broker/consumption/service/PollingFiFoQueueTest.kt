@@ -26,9 +26,6 @@ class PollingFiFoQueueTest : IntegrationTestBase() {
     @Inject
     private lateinit var pollingQueue: PollingFifoQueue
 
-    @Inject
-    private lateinit var channelService: ChannelService
-
     @BeforeEach
     fun setUp() {
         clean()

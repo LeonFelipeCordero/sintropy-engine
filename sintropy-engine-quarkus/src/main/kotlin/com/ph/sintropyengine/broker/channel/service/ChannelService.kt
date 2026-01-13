@@ -39,6 +39,16 @@ class ChannelService(
 
     fun findByName(name: String): Channel? = channelRepository.findByName(name)
 
+    fun findAll(): List<Channel> = channelRepository.findAll()
+
+    @Transactional
+    fun deleteByName(name: String) {
+        val channel =
+            channelRepository.findByName(name)
+                ?: throw IllegalStateException("Channel with name $name not found")
+        channelRepository.delete(channel.channelId!!)
+    }
+
     @Transactional
     fun deleteChannel(id: UUID) {
         channelRepository.findById(id) ?: throw IllegalStateException("Channel with id $id not found")

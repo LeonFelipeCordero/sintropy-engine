@@ -79,6 +79,11 @@ class ChannelLinkRepository(
             .execute()
     }
 
+    fun findAll(): List<ChannelLink> =
+        context
+            .selectFrom(CHANNEL_LINKS)
+            .fetchInto(ChannelLink::class.java)
+
     fun deleteAll() {
         context.deleteFrom(CHANNEL_LINKS).execute()
     }
