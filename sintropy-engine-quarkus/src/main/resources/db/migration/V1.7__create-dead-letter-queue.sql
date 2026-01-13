@@ -91,6 +91,7 @@ BEGIN
         -- 1. move_to_dlq_before_delete (inserts to DLQ)
         -- 2. mark_as_delivered_in_message_log (keeps processed=false for FAILED)
         DELETE FROM messages WHERE message_id = NEW.message_id;
+        DELETE FROM message_log WHERE message_id = NEW.message_id;
         RETURN NULL; -- Prevent the UPDATE from completing (row is deleted)
     END IF;
 
