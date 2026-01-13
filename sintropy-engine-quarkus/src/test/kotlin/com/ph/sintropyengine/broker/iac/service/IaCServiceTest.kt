@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.io.File
 
 @QuarkusTest
 class IaCServiceTest : IntegrationTestBase() {
@@ -754,28 +755,312 @@ class IaCServiceTest : IntegrationTestBase() {
     }
 
     @Nested
-    inner class HashTracking {
+    inner class FileProcessing {
+        private fun withTempIaCFile(
+            content: String,
+            test: (filePath: String) -> Unit,
+        ) {
+            val tempFile = File.createTempFile("iac-test-", ".json")
+            try {
+                tempFile.writeText(content)
+                test(tempFile.absolutePath)
+            } finally {
+                tempFile.delete()
+            }
+        }
+
         @Test
-        fun `should store hash after first apply`() {
-            val iac =
-                IaC(
-                    channels =
-                        listOf(
-                            ChannelIaC(
-                                name = "test-channel",
-                                channelType = "QUEUE",
-                                consumptionType = "STANDARD",
-                                routingKeys = listOf("key1"),
-                            ),
-                        ),
-                    producers = emptyList(),
-                    channelLinks = emptyList(),
-                )
+        fun `should return FILE_NOT_FOUND when file does not exist`() {
+            val result = iaCService.processIaCFile("/non/existent/path/init.json")
 
-            iaCService.applyChanges(iac)
+            assertThat(result).isEqualTo(IaCResult.FILE_NOT_FOUND)
+        }
 
-            // Verify resources were created
-            assertThat(channelService.findAll()).hasSize(1)
+        @Test
+        fun `should parse JSON and create resources from file`() {
+            val jsonContent =
+                """
+                {
+                    "channels": [
+                        {
+                            "name": "file-channel",
+                            "channelType": "QUEUE",
+                            "consumptionType": "STANDARD",
+                            "routingKeys": ["key1", "key2"]
+                        }
+                    ],
+                    "producers": [
+                        {
+                            "name": "file-producer",
+                            "channelName": "file-channel"
+                        }
+                    ],
+                    "channelLinks": []
+                }
+                """.trimIndent()
+
+            withTempIaCFile(jsonContent) { filePath ->
+                val result = iaCService.processIaCFile(filePath)
+
+                assertThat(result).isEqualTo(IaCResult.APPLIED)
+                assertThat(channelService.findAll()).hasSize(1)
+                assertThat(channelService.findAll().first().name).isEqualTo("file-channel")
+                assertThat(producerService.findAll()).hasSize(1)
+                assertThat(producerService.findAll().first().name).isEqualTo("file-producer")
+            }
+        }
+
+        @Test
+        fun `should store hash in database after processing`() {
+            val jsonContent =
+                """
+                {
+                    "channels": [
+                        {
+                            "name": "hash-test-channel",
+                            "channelType": "QUEUE",
+                            "consumptionType": "STANDARD",
+                            "routingKeys": ["key1"]
+                        }
+                    ],
+                    "producers": [],
+                    "channelLinks": []
+                }
+                """.trimIndent()
+
+            withTempIaCFile(jsonContent) { filePath ->
+                iaCService.processIaCFile(filePath)
+
+                val storedFile = iaCRepository.findByFileName("init.json")
+                assertThat(storedFile).isNotNull
+                assertThat(storedFile?.hash).isNotBlank()
+            }
+        }
+
+        @Test
+        fun `should return UNCHANGED when file hash matches stored hash`() {
+            val jsonContent =
+                """
+                {
+                    "channels": [
+                        {
+                            "name": "unchanged-channel",
+                            "channelType": "QUEUE",
+                            "consumptionType": "STANDARD",
+                            "routingKeys": ["key1"]
+                        }
+                    ],
+                    "producers": [],
+                    "channelLinks": []
+                }
+                """.trimIndent()
+
+            withTempIaCFile(jsonContent) { filePath ->
+                // First call - should apply
+                val firstResult = iaCService.processIaCFile(filePath)
+                assertThat(firstResult).isEqualTo(IaCResult.APPLIED)
+
+                // Second call with same content - should be unchanged
+                val secondResult = iaCService.processIaCFile(filePath)
+                assertThat(secondResult).isEqualTo(IaCResult.UNCHANGED)
+            }
+        }
+
+        @Test
+        fun `should apply changes when file content changes`() {
+            val initialContent =
+                """
+                {
+                    "channels": [
+                        {
+                            "name": "initial-channel",
+                            "channelType": "QUEUE",
+                            "consumptionType": "STANDARD",
+                            "routingKeys": ["key1"]
+                        }
+                    ],
+                    "producers": [],
+                    "channelLinks": []
+                }
+                """.trimIndent()
+
+            val updatedContent =
+                """
+                {
+                    "channels": [
+                        {
+                            "name": "updated-channel",
+                            "channelType": "QUEUE",
+                            "consumptionType": "STANDARD",
+                            "routingKeys": ["key1"]
+                        }
+                    ],
+                    "producers": [],
+                    "channelLinks": []
+                }
+                """.trimIndent()
+
+            val tempFile = File.createTempFile("iac-test-", ".json")
+            try {
+                // First apply
+                tempFile.writeText(initialContent)
+                val firstResult = iaCService.processIaCFile(tempFile.absolutePath)
+                assertThat(firstResult).isEqualTo(IaCResult.APPLIED)
+                assertThat(channelService.findAll().first().name).isEqualTo("initial-channel")
+
+                // Update file content
+                tempFile.writeText(updatedContent)
+                val secondResult = iaCService.processIaCFile(tempFile.absolutePath)
+                assertThat(secondResult).isEqualTo(IaCResult.APPLIED)
+
+                val channels = channelService.findAll()
+                assertThat(channels).hasSize(1)
+                assertThat(channels.first().name).isEqualTo("updated-channel")
+            } finally {
+                tempFile.delete()
+            }
+        }
+
+        @Test
+        fun `should update hash in database when file changes`() {
+            val content1 =
+                """
+                {
+                    "channels": [{"name": "ch1", "channelType": "QUEUE", "consumptionType": "STANDARD", "routingKeys": ["k1"]}],
+                    "producers": [],
+                    "channelLinks": []
+                }
+                """.trimIndent()
+
+            val content2 =
+                """
+                {
+                    "channels": [{"name": "ch2", "channelType": "QUEUE", "consumptionType": "STANDARD", "routingKeys": ["k1"]}],
+                    "producers": [],
+                    "channelLinks": []
+                }
+                """.trimIndent()
+
+            val tempFile = File.createTempFile("iac-test-", ".json")
+            try {
+                tempFile.writeText(content1)
+                iaCService.processIaCFile(tempFile.absolutePath)
+                val hash1 = iaCRepository.findByFileName("init.json")?.hash
+
+                tempFile.writeText(content2)
+                iaCService.processIaCFile(tempFile.absolutePath)
+                val hash2 = iaCRepository.findByFileName("init.json")?.hash
+
+                assertThat(hash1).isNotEqualTo(hash2)
+            } finally {
+                tempFile.delete()
+            }
+        }
+
+        @Test
+        fun `should create full infrastructure from JSON file`() {
+            val jsonContent =
+                """
+                {
+                    "channels": [
+                        {
+                            "name": "orders",
+                            "channelType": "QUEUE",
+                            "consumptionType": "FIFO",
+                            "routingKeys": ["new", "processed"]
+                        },
+                        {
+                            "name": "notifications",
+                            "channelType": "QUEUE",
+                            "consumptionType": "FIFO",
+                            "routingKeys": ["email"]
+                        }
+                    ],
+                    "producers": [
+                        {"name": "order-producer", "channelName": "orders"}
+                    ],
+                    "channelLinks": [
+                        {
+                            "sourceChannelName": "orders",
+                            "targetChannelName": "notifications",
+                            "sourceRoutingKey": "processed",
+                            "targetRoutingKey": "email"
+                        }
+                    ]
+                }
+                """.trimIndent()
+
+            withTempIaCFile(jsonContent) { filePath ->
+                val result = iaCService.processIaCFile(filePath)
+
+                assertThat(result).isEqualTo(IaCResult.APPLIED)
+                assertThat(channelService.findAll()).hasSize(2)
+                assertThat(producerService.findAll()).hasSize(1)
+                assertThat(channelLinkService.findAll()).hasSize(1)
+
+                val link = channelLinkService.findAll().first()
+                assertThat(link.sourceRoutingKey).isEqualTo("processed")
+                assertThat(link.targetRoutingKey).isEqualTo("email")
+            }
+        }
+
+        @Test
+        fun `should handle empty IaC file`() {
+            val jsonContent =
+                """
+                {
+                    "channels": [],
+                    "producers": [],
+                    "channelLinks": []
+                }
+                """.trimIndent()
+
+            withTempIaCFile(jsonContent) { filePath ->
+                val result = iaCService.processIaCFile(filePath)
+
+                assertThat(result).isEqualTo(IaCResult.APPLIED)
+                assertThat(channelService.findAll()).isEmpty()
+                assertThat(producerService.findAll()).isEmpty()
+                assertThat(channelLinkService.findAll()).isEmpty()
+            }
+        }
+
+        @Test
+        fun `should delete existing resources when processing empty file after populated file`() {
+            val populatedContent =
+                """
+                {
+                    "channels": [{"name": "to-delete", "channelType": "QUEUE", "consumptionType": "STANDARD", "routingKeys": ["k1"]}],
+                    "producers": [{"name": "producer-to-delete", "channelName": "to-delete"}],
+                    "channelLinks": []
+                }
+                """.trimIndent()
+
+            val emptyContent =
+                """
+                {
+                    "channels": [],
+                    "producers": [],
+                    "channelLinks": []
+                }
+                """.trimIndent()
+
+            val tempFile = File.createTempFile("iac-test-", ".json")
+            try {
+                // First apply with resources
+                tempFile.writeText(populatedContent)
+                iaCService.processIaCFile(tempFile.absolutePath)
+                assertThat(channelService.findAll()).hasSize(1)
+                assertThat(producerService.findAll()).hasSize(1)
+
+                // Then apply empty - should delete everything
+                tempFile.writeText(emptyContent)
+                iaCService.processIaCFile(tempFile.absolutePath)
+                assertThat(channelService.findAll()).isEmpty()
+                assertThat(producerService.findAll()).isEmpty()
+            } finally {
+                tempFile.delete()
+            }
         }
     }
 }

@@ -33,17 +33,27 @@ class IaCService(
     private val channelLinkService: ChannelLinkService,
     private val iaCRepository: IaCRepository,
 ) {
-    @Transactional
     @PostConstruct
     fun init() {
+        processIaCFile()
+    }
+
+    /**
+     * Processes IaC file from the default location ($HOME/.sintropy-engine/init.json).
+     * Returns result indicating what action was taken.
+     */
+    @Transactional
+    internal fun processIaCFile(basePath: String? = null): IaCResult {
         val userHome =
             System.getProperty("user.home")
                 ?: throw IllegalStateException("Home directory not found for IaC file")
-        val file = File("$userHome/.sintropy-engine/$IAC_FILE_NAME")
+
+        val filePath = basePath ?: "$userHome/.sintropy-engine/$IAC_FILE_NAME"
+        val file = File(filePath)
 
         if (!file.exists()) {
             logger.info { "IaC file not found at ${file.absolutePath}. Skipping IaC initialization..." }
-            return
+            return IaCResult.FILE_NOT_FOUND
         }
 
         val fileContent = file.readText()
@@ -53,7 +63,7 @@ class IaCService(
 
         if (storedFile != null && storedFile.hash == currentHash) {
             logger.info { "IaC file unchanged (hash: $currentHash). Skipping initialization..." }
-            return
+            return IaCResult.UNCHANGED
         }
 
         logger.info { "IaC file changed. Processing changes..." }
@@ -69,6 +79,7 @@ class IaCService(
         }
 
         logger.info { "IaC initialization completed. Hash: $currentHash" }
+        return IaCResult.APPLIED
     }
 
     internal fun applyChanges(desired: IaC) {
@@ -212,4 +223,10 @@ class IaCService(
         sourceRoutingKey: String,
         targetRoutingKey: String,
     ): String = "$sourceChannelName:$sourceRoutingKey->$targetChannelName:$targetRoutingKey"
+}
+
+enum class IaCResult {
+    FILE_NOT_FOUND,
+    UNCHANGED,
+    APPLIED,
 }
