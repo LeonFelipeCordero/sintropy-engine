@@ -27,9 +27,6 @@ class PollingStandardQueueTest : IntegrationTestBase() {
     @Inject
     private lateinit var pollingQueue: PollingStandardQueue
 
-    @Inject
-    private lateinit var channelService: ChannelService
-
     @BeforeEach
     fun setUp() {
         clean()

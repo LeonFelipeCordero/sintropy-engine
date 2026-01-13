@@ -7,6 +7,7 @@ package com.ph.sintropyengine.jooq.generated;
 import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks;
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
 import com.ph.sintropyengine.jooq.generated.tables.DeadLetterQueue;
+import com.ph.sintropyengine.jooq.generated.tables.IacFiles;
 import com.ph.sintropyengine.jooq.generated.tables.Messages;
 import com.ph.sintropyengine.jooq.generated.tables.Producers;
 
@@ -27,6 +28,7 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     public static final Index CHANNELS_NAME_IDX = Internal.createIndex(DSL.name("channels_name_idx"), Channels.CHANNELS, new OrderField[] { Channels.CHANNELS.NAME }, true);
+    public static final Index IAC_FILES_FILE_NAME_IDX = Internal.createIndex(DSL.name("iac_files_file_name_idx"), IacFiles.IAC_FILES, new OrderField[] { IacFiles.IAC_FILES.FILE_NAME }, true);
     public static final Index IDX_CHANNEL_LINKS_SOURCE = Internal.createIndex(DSL.name("idx_channel_links_source"), ChannelLinks.CHANNEL_LINKS, new OrderField[] { ChannelLinks.CHANNEL_LINKS.SOURCE_CHANNEL_ID, ChannelLinks.CHANNEL_LINKS.SOURCE_ROUTING_KEY }, false);
     public static final Index IDX_CHANNEL_LINKS_TARGET = Internal.createIndex(DSL.name("idx_channel_links_target"), ChannelLinks.CHANNEL_LINKS, new OrderField[] { ChannelLinks.CHANNEL_LINKS.TARGET_CHANNEL_ID }, false);
     public static final Index IDX_DLQ_CHANNEL_ROUTING = Internal.createIndex(DSL.name("idx_dlq_channel_routing"), DeadLetterQueue.DEAD_LETTER_QUEUE, new OrderField[] { DeadLetterQueue.DEAD_LETTER_QUEUE.CHANNEL_ID, DeadLetterQueue.DEAD_LETTER_QUEUE.ROUTING_KEY }, false);

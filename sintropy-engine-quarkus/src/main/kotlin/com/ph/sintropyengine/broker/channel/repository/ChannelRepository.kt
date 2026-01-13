@@ -72,7 +72,7 @@ class ChannelRepository(
                 .where(CHANNELS.CHANNEL_ID.eq(id))
                 .fetch()
 
-        return mapRecordWithKeysToDTO(records)
+        return mapRecordsWithKeysToDTO(records).firstOrNull()
     }
 
     fun findByName(name: String): Channel? {
@@ -87,7 +87,7 @@ class ChannelRepository(
                 .where(CHANNELS.NAME.eq(name))
                 .fetch()
 
-        return mapRecordWithKeysToDTO(records)
+        return mapRecordsWithKeysToDTO(records).firstOrNull()
     }
 
     fun delete(channelId: UUID) {
@@ -117,13 +117,27 @@ class ChannelRepository(
             .execute()
     }
 
+    fun findAll(): List<Channel> {
+        val records =
+            context
+                .select(CHANNELS.asterisk(), ROUTING_KEYS.ROUTING_KEY, QUEUES.CONSUMPTION_TYPE)
+                .from(CHANNELS)
+                .leftJoin(ROUTING_KEYS)
+                .on(CHANNELS.CHANNEL_ID.eq(ROUTING_KEYS.CHANNEL_ID))
+                .leftJoin(QUEUES)
+                .on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
+                .fetch()
+
+        return mapRecordsWithKeysToDTO(records)
+    }
+
     fun deleteAll() {
         context.deleteFrom(ROUTING_KEYS).execute()
         context.deleteFrom(QUEUES).execute()
         context.deleteFrom(CHANNELS).execute()
     }
 
-    private fun mapRecordWithKeysToDTO(records: Result<Record>): Channel? =
+    private fun mapRecordsWithKeysToDTO(records: Result<Record>): List<Channel> =
         records
             .groupBy { record ->
                 Triple(record[CHANNELS.CHANNEL_ID], record[CHANNELS.NAME], record[CHANNELS.CHANNEL_TYPE])
@@ -140,7 +154,7 @@ class ChannelRepository(
                             null
                         },
                 )
-            }.firstOrNull()
+            }
 }
 
 private fun ConsumptionType.toDBEnum(): com.ph.sintropyengine.jooq.generated.enums.ConsumptionType =

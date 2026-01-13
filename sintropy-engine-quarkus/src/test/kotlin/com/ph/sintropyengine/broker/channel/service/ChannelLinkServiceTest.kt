@@ -12,9 +12,6 @@ import java.util.UUID
 
 @QuarkusTest
 class ChannelLinkServiceTest : IntegrationTestBase() {
-    @Inject
-    private lateinit var channelLinkService: ChannelLinkService
-
     @BeforeEach
     fun setUp() {
         clean()

@@ -10,11 +10,14 @@ import com.ph.sintropyengine.broker.channel.model.ConsumptionType.FIFO
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType.STANDARD
 import com.ph.sintropyengine.broker.channel.repository.ChannelLinkRepository
 import com.ph.sintropyengine.broker.channel.repository.ChannelRepository
+import com.ph.sintropyengine.broker.channel.service.ChannelLinkService
+import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.repository.DeadLetterQueueRepository
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.consumption.service.MessageRecoveryService
 import com.ph.sintropyengine.broker.consumption.service.PollingQueue
+import com.ph.sintropyengine.broker.iac.repository.IaCRepository
 import com.ph.sintropyengine.broker.producer.model.Producer
 import com.ph.sintropyengine.broker.producer.repository.ProducerRepository
 import com.ph.sintropyengine.broker.producer.service.ProducerService
@@ -47,6 +50,15 @@ open class IntegrationTestBase {
 
     @Inject
     protected lateinit var producerService: ProducerService
+
+    @Inject
+    protected lateinit var channelService: ChannelService
+
+    @Inject
+    protected lateinit var channelLinkService: ChannelLinkService
+
+    @Inject
+    protected lateinit var iaCRepository: IaCRepository
 
     @Inject
     protected lateinit var messageRecoveryService: MessageRecoveryService

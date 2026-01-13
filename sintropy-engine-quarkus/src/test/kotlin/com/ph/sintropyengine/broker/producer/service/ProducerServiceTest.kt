@@ -65,6 +65,24 @@ class ProducerServiceTest : IntegrationTestBase() {
     }
 
     @Test
+    fun `should fail if producer is not linked to channel`() {
+        val (channel1, producer1) = createChannelWithProducer()
+        val channel2 = createChannel()
+
+        Assertions
+            .assertThatExceptionOfType(IllegalStateException::class.java)
+            .isThrownBy {
+                producerService.publishMessage(
+                    Fixtures.createMessageRequest(
+                        channelName = channel2.name,
+                        producerName = producer1.name,
+                        routingKey = channel2.routingKeys.first(),
+                    ),
+                )
+            }.withMessageContaining("is not linked to channel")
+    }
+
+    @Test
     fun `should create a message and it trigger and insert in message log`() {
         val (channel, producer) = createChannelWithProducer()
 
