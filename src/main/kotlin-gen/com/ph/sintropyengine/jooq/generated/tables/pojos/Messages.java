@@ -22,6 +22,7 @@ public class Messages implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private UUID messageId;
+    private UUID originMessageId;
     private OffsetDateTime timestamp;
     private UUID channelId;
     private UUID producerId;
@@ -33,12 +34,12 @@ public class Messages implements Serializable {
     private Integer deliveredTimes;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
-    private UUID originMessageId;
 
     public Messages() {}
 
     public Messages(Messages value) {
         this.messageId = value.messageId;
+        this.originMessageId = value.originMessageId;
         this.timestamp = value.timestamp;
         this.channelId = value.channelId;
         this.producerId = value.producerId;
@@ -50,11 +51,11 @@ public class Messages implements Serializable {
         this.deliveredTimes = value.deliveredTimes;
         this.createdAt = value.createdAt;
         this.updatedAt = value.updatedAt;
-        this.originMessageId = value.originMessageId;
     }
 
     public Messages(
         UUID messageId,
+        UUID originMessageId,
         OffsetDateTime timestamp,
         UUID channelId,
         UUID producerId,
@@ -65,10 +66,10 @@ public class Messages implements Serializable {
         OffsetDateTime lastDelivered,
         Integer deliveredTimes,
         OffsetDateTime createdAt,
-        OffsetDateTime updatedAt,
-        UUID originMessageId
+        OffsetDateTime updatedAt
     ) {
         this.messageId = messageId;
+        this.originMessageId = originMessageId;
         this.timestamp = timestamp;
         this.channelId = channelId;
         this.producerId = producerId;
@@ -80,7 +81,6 @@ public class Messages implements Serializable {
         this.deliveredTimes = deliveredTimes;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.originMessageId = originMessageId;
     }
 
     /**
@@ -95,6 +95,20 @@ public class Messages implements Serializable {
      */
     public void setMessageId(UUID messageId) {
         this.messageId = messageId;
+    }
+
+    /**
+     * Getter for <code>public.messages.origin_message_id</code>.
+     */
+    public UUID getOriginMessageId() {
+        return this.originMessageId;
+    }
+
+    /**
+     * Setter for <code>public.messages.origin_message_id</code>.
+     */
+    public void setOriginMessageId(UUID originMessageId) {
+        this.originMessageId = originMessageId;
     }
 
     /**
@@ -251,20 +265,6 @@ public class Messages implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    /**
-     * Getter for <code>public.messages.origin_message_id</code>.
-     */
-    public UUID getOriginMessageId() {
-        return this.originMessageId;
-    }
-
-    /**
-     * Setter for <code>public.messages.origin_message_id</code>.
-     */
-    public void setOriginMessageId(UUID originMessageId) {
-        this.originMessageId = originMessageId;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -279,6 +279,12 @@ public class Messages implements Serializable {
                 return false;
         }
         else if (!this.messageId.equals(other.messageId))
+            return false;
+        if (this.originMessageId == null) {
+            if (other.originMessageId != null)
+                return false;
+        }
+        else if (!this.originMessageId.equals(other.originMessageId))
             return false;
         if (this.timestamp == null) {
             if (other.timestamp != null)
@@ -346,12 +352,6 @@ public class Messages implements Serializable {
         }
         else if (!this.updatedAt.equals(other.updatedAt))
             return false;
-        if (this.originMessageId == null) {
-            if (other.originMessageId != null)
-                return false;
-        }
-        else if (!this.originMessageId.equals(other.originMessageId))
-            return false;
         return true;
     }
 
@@ -360,6 +360,7 @@ public class Messages implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((this.messageId == null) ? 0 : this.messageId.hashCode());
+        result = prime * result + ((this.originMessageId == null) ? 0 : this.originMessageId.hashCode());
         result = prime * result + ((this.timestamp == null) ? 0 : this.timestamp.hashCode());
         result = prime * result + ((this.channelId == null) ? 0 : this.channelId.hashCode());
         result = prime * result + ((this.producerId == null) ? 0 : this.producerId.hashCode());
@@ -371,7 +372,6 @@ public class Messages implements Serializable {
         result = prime * result + ((this.deliveredTimes == null) ? 0 : this.deliveredTimes.hashCode());
         result = prime * result + ((this.createdAt == null) ? 0 : this.createdAt.hashCode());
         result = prime * result + ((this.updatedAt == null) ? 0 : this.updatedAt.hashCode());
-        result = prime * result + ((this.originMessageId == null) ? 0 : this.originMessageId.hashCode());
         return result;
     }
 
@@ -380,6 +380,7 @@ public class Messages implements Serializable {
         StringBuilder sb = new StringBuilder("Messages (");
 
         sb.append(messageId);
+        sb.append(", ").append(originMessageId);
         sb.append(", ").append(timestamp);
         sb.append(", ").append(channelId);
         sb.append(", ").append(producerId);
@@ -391,7 +392,6 @@ public class Messages implements Serializable {
         sb.append(", ").append(deliveredTimes);
         sb.append(", ").append(createdAt);
         sb.append(", ").append(updatedAt);
-        sb.append(", ").append(originMessageId);
 
         sb.append(")");
         return sb.toString();

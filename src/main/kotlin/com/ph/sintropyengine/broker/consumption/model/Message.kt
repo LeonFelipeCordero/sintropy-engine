@@ -33,6 +33,7 @@ enum class MessageStatus {
 }
 
 data class MessagePreStore(
+    val originMessageId: UUID?,
     val channelId: UUID,
     val producerId: UUID,
     val routingKey: String,

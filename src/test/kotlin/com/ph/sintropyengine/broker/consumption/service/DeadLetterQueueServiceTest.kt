@@ -249,6 +249,42 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
                     dlqService.recoverAllForChannelAndRoutingKey(channel.name, "invalid-key")
                 }.withMessageContaining("Routing key invalid-key does not exist")
         }
+
+        @Test
+        fun `should recover messages ordered by original timestamp`() {
+            val (channel, producer) = createChannelWithProducer()
+
+            val message1 = publishMessage(channel, producer)
+            Thread.sleep(10)
+            val message2 = publishMessage(channel, producer)
+            Thread.sleep(10)
+            val message3 = publishMessage(channel, producer)
+
+            pollingQueue.poll(channel.channelId!!, channel.routingKeys.first(), 3)
+            pollingQueue.markAsFailed(message3.messageId)
+            pollingQueue.markAsFailed(message1.messageId)
+            pollingQueue.markAsFailed(message2.messageId)
+
+            val recovered = dlqService.recoverAllForChannelAndRoutingKey(
+                channelName = channel.name,
+                routingKey = channel.routingKeys.first(),
+            )
+
+            assertThat(recovered).hasSize(3)
+            assertThat(recovered.map { it.messageId }).containsExactly(
+                message1.messageId,
+                message2.messageId,
+                message3.messageId,
+            )
+
+            val polled = pollingQueue.poll(channel.channelId, channel.routingKeys.first(), 10)
+            assertThat(polled).hasSize(3)
+            assertThat(polled.map { it.messageId }).containsExactly(
+                message1.messageId,
+                message2.messageId,
+                message3.messageId,
+            )
+        }
     }
 
     @Nested

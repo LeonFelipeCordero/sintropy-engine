@@ -4,6 +4,7 @@
 package com.ph.sintropyengine.jooq.generated;
 
 
+import com.ph.sintropyengine.jooq.generated.tables.ChannelCircuitBreakers;
 import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks;
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
 import com.ph.sintropyengine.jooq.generated.tables.DeadLetterQueue;
@@ -20,6 +21,11 @@ import com.ph.sintropyengine.jooq.generated.tables.RoutingKeys;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
+
+    /**
+     * The table <code>public.channel_circuit_breakers</code>.
+     */
+    public static final ChannelCircuitBreakers CHANNEL_CIRCUIT_BREAKERS = ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS;
 
     /**
      * The table <code>public.channel_links</code>.

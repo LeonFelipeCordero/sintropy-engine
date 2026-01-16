@@ -8,6 +8,7 @@ import com.ph.sintropyengine.jooq.generated.Indexes;
 import com.ph.sintropyengine.jooq.generated.Keys;
 import com.ph.sintropyengine.jooq.generated.Public;
 import com.ph.sintropyengine.jooq.generated.enums.ChannelType;
+import com.ph.sintropyengine.jooq.generated.tables.ChannelCircuitBreakers.ChannelCircuitBreakersPath;
 import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks.ChannelLinksPath;
 import com.ph.sintropyengine.jooq.generated.tables.DeadLetterQueue.DeadLetterQueuePath;
 import com.ph.sintropyengine.jooq.generated.tables.MessageLog.MessageLogPath;
@@ -167,6 +168,19 @@ public class Channels extends TableImpl<ChannelsRecord> {
     @Override
     public UniqueKey<ChannelsRecord> getPrimaryKey() {
         return Keys.CHANNELS_PKEY;
+    }
+
+    private transient ChannelCircuitBreakersPath _channelCircuitBreakers;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.channel_circuit_breakers</code> table
+     */
+    public ChannelCircuitBreakersPath channelCircuitBreakers() {
+        if (_channelCircuitBreakers == null)
+            _channelCircuitBreakers = new ChannelCircuitBreakersPath(this, null, Keys.CHANNEL_CIRCUIT_BREAKERS__CHANNEL_CIRCUIT_BREAKERS_CHANNEL_ID_FKEY.getInverseKey());
+
+        return _channelCircuitBreakers;
     }
 
     private transient ChannelLinksPath _channelLinksSourceChannelIdFkey;

@@ -3,10 +3,10 @@ package com.ph.sintropyengine.broker.channel.service
 import com.ph.sintropyengine.IntegrationTestBase
 import com.ph.sintropyengine.broker.channel.model.ChannelType
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType
-import com.ph.sintropyengine.broker.channel.service.ChannelService
+import com.ph.sintropyengine.broker.consumption.model.CircuitState
 import io.quarkus.test.junit.QuarkusTest
-import jakarta.inject.Inject
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -28,14 +28,14 @@ class ChannelServiceTest : IntegrationTestBase() {
             )
         val fetchedChannel = channelService.findByName("test")
 
-        Assertions.assertThat(createdChannel).usingRecursiveComparison().isEqualTo(fetchedChannel)
+        assertThat(createdChannel).usingRecursiveComparison().ignoringFields("routingKeysCircuitState")
+            .isEqualTo(fetchedChannel)
     }
 
     @Test
     fun `should fail if the channel name already exist`() {
         channelService.createChannel("test", ChannelType.QUEUE, listOf("test.1"), ConsumptionType.STANDARD)
-        Assertions
-            .assertThatExceptionOfType(IllegalStateException::class.java)
+        assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy {
                 channelService.createChannel(
                     "test",
@@ -48,8 +48,7 @@ class ChannelServiceTest : IntegrationTestBase() {
 
     @Test
     fun `should fail if the channel routing keys are not provided`() {
-        Assertions
-            .assertThatExceptionOfType(IllegalArgumentException::class.java)
+        assertThatExceptionOfType(IllegalArgumentException::class.java)
             .isThrownBy { channelService.createChannel("test", ChannelType.QUEUE, listOf(), ConsumptionType.STANDARD) }
             .withMessage("At least one routing key must be provided")
     }
@@ -75,8 +74,7 @@ class ChannelServiceTest : IntegrationTestBase() {
                 listOf("test.1"),
                 ConsumptionType.STANDARD,
             )
-        Assertions
-            .assertThatExceptionOfType(IllegalStateException::class.java)
+        assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy { channelService.addRoutingKey(createdChannel.channelId!!, "test.1") }
             .withMessage("RoutingKey test.1 already exists")
     }
@@ -92,7 +90,7 @@ class ChannelServiceTest : IntegrationTestBase() {
             )
         channelService.deleteChannel(createdChannel.channelId!!)
         val foundChannel = channelService.findById(createdChannel.channelId)
-        Assertions.assertThat(foundChannel).isNull()
+        assertThat(foundChannel).isNull()
     }
 
     @Test
@@ -105,8 +103,7 @@ class ChannelServiceTest : IntegrationTestBase() {
                 ConsumptionType.STANDARD,
             )
         channelService.deleteChannel(createdChannel.channelId!!)
-        Assertions
-            .assertThatExceptionOfType(IllegalStateException::class.java)
+        assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy { channelService.deleteChannel(createdChannel.channelId) }
             .withMessageContainingAll("Channel with id", "not found")
     }
@@ -121,14 +118,38 @@ class ChannelServiceTest : IntegrationTestBase() {
                 ConsumptionType.FIFO,
             )
         val foundChannel = channelService.findById(createdChannel.channelId!!)
-        Assertions.assertThat(foundChannel?.consumptionType).isEqualTo(ConsumptionType.FIFO)
+        assertThat(foundChannel?.consumptionType).isEqualTo(ConsumptionType.FIFO)
     }
 
     @Test
     fun `should create an steam and have no queue details`() {
         val createdChannel = channelService.createChannel("test", ChannelType.STREAM, listOf("test.1"))
         val foundChannel = channelService.findById(createdChannel.channelId!!)
-        Assertions.assertThat(foundChannel?.channelType).isEqualTo(ChannelType.STREAM)
-        Assertions.assertThat(foundChannel?.consumptionType).isNull()
+        assertThat(foundChannel?.channelType).isEqualTo(ChannelType.STREAM)
+        assertThat(foundChannel?.consumptionType).isNull()
+    }
+
+    @Test
+    fun `should link circuit state per routing key to channel when fetched by ID`() {
+        val channel = channelService.createChannel("test", ChannelType.STREAM, listOf("test.1", "test.2"))
+
+        val foundChannelById = channelService.findById(channel.channelId!!)!!
+
+        assertThat(foundChannelById.routingKeysCircuitState.first().routingKey).isEqualTo("test.1")
+        assertThat(foundChannelById.routingKeysCircuitState.first().circuitState).isEqualTo(CircuitState.CLOSED)
+        assertThat(foundChannelById.routingKeysCircuitState[1].routingKey).isEqualTo("test.2")
+        assertThat(foundChannelById.routingKeysCircuitState[1].circuitState).isEqualTo(CircuitState.CLOSED)
+    }
+
+    @Test
+    fun `should link circuit state per routing key to channel when fetched by name`() {
+        val channel = channelService.createChannel("test", ChannelType.STREAM, listOf("test.1", "test.2"))
+
+        val foundChannelByName = channelService.findByName(channel.name)!!
+
+        assertThat(foundChannelByName.routingKeysCircuitState.first().routingKey).isEqualTo("test.1")
+        assertThat(foundChannelByName.routingKeysCircuitState.first().circuitState).isEqualTo(CircuitState.CLOSED)
+        assertThat(foundChannelByName.routingKeysCircuitState[1].routingKey).isEqualTo("test.2")
+        assertThat(foundChannelByName.routingKeysCircuitState[1].circuitState).isEqualTo(CircuitState.CLOSED)
     }
 }

@@ -69,6 +69,11 @@ public class Messages extends TableImpl<MessagesRecord> {
     public final TableField<MessagesRecord, UUID> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
+     * The column <code>public.messages.origin_message_id</code>.
+     */
+    public final TableField<MessagesRecord, UUID> ORIGIN_MESSAGE_ID = createField(DSL.name("origin_message_id"), SQLDataType.UUID, this, "");
+
+    /**
      * The column <code>public.messages.timestamp</code>.
      */
     public final TableField<MessagesRecord, OffsetDateTime> TIMESTAMP = createField(DSL.name("timestamp"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
@@ -122,11 +127,6 @@ public class Messages extends TableImpl<MessagesRecord> {
      * The column <code>public.messages.updated_at</code>.
      */
     public final TableField<MessagesRecord, OffsetDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
-
-    /**
-     * The column <code>public.messages.origin_message_id</code>.
-     */
-    public final TableField<MessagesRecord, UUID> ORIGIN_MESSAGE_ID = createField(DSL.name("origin_message_id"), SQLDataType.UUID, this, "");
 
     private Messages(Name alias, Table<MessagesRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -197,7 +197,7 @@ public class Messages extends TableImpl<MessagesRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.MESSAGES_ORIGIN_MESSAGE_IDX, Indexes.MESSAGES_POLLING_1IDX);
+        return Arrays.asList(Indexes.MESSAGES_ORIGIN_MESSAGE_IDX, Indexes.MESSAGES_POLLING_IDX);
     }
 
     @Override

@@ -1,39 +1,3 @@
-ALTER TABLE messages ADD COLUMN origin_message_id UUID;
-CREATE INDEX messages_origin_message_idx ON messages(origin_message_id);
-
-ALTER TABLE message_log ADD COLUMN origin_message_id UUID;
-
-CREATE OR REPLACE FUNCTION messages_to_message_log()
-    RETURNS trigger AS
-$$
-BEGIN
-    INSERT INTO message_log(message_id,
-                            timestamp,
-                            channel_id,
-                            producer_id,
-                            routing_key,
-                            message,
-                            headers,
-                            processed,
-                            origin_message_id,
-                            created_at,
-                            updated_at)
-    VALUES (NEW.message_id,
-            NEW.timestamp,
-            NEW.channel_id,
-            NEW.producer_id,
-            NEW.routing_key,
-            NEW.message,
-            NEW.headers,
-            false,
-            NEW.origin_message_id,
-            NEW.created_at,
-            NEW.updated_at);
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE OR REPLACE FUNCTION route_message_to_linked_channels()
     RETURNS trigger AS
 $$
@@ -50,31 +14,28 @@ BEGIN
         WHERE source_channel_id = NEW.channel_id
           AND source_routing_key = NEW.routing_key
           AND enabled = true
-    LOOP
-        INSERT INTO messages (
-            timestamp,
-            channel_id,
-            producer_id,
-            routing_key,
-            message,
-            headers,
-            status,
-            origin_message_id,
-            created_at,
-            updated_at
-        ) VALUES (
-            NEW.timestamp,
-            link.target_channel_id,
-            NEW.producer_id,
-            link.target_routing_key,
-            NEW.message,
-            NEW.headers,
-            'READY',
-            NEW.message_id,
-            NOW(),
-            NOW()
-        );
-    END LOOP;
+        LOOP
+            INSERT INTO messages (origin_message_id,
+                                  timestamp,
+                                  channel_id,
+                                  producer_id,
+                                  routing_key,
+                                  message,
+                                  headers,
+                                  status,
+                                  created_at,
+                                  updated_at)
+            VALUES (NEW.message_id,
+                    NEW.timestamp,
+                    link.target_channel_id,
+                    NEW.producer_id,
+                    link.target_routing_key,
+                    NEW.message,
+                    NEW.headers,
+                    'READY',
+                    NOW(),
+                    NOW());
+        END LOOP;
 
     RETURN NEW;
 END;

@@ -4,6 +4,7 @@
 package com.ph.sintropyengine.jooq.generated;
 
 
+import com.ph.sintropyengine.jooq.generated.tables.ChannelCircuitBreakers;
 import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks;
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
 import com.ph.sintropyengine.jooq.generated.tables.DeadLetterQueue;
@@ -28,14 +29,16 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     public static final Index CHANNELS_NAME_IDX = Internal.createIndex(DSL.name("channels_name_idx"), Channels.CHANNELS, new OrderField[] { Channels.CHANNELS.NAME }, true);
+    public static final Index DLQ_CHANNEL_ROUTING_IDX = Internal.createIndex(DSL.name("dlq_channel_routing_idx"), DeadLetterQueue.DEAD_LETTER_QUEUE, new OrderField[] { DeadLetterQueue.DEAD_LETTER_QUEUE.CHANNEL_ID, DeadLetterQueue.DEAD_LETTER_QUEUE.ROUTING_KEY }, false);
+    public static final Index DLQ_FAILED_AT_IDX = Internal.createIndex(DSL.name("dlq_failed_at_idx"), DeadLetterQueue.DEAD_LETTER_QUEUE, new OrderField[] { DeadLetterQueue.DEAD_LETTER_QUEUE.FAILED_AT }, false);
+    public static final Index DLQ_MESSAGE_ID_IDX = Internal.createIndex(DSL.name("dlq_message_id_idx"), DeadLetterQueue.DEAD_LETTER_QUEUE, new OrderField[] { DeadLetterQueue.DEAD_LETTER_QUEUE.MESSAGE_ID }, false);
     public static final Index IAC_FILES_FILE_NAME_IDX = Internal.createIndex(DSL.name("iac_files_file_name_idx"), IacFiles.IAC_FILES, new OrderField[] { IacFiles.IAC_FILES.FILE_NAME }, true);
     public static final Index IDX_CHANNEL_LINKS_SOURCE = Internal.createIndex(DSL.name("idx_channel_links_source"), ChannelLinks.CHANNEL_LINKS, new OrderField[] { ChannelLinks.CHANNEL_LINKS.SOURCE_CHANNEL_ID, ChannelLinks.CHANNEL_LINKS.SOURCE_ROUTING_KEY }, false);
     public static final Index IDX_CHANNEL_LINKS_TARGET = Internal.createIndex(DSL.name("idx_channel_links_target"), ChannelLinks.CHANNEL_LINKS, new OrderField[] { ChannelLinks.CHANNEL_LINKS.TARGET_CHANNEL_ID }, false);
-    public static final Index IDX_DLQ_CHANNEL_ROUTING = Internal.createIndex(DSL.name("idx_dlq_channel_routing"), DeadLetterQueue.DEAD_LETTER_QUEUE, new OrderField[] { DeadLetterQueue.DEAD_LETTER_QUEUE.CHANNEL_ID, DeadLetterQueue.DEAD_LETTER_QUEUE.ROUTING_KEY }, false);
-    public static final Index IDX_DLQ_FAILED_AT = Internal.createIndex(DSL.name("idx_dlq_failed_at"), DeadLetterQueue.DEAD_LETTER_QUEUE, new OrderField[] { DeadLetterQueue.DEAD_LETTER_QUEUE.FAILED_AT }, false);
-    public static final Index IDX_DLQ_MESSAGE_ID = Internal.createIndex(DSL.name("idx_dlq_message_id"), DeadLetterQueue.DEAD_LETTER_QUEUE, new OrderField[] { DeadLetterQueue.DEAD_LETTER_QUEUE.MESSAGE_ID }, false);
+    public static final Index IDX_CIRCUIT_BREAKERS_CHANNEL_ROUTING = Internal.createIndex(DSL.name("idx_circuit_breakers_channel_routing"), ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS, new OrderField[] { ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID, ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS.ROUTING_KEY }, false);
+    public static final Index IDX_CIRCUIT_BREAKERS_STATE = Internal.createIndex(DSL.name("idx_circuit_breakers_state"), ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS, new OrderField[] { ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS.STATE }, false);
     public static final Index MESSAGES_ORIGIN_MESSAGE_IDX = Internal.createIndex(DSL.name("messages_origin_message_idx"), Messages.MESSAGES, new OrderField[] { Messages.MESSAGES.ORIGIN_MESSAGE_ID }, false);
-    public static final Index MESSAGES_POLLING_1IDX = Internal.createIndex(DSL.name("messages_polling_1idx"), Messages.MESSAGES, new OrderField[] { Messages.MESSAGES.CHANNEL_ID, Messages.MESSAGES.ROUTING_KEY, Messages.MESSAGES.STATUS, Messages.MESSAGES.LAST_DELIVERED, Messages.MESSAGES.DELIVERED_TIMES }, false);
+    public static final Index MESSAGES_POLLING_IDX = Internal.createIndex(DSL.name("messages_polling_idx"), Messages.MESSAGES, new OrderField[] { Messages.MESSAGES.CHANNEL_ID, Messages.MESSAGES.ROUTING_KEY, Messages.MESSAGES.STATUS, Messages.MESSAGES.LAST_DELIVERED, Messages.MESSAGES.DELIVERED_TIMES }, false);
     public static final Index PRODUCERS_CHANNEL_ID_IDX = Internal.createIndex(DSL.name("producers_channel_id_idx"), Producers.PRODUCERS, new OrderField[] { Producers.PRODUCERS.CHANNEL_ID }, false);
     public static final Index PRODUCERS_NAME_IDX = Internal.createIndex(DSL.name("producers_name_idx"), Producers.PRODUCERS, new OrderField[] { Producers.PRODUCERS.NAME }, true);
 }

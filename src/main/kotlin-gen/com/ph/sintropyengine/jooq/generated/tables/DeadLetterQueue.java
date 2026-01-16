@@ -70,12 +70,12 @@ public class DeadLetterQueue extends TableImpl<DeadLetterQueueRecord> {
     /**
      * The column <code>public.dead_letter_queue.message_id</code>.
      */
-    public final TableField<DeadLetterQueueRecord, UUID> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<DeadLetterQueueRecord, UUID> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.dead_letter_queue.timestamp</code>.
      */
-    public final TableField<DeadLetterQueueRecord, OffsetDateTime> TIMESTAMP = createField(DSL.name("timestamp"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false), this, "");
+    public final TableField<DeadLetterQueueRecord, OffsetDateTime> TIMESTAMP = createField(DSL.name("timestamp"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
 
     /**
      * The column <code>public.dead_letter_queue.channel_id</code>.
@@ -196,7 +196,7 @@ public class DeadLetterQueue extends TableImpl<DeadLetterQueueRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.IDX_DLQ_CHANNEL_ROUTING, Indexes.IDX_DLQ_FAILED_AT, Indexes.IDX_DLQ_MESSAGE_ID);
+        return Arrays.asList(Indexes.DLQ_CHANNEL_ROUTING_IDX, Indexes.DLQ_FAILED_AT_IDX, Indexes.DLQ_MESSAGE_ID_IDX);
     }
 
     @Override

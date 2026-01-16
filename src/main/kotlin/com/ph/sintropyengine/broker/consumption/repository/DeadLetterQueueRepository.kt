@@ -1,9 +1,11 @@
 package com.ph.sintropyengine.broker.consumption.repository
 
 import com.ph.sintropyengine.broker.consumption.model.DeadLetterMessage
+import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
 import com.ph.sintropyengine.jooq.generated.Tables.DEAD_LETTER_QUEUE
 import jakarta.enterprise.context.ApplicationScoped
 import org.jooq.DSLContext
+import org.jooq.JSONB
 import java.util.UUID
 
 @ApplicationScoped
@@ -46,6 +48,7 @@ class DeadLetterQueueRepository(
             .selectFrom(DEAD_LETTER_QUEUE)
             .where(DEAD_LETTER_QUEUE.CHANNEL_ID.eq(channelId))
             .and(DEAD_LETTER_QUEUE.ROUTING_KEY.eq(routingKey))
+            .orderBy(DEAD_LETTER_QUEUE.TIMESTAMP)
             .fetchInto(DeadLetterMessage::class.java)
 
     fun delete(dlqEntryId: UUID) {
@@ -81,4 +84,27 @@ class DeadLetterQueueRepository(
     fun deleteAll() {
         context.deleteFrom(DEAD_LETTER_QUEUE).execute()
     }
+
+    fun save(message: MessagePreStore): DeadLetterMessage =
+        context
+            .insertInto(
+                DEAD_LETTER_QUEUE,
+                DEAD_LETTER_QUEUE.CHANNEL_ID,
+                DEAD_LETTER_QUEUE.PRODUCER_ID,
+                DEAD_LETTER_QUEUE.ROUTING_KEY,
+                DEAD_LETTER_QUEUE.MESSAGE,
+                DEAD_LETTER_QUEUE.HEADERS,
+                DEAD_LETTER_QUEUE.ORIGIN_MESSAGE_ID,
+                DEAD_LETTER_QUEUE.DELIVERED_TIMES,
+            ).values(
+                message.channelId,
+                message.producerId,
+                message.routingKey,
+                JSONB.jsonb(message.message),
+                JSONB.jsonb(message.headers),
+                message.originMessageId,
+                0,
+            ).returning()
+            .fetchOneInto(DeadLetterMessage::class.java)
+            ?: throw IllegalStateException("Failed to save message to DLQ")
 }

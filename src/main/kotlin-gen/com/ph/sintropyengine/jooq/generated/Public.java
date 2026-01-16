@@ -4,6 +4,7 @@
 package com.ph.sintropyengine.jooq.generated;
 
 
+import com.ph.sintropyengine.jooq.generated.tables.ChannelCircuitBreakers;
 import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks;
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
 import com.ph.sintropyengine.jooq.generated.tables.DeadLetterQueue;
@@ -34,6 +35,11 @@ public class Public extends SchemaImpl {
      * The reference instance of <code>public</code>
      */
     public static final Public PUBLIC = new Public();
+
+    /**
+     * The table <code>public.channel_circuit_breakers</code>.
+     */
+    public final ChannelCircuitBreakers CHANNEL_CIRCUIT_BREAKERS = ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS;
 
     /**
      * The table <code>public.channel_links</code>.
@@ -96,6 +102,7 @@ public class Public extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
+            ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS,
             ChannelLinks.CHANNEL_LINKS,
             Channels.CHANNELS,
             DeadLetterQueue.DEAD_LETTER_QUEUE,

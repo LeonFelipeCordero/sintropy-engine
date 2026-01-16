@@ -3,6 +3,9 @@ package com.ph.sintropyengine.broker.producer.service
 import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
+import com.ph.sintropyengine.broker.consumption.model.MessageStatus
+import com.ph.sintropyengine.broker.consumption.repository.CircuitBreakerRepository
+import com.ph.sintropyengine.broker.consumption.repository.DeadLetterQueueRepository
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.producer.api.PublishMessageRequest
 import com.ph.sintropyengine.broker.producer.model.Producer
@@ -17,6 +20,8 @@ class ProducerService(
     private val channelService: ChannelService,
     private val producerRepository: ProducerRepository,
     private val messageRepository: MessageRepository,
+    private val circuitBreakerRepository: CircuitBreakerRepository,
+    private val deadLetterQueueRepository: DeadLetterQueueRepository,
 ) {
     @Transactional
     fun createProducer(
@@ -53,6 +58,7 @@ class ProducerService(
             producerRepository.deleteByName(name)
         } ?: throw IllegalStateException("Producer $name not found")
 
+    // TODO: Should get the preStoreMessage
     @Transactional
     fun publishMessage(request: PublishMessageRequest): Message {
         val channel =
@@ -75,14 +81,33 @@ class ProducerService(
             )
         }
 
-        val message =
+        val messagePreStore =
             MessagePreStore(
-                channelId = channel.channelId!!,
+                channelId = channel.channelId,
                 producerId = producer.producerId!!,
                 routingKey = request.routingKey,
                 message = request.message,
                 headers = request.headers,
+                originMessageId = null
             )
-        return messageRepository.save(message)
+
+
+        if (!channel.canWriteMessage(messagePreStore.routingKey)) {
+            val dlqMessage = deadLetterQueueRepository.save(messagePreStore)
+            return Message(
+                messageId = dlqMessage.messageId,
+                timestamp = dlqMessage.timestamp,
+                channelId = dlqMessage.channelId,
+                producerId = dlqMessage.producerId,
+                routingKey = dlqMessage.routingKey,
+                message = dlqMessage.message,
+                headers = dlqMessage.headers,
+                status = MessageStatus.FAILED,
+                originMessageId = dlqMessage.originMessageId,
+                deliveredTimes = dlqMessage.deliveredTimes,
+            )
+        }
+
+        return messageRepository.save(messagePreStore)
     }
 }

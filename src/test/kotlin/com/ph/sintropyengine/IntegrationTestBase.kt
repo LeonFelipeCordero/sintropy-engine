@@ -13,8 +13,10 @@ import com.ph.sintropyengine.broker.channel.repository.ChannelRepository
 import com.ph.sintropyengine.broker.channel.service.ChannelLinkService
 import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.model.Message
+import com.ph.sintropyengine.broker.consumption.repository.CircuitBreakerRepository
 import com.ph.sintropyengine.broker.consumption.repository.DeadLetterQueueRepository
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
+import com.ph.sintropyengine.broker.consumption.service.CircuitBreakerService
 import com.ph.sintropyengine.broker.consumption.service.MessageRecoveryService
 import com.ph.sintropyengine.broker.consumption.service.PollingQueue
 import com.ph.sintropyengine.broker.iac.repository.IaCRepository
@@ -63,7 +65,14 @@ open class IntegrationTestBase {
     @Inject
     protected lateinit var messageRecoveryService: MessageRecoveryService
 
+    @Inject
+    protected lateinit var circuitBreakerRepository: CircuitBreakerRepository
+
+    @Inject
+    protected lateinit var circuitBreakerService: CircuitBreakerService
+
     protected fun clean() {
+        circuitBreakerRepository.deleteAll()
         dlqRepository.deleteAll()
         messageRepository.deleteAll()
         producerRepository.deleteAll()
@@ -100,7 +109,8 @@ open class IntegrationTestBase {
             ),
         )
 
-    protected fun createProducer(channel: Channel): Producer = producerRepository.save(Fixtures.createProducer(channel.channelId!!))
+    protected fun createProducer(channel: Channel): Producer =
+        producerRepository.save(Fixtures.createProducer(channel.channelId!!))
 
     protected fun createChannelWithProducer(consumptionType: ConsumptionType = STANDARD): Pair<Channel, Producer> {
         val channel = createChannel(consumptionType = consumptionType)
@@ -117,12 +127,12 @@ open class IntegrationTestBase {
         producer: Producer,
         routingKey: String = channel.routingKeys.first(),
     ): Message =
-        messageRepository.save(
-            Fixtures.createMessagePreStore(
-                channelId = channel.channelId!!,
-                producerId = producer.producerId!!,
-                routingKey = routingKey,
-            ),
+        producerService.publishMessage(
+            Fixtures.createMessageRequest(
+                channel.name,
+                producer.name,
+                routingKey,
+            )
         )
 
     /**
@@ -132,12 +142,12 @@ open class IntegrationTestBase {
     protected fun publishMessage(consumptionType: ConsumptionType = STANDARD): Message {
         val (channel, producer) = createChannelWithProducer(consumptionType = consumptionType)
 
-        return messageRepository.save(
-            Fixtures.createMessagePreStore(
-                channel.channelId!!,
-                producer.producerId!!,
+        return producerService.publishMessage(
+            Fixtures.createMessageRequest(
+                channel.name,
+                producer.name,
                 channel.routingKeys.first(),
-            ),
+            )
         )
     }
 

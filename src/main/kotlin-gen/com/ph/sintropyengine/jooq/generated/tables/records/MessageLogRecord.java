@@ -37,143 +37,143 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
     }
 
     /**
-     * Setter for <code>public.message_log.timestamp</code>.
-     */
-    public void setTimestamp(OffsetDateTime value) {
-        set(1, value);
-    }
-
-    /**
-     * Getter for <code>public.message_log.timestamp</code>.
-     */
-    public OffsetDateTime getTimestamp() {
-        return (OffsetDateTime) get(1);
-    }
-
-    /**
-     * Setter for <code>public.message_log.channel_id</code>.
-     */
-    public void setChannelId(UUID value) {
-        set(2, value);
-    }
-
-    /**
-     * Getter for <code>public.message_log.channel_id</code>.
-     */
-    public UUID getChannelId() {
-        return (UUID) get(2);
-    }
-
-    /**
-     * Setter for <code>public.message_log.producer_id</code>.
-     */
-    public void setProducerId(UUID value) {
-        set(3, value);
-    }
-
-    /**
-     * Getter for <code>public.message_log.producer_id</code>.
-     */
-    public UUID getProducerId() {
-        return (UUID) get(3);
-    }
-
-    /**
-     * Setter for <code>public.message_log.routing_key</code>.
-     */
-    public void setRoutingKey(String value) {
-        set(4, value);
-    }
-
-    /**
-     * Getter for <code>public.message_log.routing_key</code>.
-     */
-    public String getRoutingKey() {
-        return (String) get(4);
-    }
-
-    /**
-     * Setter for <code>public.message_log.message</code>.
-     */
-    public void setMessage(JSONB value) {
-        set(5, value);
-    }
-
-    /**
-     * Getter for <code>public.message_log.message</code>.
-     */
-    public JSONB getMessage() {
-        return (JSONB) get(5);
-    }
-
-    /**
-     * Setter for <code>public.message_log.headers</code>.
-     */
-    public void setHeaders(JSONB value) {
-        set(6, value);
-    }
-
-    /**
-     * Getter for <code>public.message_log.headers</code>.
-     */
-    public JSONB getHeaders() {
-        return (JSONB) get(6);
-    }
-
-    /**
-     * Setter for <code>public.message_log.processed</code>.
-     */
-    public void setProcessed(Boolean value) {
-        set(7, value);
-    }
-
-    /**
-     * Getter for <code>public.message_log.processed</code>.
-     */
-    public Boolean getProcessed() {
-        return (Boolean) get(7);
-    }
-
-    /**
-     * Setter for <code>public.message_log.created_at</code>.
-     */
-    public void setCreatedAt(OffsetDateTime value) {
-        set(8, value);
-    }
-
-    /**
-     * Getter for <code>public.message_log.created_at</code>.
-     */
-    public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(8);
-    }
-
-    /**
-     * Setter for <code>public.message_log.updated_at</code>.
-     */
-    public void setUpdatedAt(OffsetDateTime value) {
-        set(9, value);
-    }
-
-    /**
-     * Getter for <code>public.message_log.updated_at</code>.
-     */
-    public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(9);
-    }
-
-    /**
      * Setter for <code>public.message_log.origin_message_id</code>.
      */
     public void setOriginMessageId(UUID value) {
-        set(10, value);
+        set(1, value);
     }
 
     /**
      * Getter for <code>public.message_log.origin_message_id</code>.
      */
     public UUID getOriginMessageId() {
-        return (UUID) get(10);
+        return (UUID) get(1);
+    }
+
+    /**
+     * Setter for <code>public.message_log.timestamp</code>.
+     */
+    public void setTimestamp(OffsetDateTime value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>public.message_log.timestamp</code>.
+     */
+    public OffsetDateTime getTimestamp() {
+        return (OffsetDateTime) get(2);
+    }
+
+    /**
+     * Setter for <code>public.message_log.channel_id</code>.
+     */
+    public void setChannelId(UUID value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>public.message_log.channel_id</code>.
+     */
+    public UUID getChannelId() {
+        return (UUID) get(3);
+    }
+
+    /**
+     * Setter for <code>public.message_log.producer_id</code>.
+     */
+    public void setProducerId(UUID value) {
+        set(4, value);
+    }
+
+    /**
+     * Getter for <code>public.message_log.producer_id</code>.
+     */
+    public UUID getProducerId() {
+        return (UUID) get(4);
+    }
+
+    /**
+     * Setter for <code>public.message_log.routing_key</code>.
+     */
+    public void setRoutingKey(String value) {
+        set(5, value);
+    }
+
+    /**
+     * Getter for <code>public.message_log.routing_key</code>.
+     */
+    public String getRoutingKey() {
+        return (String) get(5);
+    }
+
+    /**
+     * Setter for <code>public.message_log.message</code>.
+     */
+    public void setMessage(JSONB value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>public.message_log.message</code>.
+     */
+    public JSONB getMessage() {
+        return (JSONB) get(6);
+    }
+
+    /**
+     * Setter for <code>public.message_log.headers</code>.
+     */
+    public void setHeaders(JSONB value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>public.message_log.headers</code>.
+     */
+    public JSONB getHeaders() {
+        return (JSONB) get(7);
+    }
+
+    /**
+     * Setter for <code>public.message_log.processed</code>.
+     */
+    public void setProcessed(Boolean value) {
+        set(8, value);
+    }
+
+    /**
+     * Getter for <code>public.message_log.processed</code>.
+     */
+    public Boolean getProcessed() {
+        return (Boolean) get(8);
+    }
+
+    /**
+     * Setter for <code>public.message_log.created_at</code>.
+     */
+    public void setCreatedAt(OffsetDateTime value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>public.message_log.created_at</code>.
+     */
+    public OffsetDateTime getCreatedAt() {
+        return (OffsetDateTime) get(9);
+    }
+
+    /**
+     * Setter for <code>public.message_log.updated_at</code>.
+     */
+    public void setUpdatedAt(OffsetDateTime value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>public.message_log.updated_at</code>.
+     */
+    public OffsetDateTime getUpdatedAt() {
+        return (OffsetDateTime) get(10);
     }
 
     // -------------------------------------------------------------------------
@@ -199,10 +199,11 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
     /**
      * Create a detached, initialised MessageLogRecord
      */
-    public MessageLogRecord(UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, JSONB message, JSONB headers, Boolean processed, OffsetDateTime createdAt, OffsetDateTime updatedAt, UUID originMessageId) {
+    public MessageLogRecord(UUID messageId, UUID originMessageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, JSONB message, JSONB headers, Boolean processed, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(MessageLog.MESSAGE_LOG);
 
         setMessageId(messageId);
+        setOriginMessageId(originMessageId);
         setTimestamp(timestamp);
         setChannelId(channelId);
         setProducerId(producerId);
@@ -212,7 +213,6 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
         setProcessed(processed);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
-        setOriginMessageId(originMessageId);
         resetChangedOnNotNull();
     }
 
@@ -224,6 +224,7 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
 
         if (value != null) {
             setMessageId(value.getMessageId());
+            setOriginMessageId(value.getOriginMessageId());
             setTimestamp(value.getTimestamp());
             setChannelId(value.getChannelId());
             setProducerId(value.getProducerId());
@@ -233,7 +234,6 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
             setProcessed(value.getProcessed());
             setCreatedAt(value.getCreatedAt());
             setUpdatedAt(value.getUpdatedAt());
-            setOriginMessageId(value.getOriginMessageId());
             resetChangedOnNotNull();
         }
     }

@@ -4,7 +4,10 @@ import com.ph.sintropyengine.broker.channel.model.Channel
 import com.ph.sintropyengine.broker.channel.model.ChannelType
 import com.ph.sintropyengine.broker.channel.model.ChannelType.QUEUE
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType
+import com.ph.sintropyengine.broker.channel.model.RoutingKeyCircuitState
+import com.ph.sintropyengine.broker.consumption.model.CircuitState
 import com.ph.sintropyengine.jooq.generated.Tables.CHANNELS
+import com.ph.sintropyengine.jooq.generated.Tables.CHANNEL_CIRCUIT_BREAKERS
 import com.ph.sintropyengine.jooq.generated.Tables.QUEUES
 import com.ph.sintropyengine.jooq.generated.Tables.ROUTING_KEYS
 import jakarta.enterprise.context.ApplicationScoped
@@ -63,13 +66,26 @@ class ChannelRepository(
     fun findById(id: UUID): Channel? {
         val records =
             context
-                .select(CHANNELS.asterisk(), ROUTING_KEYS.ROUTING_KEY, QUEUES.CONSUMPTION_TYPE)
+                .select(
+                    CHANNELS.asterisk(),
+                    ROUTING_KEYS.ROUTING_KEY,
+                    QUEUES.CONSUMPTION_TYPE,
+                    CHANNEL_CIRCUIT_BREAKERS.STATE
+                )
                 .from(CHANNELS)
                 .leftJoin(ROUTING_KEYS)
                 .on(CHANNELS.CHANNEL_ID.eq(ROUTING_KEYS.CHANNEL_ID))
                 .leftJoin(QUEUES)
                 .on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
+                .leftJoin(CHANNEL_CIRCUIT_BREAKERS)
+                .on(CHANNELS.CHANNEL_ID.eq(CHANNELS.CHANNEL_ID))
                 .where(CHANNELS.CHANNEL_ID.eq(id))
+                .groupBy(
+                    CHANNELS.CHANNEL_ID,
+                    ROUTING_KEYS.ROUTING_KEY,
+                    QUEUES.CONSUMPTION_TYPE,
+                    CHANNEL_CIRCUIT_BREAKERS.STATE
+                )
                 .fetch()
 
         return mapRecordsWithKeysToDTO(records).firstOrNull()
@@ -78,13 +94,26 @@ class ChannelRepository(
     fun findByName(name: String): Channel? {
         val records =
             context
-                .select(CHANNELS.asterisk(), ROUTING_KEYS.ROUTING_KEY, QUEUES.CONSUMPTION_TYPE)
+                .select(
+                    CHANNELS.asterisk(),
+                    ROUTING_KEYS.ROUTING_KEY,
+                    QUEUES.CONSUMPTION_TYPE,
+                    CHANNEL_CIRCUIT_BREAKERS.STATE
+                )
                 .from(CHANNELS)
                 .leftJoin(ROUTING_KEYS)
                 .on(CHANNELS.CHANNEL_ID.eq(ROUTING_KEYS.CHANNEL_ID))
                 .leftJoin(QUEUES)
                 .on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
+                .leftJoin(CHANNEL_CIRCUIT_BREAKERS)
+                .on(CHANNELS.CHANNEL_ID.eq(CHANNELS.CHANNEL_ID))
                 .where(CHANNELS.NAME.eq(name))
+                .groupBy(
+                    CHANNELS.CHANNEL_ID,
+                    ROUTING_KEYS.ROUTING_KEY,
+                    QUEUES.CONSUMPTION_TYPE,
+                    CHANNEL_CIRCUIT_BREAKERS.STATE
+                )
                 .fetch()
 
         return mapRecordsWithKeysToDTO(records).firstOrNull()
@@ -120,12 +149,25 @@ class ChannelRepository(
     fun findAll(): List<Channel> {
         val records =
             context
-                .select(CHANNELS.asterisk(), ROUTING_KEYS.ROUTING_KEY, QUEUES.CONSUMPTION_TYPE)
+                .select(
+                    CHANNELS.asterisk(),
+                    ROUTING_KEYS.ROUTING_KEY,
+                    QUEUES.CONSUMPTION_TYPE,
+                    CHANNEL_CIRCUIT_BREAKERS.STATE
+                )
                 .from(CHANNELS)
                 .leftJoin(ROUTING_KEYS)
                 .on(CHANNELS.CHANNEL_ID.eq(ROUTING_KEYS.CHANNEL_ID))
                 .leftJoin(QUEUES)
                 .on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
+                .leftJoin(CHANNEL_CIRCUIT_BREAKERS)
+                .on(CHANNELS.CHANNEL_ID.eq(CHANNELS.CHANNEL_ID))
+                .groupBy(
+                    CHANNELS.CHANNEL_ID,
+                    ROUTING_KEYS.ROUTING_KEY,
+                    QUEUES.CONSUMPTION_TYPE,
+                    CHANNEL_CIRCUIT_BREAKERS.STATE
+                )
                 .fetch()
 
         return mapRecordsWithKeysToDTO(records)
@@ -153,6 +195,12 @@ class ChannelRepository(
                         } else {
                             null
                         },
+                    routingKeysCircuitState = rows.map {
+                        RoutingKeyCircuitState(
+                            it[CHANNEL_CIRCUIT_BREAKERS.ROUTING_KEY],
+                            it[CHANNEL_CIRCUIT_BREAKERS.STATE].toDomainEnum()
+                        )
+                    }
                 )
             }
 }
@@ -168,4 +216,8 @@ private fun ChannelType.toDBEnum(): com.ph.sintropyengine.jooq.generated.enums.C
     com.ph.sintropyengine.jooq.generated.enums.ChannelType
         .valueOf(this.toString())
 
-private fun com.ph.sintropyengine.jooq.generated.enums.ChannelType.toDomainEnum(): ChannelType = ChannelType.valueOf(this.toString())
+private fun com.ph.sintropyengine.jooq.generated.enums.ChannelType.toDomainEnum(): ChannelType =
+    ChannelType.valueOf(this.toString())
+
+private fun com.ph.sintropyengine.jooq.generated.enums.CircuitState.toDomainEnum(): CircuitState =
+    CircuitState.valueOf(this.toString())

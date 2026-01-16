@@ -4,6 +4,7 @@
 package com.ph.sintropyengine.jooq.generated;
 
 
+import com.ph.sintropyengine.jooq.generated.tables.ChannelCircuitBreakers;
 import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks;
 import com.ph.sintropyengine.jooq.generated.tables.Channels;
 import com.ph.sintropyengine.jooq.generated.tables.DeadLetterQueue;
@@ -13,6 +14,7 @@ import com.ph.sintropyengine.jooq.generated.tables.Messages;
 import com.ph.sintropyengine.jooq.generated.tables.Producers;
 import com.ph.sintropyengine.jooq.generated.tables.Queues;
 import com.ph.sintropyengine.jooq.generated.tables.RoutingKeys;
+import com.ph.sintropyengine.jooq.generated.tables.records.ChannelCircuitBreakersRecord;
 import com.ph.sintropyengine.jooq.generated.tables.records.ChannelLinksRecord;
 import com.ph.sintropyengine.jooq.generated.tables.records.ChannelsRecord;
 import com.ph.sintropyengine.jooq.generated.tables.records.DeadLetterQueueRecord;
@@ -41,6 +43,8 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<ChannelCircuitBreakersRecord> CHANNEL_CIRCUIT_BREAKERS_CHANNEL_ID_ROUTING_KEY_KEY = Internal.createUniqueKey(ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS, DSL.name("channel_circuit_breakers_channel_id_routing_key_key"), new TableField[] { ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID, ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS.ROUTING_KEY }, true);
+    public static final UniqueKey<ChannelCircuitBreakersRecord> CHANNEL_CIRCUIT_BREAKERS_PKEY = Internal.createUniqueKey(ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS, DSL.name("channel_circuit_breakers_pkey"), new TableField[] { ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS.CIRCUIT_ID }, true);
     public static final UniqueKey<ChannelLinksRecord> CHANNEL_LINKS_PKEY = Internal.createUniqueKey(ChannelLinks.CHANNEL_LINKS, DSL.name("channel_links_pkey"), new TableField[] { ChannelLinks.CHANNEL_LINKS.CHANNEL_LINK_ID }, true);
     public static final UniqueKey<ChannelLinksRecord> CHANNEL_LINKS_SOURCE_CHANNEL_ID_TARGET_CHANNEL_ID_SOURCE_RO_KEY = Internal.createUniqueKey(ChannelLinks.CHANNEL_LINKS, DSL.name("channel_links_source_channel_id_target_channel_id_source_ro_key"), new TableField[] { ChannelLinks.CHANNEL_LINKS.SOURCE_CHANNEL_ID, ChannelLinks.CHANNEL_LINKS.TARGET_CHANNEL_ID, ChannelLinks.CHANNEL_LINKS.SOURCE_ROUTING_KEY, ChannelLinks.CHANNEL_LINKS.TARGET_ROUTING_KEY }, true);
     public static final UniqueKey<ChannelsRecord> CHANNELS_PKEY = Internal.createUniqueKey(Channels.CHANNELS, DSL.name("channels_pkey"), new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
@@ -56,6 +60,7 @@ public class Keys {
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final ForeignKey<ChannelCircuitBreakersRecord, ChannelsRecord> CHANNEL_CIRCUIT_BREAKERS__CHANNEL_CIRCUIT_BREAKERS_CHANNEL_ID_FKEY = Internal.createForeignKey(ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS, DSL.name("channel_circuit_breakers_channel_id_fkey"), new TableField[] { ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
     public static final ForeignKey<ChannelLinksRecord, ChannelsRecord> CHANNEL_LINKS__CHANNEL_LINKS_SOURCE_CHANNEL_ID_FKEY = Internal.createForeignKey(ChannelLinks.CHANNEL_LINKS, DSL.name("channel_links_source_channel_id_fkey"), new TableField[] { ChannelLinks.CHANNEL_LINKS.SOURCE_CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
     public static final ForeignKey<ChannelLinksRecord, ChannelsRecord> CHANNEL_LINKS__CHANNEL_LINKS_TARGET_CHANNEL_ID_FKEY = Internal.createForeignKey(ChannelLinks.CHANNEL_LINKS, DSL.name("channel_links_target_channel_id_fkey"), new TableField[] { ChannelLinks.CHANNEL_LINKS.TARGET_CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
     public static final ForeignKey<DeadLetterQueueRecord, ChannelsRecord> DEAD_LETTER_QUEUE__DEAD_LETTER_QUEUE_CHANNEL_ID_FKEY = Internal.createForeignKey(DeadLetterQueue.DEAD_LETTER_QUEUE, DSL.name("dead_letter_queue_channel_id_fkey"), new TableField[] { DeadLetterQueue.DEAD_LETTER_QUEUE.CHANNEL_ID }, Keys.CHANNELS_PKEY, new TableField[] { Channels.CHANNELS.CHANNEL_ID }, true);
