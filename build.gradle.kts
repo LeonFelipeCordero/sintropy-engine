@@ -110,7 +110,7 @@ jooq {
 }
 
 tasks.named("compileKotlin") {
-    dependsOn(tasks.named("jooqCodegen"))
+//    dependsOn(tasks.named("jooqCodegen"))
 }
 
 // Flyway migrations in command line
