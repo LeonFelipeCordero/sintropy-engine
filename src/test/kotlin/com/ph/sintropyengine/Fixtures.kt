@@ -72,7 +72,7 @@ object Fixtures {
             routingKey = routingKey,
             message = DEFAULT_MESSAGE,
             headers = DEFAULT_ATTRIBUTES,
-            originMessageId = null
+            originMessageId = null,
         )
 
     fun createMessageRequest(

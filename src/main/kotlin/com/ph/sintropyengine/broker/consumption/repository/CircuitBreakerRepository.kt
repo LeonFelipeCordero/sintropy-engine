@@ -3,17 +3,20 @@ package com.ph.sintropyengine.broker.consumption.repository
 import com.ph.sintropyengine.broker.consumption.model.ChannelCircuitBreaker
 import com.ph.sintropyengine.broker.consumption.model.CircuitState
 import com.ph.sintropyengine.jooq.generated.Tables
-import com.ph.sintropyengine.jooq.generated.enums.CircuitState as JooqCircuitState
 import jakarta.enterprise.context.ApplicationScoped
 import org.jooq.DSLContext
 import java.time.OffsetDateTime
 import java.util.UUID
+import com.ph.sintropyengine.jooq.generated.enums.CircuitState as JooqCircuitState
 
 @ApplicationScoped
 class CircuitBreakerRepository(
     private val context: DSLContext,
 ) {
-    fun findByChannelIdAndRoutingKey(channelId: UUID, routingKey: String): ChannelCircuitBreaker? =
+    fun findByChannelIdAndRoutingKey(
+        channelId: UUID,
+        routingKey: String,
+    ): ChannelCircuitBreaker? =
         context
             .selectFrom(Tables.CHANNEL_CIRCUIT_BREAKERS)
             .where(Tables.CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID.eq(channelId))
@@ -32,18 +35,25 @@ class CircuitBreakerRepository(
             .where(Tables.CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID.eq(channelId))
             .fetchInto(ChannelCircuitBreaker::class.java)
 
-    fun getCircuitState(channelId: UUID, routingKey: String): CircuitState {
-        val state = context
-            .select(Tables.CHANNEL_CIRCUIT_BREAKERS.STATE)
-            .from(Tables.CHANNEL_CIRCUIT_BREAKERS)
-            .where(Tables.CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID.eq(channelId))
-            .and(Tables.CHANNEL_CIRCUIT_BREAKERS.ROUTING_KEY.eq(routingKey))
-            .fetchOneInto(JooqCircuitState::class.java)
+    fun getCircuitState(
+        channelId: UUID,
+        routingKey: String,
+    ): CircuitState {
+        val state =
+            context
+                .select(Tables.CHANNEL_CIRCUIT_BREAKERS.STATE)
+                .from(Tables.CHANNEL_CIRCUIT_BREAKERS)
+                .where(Tables.CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID.eq(channelId))
+                .and(Tables.CHANNEL_CIRCUIT_BREAKERS.ROUTING_KEY.eq(routingKey))
+                .fetchOneInto(JooqCircuitState::class.java)
 
         return CircuitState.valueOf(state?.name ?: "CLOSED")
     }
 
-    fun closeCircuit(channelId: UUID, routingKey: String) {
+    fun closeCircuit(
+        channelId: UUID,
+        routingKey: String,
+    ) {
         context
             .update(Tables.CHANNEL_CIRCUIT_BREAKERS)
             .set(Tables.CHANNEL_CIRCUIT_BREAKERS.STATE, JooqCircuitState.CLOSED)

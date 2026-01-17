@@ -61,15 +61,14 @@ class CircuitBreakerApi(
         @PathParam("channelName") channelName: String,
         @PathParam("routingKey") routingKey: String,
         @QueryParam("recover") recover: Boolean?,
-    ): Response {
-        return if (recover == true) {
+    ): Response =
+        if (recover == true) {
             val recoveredCount = circuitBreakerService.closeCircuitAndRecover(channelName, routingKey)
             Response.ok(CloseCircuitResponse(success = true, recoveredCount = recoveredCount)).build()
         } else {
             circuitBreakerService.closeCircuit(channelName, routingKey)
             Response.ok(CloseCircuitResponse(success = true, recoveredCount = 0)).build()
         }
-    }
 }
 
 data class CircuitBreakerStateResponse(

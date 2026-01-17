@@ -39,6 +39,13 @@ class ChannelService(
 
     fun findByName(name: String): Channel? = channelRepository.findByName(name)
 
+    fun findByNameAndRoutingKeyStrict(
+        name: String,
+        routingKey: String,
+    ): Channel =
+        channelRepository.findByNameAndRoutingKey(name, routingKey)
+            ?: throw IllegalStateException("Channel with name $name and routing key $routingKey not found")
+
     fun findAll(): List<Channel> = channelRepository.findAll()
 
     @Transactional

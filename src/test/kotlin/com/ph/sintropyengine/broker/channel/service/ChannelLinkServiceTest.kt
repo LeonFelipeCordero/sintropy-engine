@@ -183,7 +183,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
                         "some.key",
                         target.routingKeys.first(),
                     )
-                }.withMessage("Source channel with name non-existent-channel not found")
+                }.withMessageContaining("Channel with name non-existent-channel and routing key some.key not found")
         }
 
         @Test
@@ -198,7 +198,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
                         source.routingKeys.first(),
                         "some.key",
                     )
-                }.withMessage("Target channel with name non-existent-channel not found")
+                }.withMessageContaining("Channel with name non-existent-channel and routing key some.key not found")
         }
 
         @Test
@@ -214,7 +214,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
                         "invalid.routing.key",
                         target.routingKeys.first(),
                     )
-                }.withMessageContaining("Source routing key invalid.routing.key does not exist")
+                }.withMessageContaining("Channel with name ${source.name} and routing key invalid.routing.key not found")
         }
 
         @Test
@@ -230,7 +230,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
                         source.routingKeys.first(),
                         "invalid.routing.key",
                     )
-                }.withMessageContaining("Target routing key invalid.routing.key does not exist")
+                }.withMessageContaining("Channel with name ${target.name} and routing key invalid.routing.key not found")
         }
     }
 

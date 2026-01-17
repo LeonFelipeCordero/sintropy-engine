@@ -61,7 +61,7 @@ class ProducerServiceTest : IntegrationTestBase() {
                         "test.2",
                     ),
                 )
-            }.withMessageContainingAll("Channel", "does not have routing-key test.2")
+            }.withMessageContaining("Channel with name ${channel.name} and routing key test.2 not found")
     }
 
     @Test

@@ -61,9 +61,7 @@ class ProducerService(
     // TODO: Should get the preStoreMessage
     @Transactional
     fun publishMessage(request: PublishMessageRequest): Message {
-        val channel =
-            channelService.findByName(request.channelName)
-                ?: throw IllegalStateException("Channel ${request.channelName} not found")
+        val channel = channelService.findByNameAndRoutingKeyStrict(request.channelName, request.routingKey)
 
         val producer =
             producerRepository.findByName(request.producerName)
@@ -75,12 +73,6 @@ class ProducerService(
             )
         }
 
-        if (!channel.containsRoutingKey(request.routingKey)) {
-            throw IllegalStateException(
-                "Channel ${request.channelName} does not have routing-key ${request.routingKey}",
-            )
-        }
-
         val messagePreStore =
             MessagePreStore(
                 channelId = channel.channelId,
@@ -88,9 +80,8 @@ class ProducerService(
                 routingKey = request.routingKey,
                 message = request.message,
                 headers = request.headers,
-                originMessageId = null
+                originMessageId = null,
             )
-
 
         if (!channel.canWriteMessage(messagePreStore.routingKey)) {
             val dlqMessage = deadLetterQueueRepository.save(messagePreStore)

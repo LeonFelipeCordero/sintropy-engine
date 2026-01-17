@@ -36,14 +36,7 @@ class MessageRecoveryService(
         to: OffsetDateTime?,
         batchStreamInput: BatchStreamInput,
     ) {
-        val channel = (
-            channelService.findByName(channelName)
-                ?: throw IllegalStateException("Channel with name $channelName was not found")
-        )
-
-        if (!channel.containsRoutingKey(routingKey)) {
-            throw IllegalStateException("Routing key $routingKey does not exist for channel $channelName")
-        }
+        val channel = channelService.findByNameAndRoutingKeyStrict(channelName, routingKey)
 
         logger.info { "Streaming messages for routing key [${channel.routing(routingKey)}] form $from and to $to" }
 
@@ -89,14 +82,7 @@ class MessageRecoveryService(
         routingKey: String,
         batchStreamInput: BatchStreamInput,
     ) {
-        val channel = (
-            channelService.findByName(channelName)
-                ?: throw IllegalStateException("Channel with name $channelName was not found")
-        )
-
-        if (!channel.containsRoutingKey(routingKey)) {
-            throw IllegalStateException("Routing key $routingKey does not exist for channel $channelName")
-        }
+        val channel = channelService.findByNameAndRoutingKeyStrict(channelName, routingKey)
 
         logger.info { "Streaming ALL messages for routing key [${channel.routing(routingKey)}]" }
 

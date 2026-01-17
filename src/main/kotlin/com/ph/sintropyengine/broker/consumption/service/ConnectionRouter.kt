@@ -24,12 +24,7 @@ class ConnectionRouter(
         channelName: String,
         routingKey: String,
     ) {
-        val channel =
-            channelService.findByName(channelName) ?: throw IllegalStateException("Channel $channelName not found")
-
-        if (!channel.containsRoutingKey(routingKey)) {
-            throw IllegalStateException("Routing key $routingKey not found in channel $channelName")
-        }
+        val channel = channelService.findByNameAndRoutingKeyStrict(channelName, routingKey)
 
         mutex.withLock {
             val routing = routing(channel.channelId!!, routingKey)

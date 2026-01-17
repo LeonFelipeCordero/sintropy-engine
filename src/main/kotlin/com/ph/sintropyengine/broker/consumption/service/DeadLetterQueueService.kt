@@ -24,13 +24,7 @@ class DeadLetterQueueService(
         pageSize: Int = 100,
         page: Int = 0,
     ): List<DeadLetterMessage> {
-        val channel =
-            channelService.findByName(channelName)
-                ?: throw IllegalStateException("Channel with name $channelName not found")
-
-        if (!channel.containsRoutingKey(routingKey)) {
-            throw IllegalStateException("Routing key $routingKey does not exist for channel $channelName")
-        }
+        val channel = channelService.findByNameAndRoutingKeyStrict(channelName, routingKey)
 
         return dlqRepository.findByChannelIdAndRoutingKey(
             channelId = channel.channelId!!,
@@ -73,13 +67,7 @@ class DeadLetterQueueService(
         channelName: String,
         routingKey: String,
     ): List<Message> {
-        val channel =
-            channelService.findByName(channelName)
-                ?: throw IllegalStateException("Channel with name $channelName not found")
-
-        if (!channel.containsRoutingKey(routingKey)) {
-            throw IllegalStateException("Routing key $routingKey does not exist for channel $channelName")
-        }
+        val channel = channelService.findByNameAndRoutingKeyStrict(channelName, routingKey)
 
         val dlqEntries =
             dlqRepository.findAllByChannelIdAndRoutingKey(

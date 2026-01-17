@@ -28,7 +28,9 @@ class ChannelServiceTest : IntegrationTestBase() {
             )
         val fetchedChannel = channelService.findByName("test")
 
-        assertThat(createdChannel).usingRecursiveComparison().ignoringFields("routingKeysCircuitState")
+        assertThat(createdChannel)
+            .usingRecursiveComparison()
+            .ignoringFields("routingKeysCircuitState")
             .isEqualTo(fetchedChannel)
     }
 

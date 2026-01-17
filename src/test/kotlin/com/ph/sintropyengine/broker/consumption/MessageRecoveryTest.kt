@@ -306,7 +306,8 @@ class MessageRecoveryTest : IntegrationTestBase() {
             latch.await(5, TimeUnit.SECONDS)
 
             assertThat(errorResponse).isNotNull
-            assertThat(errorResponse!!.error).contains("Channel with name non-existent-channel was not found")
+            assertThat(errorResponse!!.error)
+                .contains("Channel with name non-existent-channel and routing key test.1 not found")
         }
 
     @Test
@@ -339,7 +340,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
             latch.await(5, TimeUnit.SECONDS)
 
             assertThat(errorResponse).isNotNull
-            assertThat(errorResponse!!.error).contains("Routing key invalid.routing.key does not exist for channel ${channel.name}")
+            assertThat(errorResponse!!.error).contains("Channel with name ${channel.name} and routing key invalid.routing.key not found")
         }
 
     @Test

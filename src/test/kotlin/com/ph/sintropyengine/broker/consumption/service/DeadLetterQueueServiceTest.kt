@@ -237,7 +237,7 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
             assertThatExceptionOfType(IllegalStateException::class.java)
                 .isThrownBy {
                     dlqService.recoverAllForChannelAndRoutingKey("non-existent", "key")
-                }.withMessageContaining("Channel with name non-existent not found")
+                }.withMessageContaining("Channel with name non-existent and routing key key not found")
         }
 
         @Test
@@ -247,7 +247,7 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
             assertThatExceptionOfType(IllegalStateException::class.java)
                 .isThrownBy {
                     dlqService.recoverAllForChannelAndRoutingKey(channel.name, "invalid-key")
-                }.withMessageContaining("Routing key invalid-key does not exist")
+                }.withMessageContaining("Channel with name ${channel.name} and routing key invalid-key not found")
         }
 
         @Test
@@ -265,10 +265,11 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
             pollingQueue.markAsFailed(message1.messageId)
             pollingQueue.markAsFailed(message2.messageId)
 
-            val recovered = dlqService.recoverAllForChannelAndRoutingKey(
-                channelName = channel.name,
-                routingKey = channel.routingKeys.first(),
-            )
+            val recovered =
+                dlqService.recoverAllForChannelAndRoutingKey(
+                    channelName = channel.name,
+                    routingKey = channel.routingKeys.first(),
+                )
 
             assertThat(recovered).hasSize(3)
             assertThat(recovered.map { it.messageId }).containsExactly(

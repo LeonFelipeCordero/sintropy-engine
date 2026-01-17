@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
 
 @QuarkusTest
 class CircuitBreakerServiceTest : IntegrationTestBase() {
-
     @Inject
     private lateinit var pollingFifoQueue: PollingFifoQueue
 
@@ -51,7 +50,7 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
         fun `should fail when channel not found`() {
             assertThatExceptionOfType(IllegalStateException::class.java)
                 .isThrownBy { circuitBreakerService.getCircuitState("non-existent", "key") }
-                .withMessageContaining("Channel with name non-existent not found")
+                .withMessageContaining("Channel with name non-existent and routing key key not found")
         }
 
         @Test
@@ -60,7 +59,7 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
 
             assertThatExceptionOfType(IllegalStateException::class.java)
                 .isThrownBy { circuitBreakerService.getCircuitState(channel.name, "invalid-key") }
-                .withMessageContaining("Routing key invalid-key does not exist")
+                .withMessageContaining("Channel with name ${channel.name} and routing key invalid-key not found")
         }
     }
 
@@ -99,7 +98,7 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
         fun `should fail when channel not found`() {
             assertThatExceptionOfType(IllegalStateException::class.java)
                 .isThrownBy { circuitBreakerService.getCircuitBreaker("non-existent", "key") }
-                .withMessageContaining("Channel with name non-existent not found")
+                .withMessageContaining("Channel with name non-existent and routing key key not found")
         }
 
         @Test
@@ -108,7 +107,7 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
 
             assertThatExceptionOfType(IllegalStateException::class.java)
                 .isThrownBy { circuitBreakerService.getCircuitBreaker(channel.name, "invalid-key") }
-                .withMessageContaining("Routing key invalid-key does not exist")
+                .withMessageContaining("Channel with name ${channel.name} and routing key invalid-key not found")
         }
     }
 
@@ -199,7 +198,7 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
         fun `should fail when channel not found`() {
             assertThatExceptionOfType(IllegalStateException::class.java)
                 .isThrownBy { circuitBreakerService.closeCircuit("non-existent", "key") }
-                .withMessageContaining("Channel with name non-existent not found")
+                .withMessageContaining("Channel with name non-existent and routing key key not found")
         }
 
         @Test
@@ -208,7 +207,7 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
 
             assertThatExceptionOfType(IllegalStateException::class.java)
                 .isThrownBy { circuitBreakerService.closeCircuit(channel.name, "invalid-key") }
-                .withMessageContaining("Routing key invalid-key does not exist")
+                .withMessageContaining("Channel with name ${channel.name} and routing key invalid-key not found")
         }
     }
 
@@ -223,25 +222,28 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
             pollingFifoQueue.poll(channel.channelId!!, channel.routingKeys.first())
             pollingFifoQueue.markAsFailed(message1.messageId)
 
-            val dlqMessages = dlqRepository.findAllByChannelIdAndRoutingKey(
-                channel.channelId,
-                channel.routingKeys.first(),
-            )
+            val dlqMessages =
+                dlqRepository.findAllByChannelIdAndRoutingKey(
+                    channel.channelId,
+                    channel.routingKeys.first(),
+                )
             assertThat(dlqMessages).hasSize(2)
 
-            val recoveredCount = circuitBreakerService.closeCircuitAndRecover(
-                channel.name,
-                channel.routingKeys.first(),
-            )
+            val recoveredCount =
+                circuitBreakerService.closeCircuitAndRecover(
+                    channel.name,
+                    channel.routingKeys.first(),
+                )
 
             assertThat(recoveredCount).isEqualTo(2)
             assertThat(circuitBreakerService.getCircuitState(channel.name, channel.routingKeys.first()))
                 .isEqualTo(CircuitState.CLOSED)
 
-            val remainingDlq = dlqRepository.findAllByChannelIdAndRoutingKey(
-                channel.channelId,
-                channel.routingKeys.first(),
-            )
+            val remainingDlq =
+                dlqRepository.findAllByChannelIdAndRoutingKey(
+                    channel.channelId,
+                    channel.routingKeys.first(),
+                )
             assertThat(remainingDlq).isEmpty()
 
             val messagesInQueue = messageRepository.findAll()
@@ -252,10 +254,11 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
         fun `should return 0 when circuit already closed`() {
             val channel = createFifoQueueChannel()
 
-            val recoveredCount = circuitBreakerService.closeCircuitAndRecover(
-                channel.name,
-                channel.routingKeys.first(),
-            )
+            val recoveredCount =
+                circuitBreakerService.closeCircuitAndRecover(
+                    channel.name,
+                    channel.routingKeys.first(),
+                )
 
             assertThat(recoveredCount).isEqualTo(0)
         }
@@ -264,7 +267,7 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
         fun `should fail when channel not found`() {
             assertThatExceptionOfType(IllegalStateException::class.java)
                 .isThrownBy { circuitBreakerService.closeCircuitAndRecover("non-existent", "key") }
-                .withMessageContaining("Channel with name non-existent not found")
+                .withMessageContaining("Channel with name non-existent and routing key key not found")
         }
 
         @Test
@@ -273,7 +276,7 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
 
             assertThatExceptionOfType(IllegalStateException::class.java)
                 .isThrownBy { circuitBreakerService.closeCircuitAndRecover(channel.name, "invalid-key") }
-                .withMessageContaining("Routing key invalid-key does not exist")
+                .withMessageContaining("Channel with name ${channel.name} and routing key invalid-key not found")
         }
     }
 
@@ -304,10 +307,11 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
             val messagesInQueue = messageRepository.findAll()
             assertThat(messagesInQueue).isEmpty()
 
-            val dlqMessages = dlqRepository.findAllByChannelIdAndRoutingKey(
-                channel.channelId,
-                channel.routingKeys.first(),
-            )
+            val dlqMessages =
+                dlqRepository.findAllByChannelIdAndRoutingKey(
+                    channel.channelId,
+                    channel.routingKeys.first(),
+                )
             assertThat(dlqMessages).hasSize(3)
             assertThat(dlqMessages.map { it.messageId }).containsExactlyInAnyOrder(
                 message1.messageId,
@@ -329,10 +333,11 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
             val messagesInQueue = messageRepository.findAll()
             assertThat(messagesInQueue).isEmpty()
 
-            val dlqMessages = dlqRepository.findAllByChannelIdAndRoutingKey(
-                channel.channelId,
-                channel.routingKeys.first(),
-            )
+            val dlqMessages =
+                dlqRepository.findAllByChannelIdAndRoutingKey(
+                    channel.channelId,
+                    channel.routingKeys.first(),
+                )
             assertThat(dlqMessages.map { it.messageId }).contains(newMessage.messageId)
         }
 

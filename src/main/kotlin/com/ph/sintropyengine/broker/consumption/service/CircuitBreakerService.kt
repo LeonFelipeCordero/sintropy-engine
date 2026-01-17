@@ -16,46 +16,38 @@ class CircuitBreakerService(
     private val channelService: ChannelService,
     private val deadLetterQueueService: DeadLetterQueueService,
 ) {
-    fun getCircuitState(channelName: String, routingKey: String): CircuitState {
-        val channel = channelService.findByName(channelName)
-            ?: throw IllegalStateException("Channel with name $channelName not found")
-
-        if (!channel.containsRoutingKey(routingKey)) {
-            throw IllegalStateException("Routing key $routingKey does not exist for channel $channelName")
-        }
-
+    fun getCircuitState(
+        channelName: String,
+        routingKey: String,
+    ): CircuitState {
+        val channel = channelService.findByNameAndRoutingKeyStrict(channelName, routingKey)
         return circuitBreakerRepository.getCircuitState(channel.channelId!!, routingKey)
     }
 
-    fun getCircuitBreaker(channelName: String, routingKey: String): ChannelCircuitBreaker? {
-        val channel = channelService.findByName(channelName)
-            ?: throw IllegalStateException("Channel with name $channelName not found")
-
-        if (!channel.containsRoutingKey(routingKey)) {
-            throw IllegalStateException("Routing key $routingKey does not exist for channel $channelName")
-        }
-
+    fun getCircuitBreaker(
+        channelName: String,
+        routingKey: String,
+    ): ChannelCircuitBreaker? {
+        val channel = channelService.findByNameAndRoutingKeyStrict(channelName, routingKey)
         return circuitBreakerRepository.findByChannelIdAndRoutingKey(channel.channelId!!, routingKey)
     }
 
-    fun getAllOpenCircuits(): List<ChannelCircuitBreaker> =
-        circuitBreakerRepository.findAllOpen()
+    fun getAllOpenCircuits(): List<ChannelCircuitBreaker> = circuitBreakerRepository.findAllOpen()
 
     fun getCircuitBreakersForChannel(channelName: String): List<ChannelCircuitBreaker> {
-        val channel = channelService.findByName(channelName)
-            ?: throw IllegalStateException("Channel with name $channelName not found")
+        val channel =
+            channelService.findByName(channelName)
+                ?: throw IllegalStateException("Channel with name $channelName not found")
 
         return circuitBreakerRepository.findAllByChannelId(channel.channelId!!)
     }
 
     @Transactional
-    fun closeCircuit(channelName: String, routingKey: String) {
-        val channel = channelService.findByName(channelName)
-            ?: throw IllegalStateException("Channel with name $channelName not found")
-
-        if (!channel.containsRoutingKey(routingKey)) {
-            throw IllegalStateException("Routing key $routingKey does not exist for channel $channelName")
-        }
+    fun closeCircuit(
+        channelName: String,
+        routingKey: String,
+    ) {
+        val channel = channelService.findByNameAndRoutingKeyStrict(channelName, routingKey)
 
         val currentState = circuitBreakerRepository.getCircuitState(channel.channelId!!, routingKey)
         if (currentState == CircuitState.CLOSED) {
@@ -68,13 +60,11 @@ class CircuitBreakerService(
     }
 
     @Transactional
-    fun closeCircuitAndRecover(channelName: String, routingKey: String): Int {
-        val channel = channelService.findByName(channelName)
-            ?: throw IllegalStateException("Channel with name $channelName not found")
-
-        if (!channel.containsRoutingKey(routingKey)) {
-            throw IllegalStateException("Routing key $routingKey does not exist for channel $channelName")
-        }
+    fun closeCircuitAndRecover(
+        channelName: String,
+        routingKey: String,
+    ): Int {
+        val channel = channelService.findByNameAndRoutingKeyStrict(channelName, routingKey)
 
         val currentState = circuitBreakerRepository.getCircuitState(channel.channelId!!, routingKey)
         if (currentState == CircuitState.CLOSED) {

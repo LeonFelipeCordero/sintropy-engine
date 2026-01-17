@@ -14,6 +14,7 @@ import java.util.UUID
 class ChannelLinkService(
     private val channelLinkRepository: ChannelLinkRepository,
     private val channelRepository: ChannelRepository,
+    private val channelService: ChannelService,
 ) {
     @Transactional
     fun linkChannels(
@@ -22,21 +23,8 @@ class ChannelLinkService(
         sourceRoutingKey: String,
         targetRoutingKey: String,
     ): ChannelLink {
-        val sourceChannel =
-            channelRepository.findByName(sourceChannelName)
-                ?: throw IllegalStateException("Source channel with name $sourceChannelName not found")
-
-        val targetChannel =
-            channelRepository.findByName(targetChannelName)
-                ?: throw IllegalStateException("Target channel with name $targetChannelName not found")
-
-        if (!sourceChannel.containsRoutingKey(sourceRoutingKey)) {
-            throw IllegalStateException("Source routing key $sourceRoutingKey does not exist in channel $sourceChannelName")
-        }
-
-        if (!targetChannel.containsRoutingKey(targetRoutingKey)) {
-            throw IllegalStateException("Target routing key $targetRoutingKey does not exist in channel $targetChannelName")
-        }
+        val sourceChannel = channelService.findByNameAndRoutingKeyStrict(sourceChannelName, sourceRoutingKey)
+        val targetChannel = channelService.findByNameAndRoutingKeyStrict(targetChannelName, targetRoutingKey)
 
         validateLinkCompatibility(sourceChannel, targetChannel)
 

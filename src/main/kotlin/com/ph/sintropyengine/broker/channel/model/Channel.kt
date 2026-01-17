@@ -11,7 +11,7 @@ data class Channel(
     val channelType: ChannelType,
     val routingKeys: MutableList<String>,
     val consumptionType: ConsumptionType? = null,
-    val routingKeysCircuitState: List<RoutingKeyCircuitState> = listOf()
+    val routingKeysCircuitState: List<RoutingKeyCircuitState> = listOf(),
 ) {
     fun containsRoutingKey(routingKey: String): Boolean = routingKeys.contains(routingKey)
 
@@ -28,19 +28,14 @@ data class Channel(
         return consumptionType
     }
 
-    fun canWriteMessage(routingKey: String): Boolean {
-        return !isFifo() || !(isFifo() && isCircuitOpen(routingKey))
-    }
+    fun canWriteMessage(routingKey: String): Boolean = !isFifo() || !(isFifo() && isCircuitOpen(routingKey))
 
-    fun isFifo(): Boolean =
-        channelType == ChannelType.STREAM || consumptionType == ConsumptionType.FIFO
+    fun isFifo(): Boolean = channelType == ChannelType.STREAM || consumptionType == ConsumptionType.FIFO
 
-
-    fun isCircuitOpen(routingKey: String): Boolean {
-        return routingKeysCircuitState
+    fun isCircuitOpen(routingKey: String): Boolean =
+        routingKeysCircuitState
             .find { it.routingKey == routingKey }
             ?.circuitState == CircuitState.OPEN
-    }
 }
 
 enum class ChannelType {

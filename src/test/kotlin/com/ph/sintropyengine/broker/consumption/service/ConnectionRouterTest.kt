@@ -27,7 +27,7 @@ class ConnectionRouterTest {
 
     @BeforeEach
     fun setUp() {
-        every { channelService.findByName(any()) } returns defaultChannel
+        every { channelService.findByNameAndRoutingKeyStrict(any(), any()) } returns defaultChannel
 
         connectionRouter = ConnectionRouter(channelService)
     }
@@ -126,17 +126,20 @@ class ConnectionRouterTest {
                     channelId = UUID.randomUUID(),
                     routingKeys = mutableListOf("test.1.1", "test.1.2", "test.1.3"),
                 )
-            every { channelService.findByName(channel1.name) } returns channel1
+            every { channelService.findByNameAndRoutingKeyStrict(channel1.name, "test.1.1") } returns channel1
+            every { channelService.findByNameAndRoutingKeyStrict(channel1.name, "test.1.2") } returns channel1
+            every { channelService.findByNameAndRoutingKeyStrict(channel1.name, "test.1.3") } returns channel1
 
             val channel2 =
                 Fixtures.createChannel(
                     channelId = UUID.randomUUID(),
                     routingKeys = mutableListOf("test.2.1", "test.2.2"),
                 )
-            every { channelService.findByName(channel2.name) } returns channel2
+            every { channelService.findByNameAndRoutingKeyStrict(channel2.name, "test.2.1") } returns channel2
+            every { channelService.findByNameAndRoutingKeyStrict(channel2.name, "test.2.2") } returns channel2
 
             val channel3 = Fixtures.createChannel(channelId = UUID.randomUUID(), routingKeys = mutableListOf("test.3.1"))
-            every { channelService.findByName(channel3.name) } returns channel3
+            every { channelService.findByNameAndRoutingKeyStrict(channel3.name, "test.3.1") } returns channel3
 
             val mutex = Mutex()
             val connections = mutableMapOf<String, MutableList<String>>()
