@@ -89,6 +89,32 @@ class ChannelRepository(
         return mapRecordsWithKeysToDTO(records).firstOrNull()
     }
 
+    fun findByIds(ids: Set<UUID>): Map<UUID, Channel> {
+        val records =
+            context
+                .select(
+                    CHANNELS.asterisk(),
+                    ROUTING_KEYS.ROUTING_KEY,
+                    QUEUES.CONSUMPTION_TYPE,
+                    CHANNEL_CIRCUIT_BREAKERS.STATE,
+                ).from(CHANNELS)
+                .leftJoin(ROUTING_KEYS)
+                .on(CHANNELS.CHANNEL_ID.eq(ROUTING_KEYS.CHANNEL_ID))
+                .leftJoin(QUEUES)
+                .on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
+                .leftJoin(CHANNEL_CIRCUIT_BREAKERS)
+                .on(CHANNELS.CHANNEL_ID.eq(CHANNELS.CHANNEL_ID))
+                .where(CHANNELS.CHANNEL_ID.`in`(ids))
+                .groupBy(
+                    CHANNELS.CHANNEL_ID,
+                    ROUTING_KEYS.ROUTING_KEY,
+                    QUEUES.CONSUMPTION_TYPE,
+                    CHANNEL_CIRCUIT_BREAKERS.STATE,
+                ).fetch()
+
+        return mapRecordsWithKeysToDTO(records).associateBy { it.channelId!! }
+    }
+
     fun findByName(name: String): Channel? {
         val records =
             context

@@ -16,7 +16,11 @@ import java.util.UUID
 class MessageRepository(
     private val context: DSLContext,
 ) {
-    fun save(message: MessagePreStore): Message =
+    fun save(
+        message: MessagePreStore,
+        channelId: UUID,
+        producerId: UUID,
+    ): Message =
         context
             .insertInto(
                 Tables.MESSAGES,
@@ -26,8 +30,8 @@ class MessageRepository(
                 Tables.MESSAGES.MESSAGE,
                 Tables.MESSAGES.HEADERS,
             ).values(
-                message.channelId,
-                message.producerId,
+                channelId,
+                producerId,
                 message.routingKey,
                 JSONB.jsonb(message.message),
                 JSONB.jsonb(message.headers),

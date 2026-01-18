@@ -25,10 +25,11 @@ object Fixtures {
         channelType: ChannelType = QUEUE,
         routingKeys: List<String> = listOf(DEFAULT_ROUTING_KEY),
         consumptionType: ConsumptionType? = if (channelType == QUEUE) STANDARD else null,
+        name: String = UUID.randomUUID().toString(),
     ): Channel =
         Channel(
             channelId = channelId,
-            name = UUID.randomUUID().toString(),
+            name = name,
             channelType = channelType,
             routingKeys = routingKeys.toMutableList(),
             consumptionType = consumptionType,
@@ -62,13 +63,13 @@ object Fixtures {
         )
 
     fun createMessagePreStore(
-        channelId: UUID,
-        producerId: UUID,
+        channelName: String,
+        producerName: String,
         routingKey: String = DEFAULT_ROUTING_KEY,
     ): MessagePreStore =
         MessagePreStore(
-            channelId = channelId,
-            producerId = producerId,
+            channelName = channelName,
+            producerName = producerName,
             routingKey = routingKey,
             message = DEFAULT_MESSAGE,
             headers = DEFAULT_ATTRIBUTES,

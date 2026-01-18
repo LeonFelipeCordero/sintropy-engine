@@ -73,7 +73,7 @@ class CircuitBreakerApiTest : IntegrationTestBase() {
                 .then()
                 .statusCode(200)
                 .body("$", hasSize<Any>(1))
-                .body("[0].channelId", equalTo(channel.channelId.toString()))
+                .body("[0].channelName", equalTo(channel.name))
                 .body("[0].state", equalTo("CLOSED"))
         }
 
@@ -92,7 +92,7 @@ class CircuitBreakerApiTest : IntegrationTestBase() {
                 .then()
                 .statusCode(200)
                 .body("$", hasSize<Any>(1))
-                .body("[0].channelId", equalTo(channel.channelId.toString()))
+                .body("[0].channelName", equalTo(channel.name))
                 .body("[0].state", equalTo("OPEN"))
         }
 
@@ -117,7 +117,7 @@ class CircuitBreakerApiTest : IntegrationTestBase() {
                 .get("/circuit-breakers/channels/${channel.name}/routing-keys/${channel.routingKeys.first()}")
                 .then()
                 .statusCode(200)
-                .body("channelId", equalTo(channel.channelId.toString()))
+                .body("channelName", equalTo(channel.name))
                 .body("routingKey", equalTo(channel.routingKeys.first()))
                 .body("state", equalTo("CLOSED"))
         }
@@ -136,7 +136,7 @@ class CircuitBreakerApiTest : IntegrationTestBase() {
                 .get("/circuit-breakers/channels/${channel.name}/routing-keys/${channel.routingKeys.first()}")
                 .then()
                 .statusCode(200)
-                .body("channelId", equalTo(channel.channelId.toString()))
+                .body("channelName", equalTo(channel.name))
                 .body("routingKey", equalTo(channel.routingKeys.first()))
                 .body("state", equalTo("OPEN"))
                 .body("failedMessageId", equalTo(message.messageId.toString()))

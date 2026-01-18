@@ -8,7 +8,7 @@ import com.ph.sintropyengine.broker.channel.model.Channel
 import com.ph.sintropyengine.broker.consumption.api.ReadyToStreamResponse
 import com.ph.sintropyengine.broker.consumption.api.RecoveryStreamRequest
 import com.ph.sintropyengine.broker.consumption.api.StreamingErrorResponse
-import com.ph.sintropyengine.broker.consumption.model.MessageLog
+import com.ph.sintropyengine.broker.consumption.api.response.MessageLogResponse
 import com.ph.sintropyengine.broker.producer.model.Producer
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.websockets.next.BasicWebSocketConnector
@@ -78,7 +78,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
             val message2 = publishMessage(channel, producer)
             val message3 = publishMessage(channel, producer)
 
-            val receivedMessages = mutableListOf<MessageLog>()
+            val receivedMessages = mutableListOf<MessageLogResponse>()
             val latch = CountDownLatch(3)
             var streamingComplete = false
 
@@ -97,7 +97,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
                             }
 
                             message.startsWith("[") -> {
-                                val messages: List<MessageLog> = objectMapper.readValue(message)
+                                val messages: List<MessageLogResponse> = objectMapper.readValue(message)
                                 receivedMessages.addAll(messages)
                                 messages.forEach { _ -> latch.countDown() }
                             }
@@ -135,7 +135,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
             Thread.sleep(100)
             val message3 = publishMessage(channel, producer)
 
-            val receivedMessages = mutableListOf<MessageLog>()
+            val receivedMessages = mutableListOf<MessageLogResponse>()
             val completeLatch = CountDownLatch(1)
 
             val connection =
@@ -151,7 +151,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
                             }
 
                             message.startsWith("[") -> {
-                                val messages: List<MessageLog> = objectMapper.readValue(message)
+                                val messages: List<MessageLogResponse> = objectMapper.readValue(message)
                                 receivedMessages.addAll(messages)
                             }
                         }
@@ -187,7 +187,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
             Thread.sleep(50)
             val message3 = publishMessage(channel, producer)
 
-            val receivedMessages = mutableListOf<MessageLog>()
+            val receivedMessages = mutableListOf<MessageLogResponse>()
             val completeLatch = CountDownLatch(1)
 
             val connection =
@@ -203,7 +203,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
                             }
 
                             message.startsWith("[") -> {
-                                val messages: List<MessageLog> = objectMapper.readValue(message)
+                                val messages: List<MessageLogResponse> = objectMapper.readValue(message)
                                 receivedMessages.addAll(messages)
                             }
                         }
@@ -236,7 +236,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
         runTest {
             publishMessage(channel, producer)
 
-            val receivedMessages = mutableListOf<MessageLog>()
+            val receivedMessages = mutableListOf<MessageLogResponse>()
             val completeLatch = CountDownLatch(1)
 
             val connection =
@@ -252,7 +252,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
                             }
 
                             message.startsWith("[") -> {
-                                val messages: List<MessageLog> = objectMapper.readValue(message)
+                                val messages: List<MessageLogResponse> = objectMapper.readValue(message)
                                 receivedMessages.addAll(messages)
                             }
                         }
@@ -386,7 +386,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
                 publishMessage(channel, producer)
             }
 
-            val receivedBatches = mutableListOf<List<MessageLog>>()
+            val receivedBatches = mutableListOf<List<MessageLogResponse>>()
             val completeLatch = CountDownLatch(1)
 
             val connection =
@@ -402,7 +402,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
                             }
 
                             message.startsWith("[") -> {
-                                val messages: List<MessageLog> = objectMapper.readValue(message)
+                                val messages: List<MessageLogResponse> = objectMapper.readValue(message)
                                 if (messages.isNotEmpty()) {
                                     receivedBatches.add(messages)
                                 }
@@ -440,7 +440,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
             val message2 = publishMessage(channel, producer, "other.routing.key")
             val message3 = publishMessage(channel, producer, Fixtures.DEFAULT_ROUTING_KEY)
 
-            val receivedMessages = mutableListOf<MessageLog>()
+            val receivedMessages = mutableListOf<MessageLogResponse>()
             val completeLatch = CountDownLatch(1)
 
             val connection =
@@ -456,7 +456,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
                             }
 
                             message.startsWith("[") -> {
-                                val messages: List<MessageLog> = objectMapper.readValue(message)
+                                val messages: List<MessageLogResponse> = objectMapper.readValue(message)
                                 receivedMessages.addAll(messages)
                             }
                         }
@@ -519,8 +519,8 @@ class MessageRecoveryTest : IntegrationTestBase() {
             .then()
             .statusCode(200)
             .body("messageId", equalTo(message.messageId.toString()))
-            .body("channelId", equalTo(message.channelId.toString()))
-            .body("producerId", equalTo(message.producerId.toString()))
+            .body("channelName", equalTo(channel.name))
+            .body("producerName", equalTo(producer.name))
             .body("routingKey", equalTo(message.routingKey))
             .body("message", notNullValue())
     }

@@ -1,6 +1,11 @@
 package com.ph.sintropyengine.broker.consumption.api
 
+import com.ph.sintropyengine.broker.channel.service.ChannelService
+import com.ph.sintropyengine.broker.consumption.api.response.DeadLetterMessageResponse
+import com.ph.sintropyengine.broker.consumption.api.response.MessageResponse
+import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.service.DeadLetterQueueService
+import com.ph.sintropyengine.broker.producer.service.ProducerService
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
@@ -17,6 +22,8 @@ import java.util.UUID
 @Consumes(MediaType.APPLICATION_JSON)
 class DeadLetterQueueApi(
     private val dlqService: DeadLetterQueueService,
+    private val channelService: ChannelService,
+    private val producerService: ProducerService,
 ) {
     @GET
     @Path("/channels/{channelName}/routing-keys/{routingKey}")
@@ -33,7 +40,16 @@ class DeadLetterQueueApi(
                 pageSize = pageSize ?: 100,
                 page = page ?: 0,
             )
-        return Response.ok(messages).build()
+        val producerIds = messages.map { it.producerId }.toSet()
+        val producersById = producerService.findByIds(producerIds)
+        val responses =
+            messages.map { message ->
+                val producer =
+                    producersById[message.producerId]
+                        ?: throw IllegalStateException("Producer ${message.producerId} not found")
+                message.toResponse(channelName, producer.name)
+            }
+        return Response.ok(responses).build()
     }
 
     @POST
@@ -42,14 +58,36 @@ class DeadLetterQueueApi(
         @PathParam("messageId") messageId: UUID,
     ): Response {
         val recoveredMessage = dlqService.recoverMessage(messageId)
-        return Response.ok(recoveredMessage).build()
+        val channel =
+            channelService.findById(recoveredMessage.channelId)
+                ?: throw IllegalStateException("Channel not found")
+        val producer =
+            producerService.findById(recoveredMessage.producerId)
+                ?: throw IllegalStateException("Producer not found")
+        return Response.ok(recoveredMessage.toResponse(channel.name, producer.name)).build()
     }
 
     @POST
     @Path("/messages/recover")
     fun recoverMultipleMessages(request: RecoverMessagesRequest): Response {
         val recoveredMessages = dlqService.recoverMessages(request.messageIds)
-        return Response.ok(recoveredMessages).build()
+
+        val channelIds = recoveredMessages.map { it.channelId }.toSet()
+        val producerIds = recoveredMessages.map { it.producerId }.toSet()
+        val channelsById = channelService.findByIds(channelIds)
+        val producersById = producerService.findByIds(producerIds)
+
+        val responses =
+            recoveredMessages.map { message ->
+                val channel =
+                    channelsById[message.channelId]
+                        ?: throw IllegalStateException("Channel ${message.channelId} not found")
+                val producer =
+                    producersById[message.producerId]
+                        ?: throw IllegalStateException("Producer ${message.producerId} not found")
+                message.toResponse(channel.name, producer.name)
+            }
+        return Response.ok(responses).build()
     }
 
     @POST

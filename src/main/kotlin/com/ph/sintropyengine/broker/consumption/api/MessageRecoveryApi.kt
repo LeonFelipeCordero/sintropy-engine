@@ -1,8 +1,11 @@
 package com.ph.sintropyengine.broker.consumption.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.ph.sintropyengine.broker.channel.service.ChannelService
+import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.service.BatchStreamInput
 import com.ph.sintropyengine.broker.consumption.service.MessageRecoveryService
+import com.ph.sintropyengine.broker.producer.service.ProducerService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.quarkus.websockets.next.OnClose
 import io.quarkus.websockets.next.OnOpen
@@ -33,6 +36,8 @@ private const val IDLE_TIMEOUT_SECONDS = 30L
 @Consumes(MediaType.APPLICATION_JSON)
 class MessageRecoveryRestApi(
     private val messageRecoveryService: MessageRecoveryService,
+    private val channelService: ChannelService,
+    private val producerService: ProducerService,
 ) {
     @POST
     @Path("/messages/{messageId}/retrigger")
@@ -40,7 +45,13 @@ class MessageRecoveryRestApi(
         @PathParam("messageId") messageId: UUID,
     ): Response {
         val messageLog = messageRecoveryService.retriggerMessage(messageId)
-        return Response.ok(messageLog).build()
+        val channel =
+            channelService.findById(messageLog.channelId)
+                ?: throw IllegalStateException("Channel not found")
+        val producer =
+            producerService.findById(messageLog.producerId)
+                ?: throw IllegalStateException("Producer not found")
+        return Response.ok(messageLog.toResponse(channel.name, producer.name)).build()
     }
 }
 
@@ -106,7 +117,7 @@ class MessageRecoveryApi {
                     routingKey = routingKey,
                     from =
                         request.from
-                            ?: throw kotlin.IllegalStateException("Provide an start point when not requesting a full recovery"),
+                            ?: throw IllegalStateException("Provide an start point when not requesting a full recovery"),
                     to = request.to,
                     batchStreamInput = batchStreamInput,
                 )

@@ -2,8 +2,11 @@ package com.ph.sintropyengine.broker.consumption.api
 
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType
 import com.ph.sintropyengine.broker.channel.service.ChannelService
+import com.ph.sintropyengine.broker.consumption.api.response.MessageResponse
+import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.service.PollingFifoQueue
 import com.ph.sintropyengine.broker.consumption.service.PollingStandardQueue
+import com.ph.sintropyengine.broker.producer.service.ProducerService
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.POST
@@ -19,6 +22,7 @@ import java.util.UUID
 @Consumes(MediaType.APPLICATION_JSON)
 class QueueApi(
     private val channelService: ChannelService,
+    private val producerService: ProducerService,
     private val pollingFifoQueue: PollingFifoQueue,
     private val pollingStandardQueue: PollingStandardQueue,
 ) {
@@ -53,7 +57,17 @@ class QueueApi(
                 }
             }
 
-        return Response.ok(messages).build()
+        val producerIds = messages.map { it.producerId }.toSet()
+        val producersById = producerService.findByIds(producerIds)
+        val responses =
+            messages.map { message ->
+                val producer =
+                    producersById[message.producerId]
+                        ?: throw IllegalStateException("Producer ${message.producerId} not found")
+                message.toResponse(request.channelName, producer.name)
+            }
+
+        return Response.ok(responses).build()
     }
 
     @POST

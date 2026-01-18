@@ -1,5 +1,6 @@
 package com.ph.sintropyengine.broker.channel.api
 
+import com.ph.sintropyengine.broker.channel.api.response.toResponse
 import com.ph.sintropyengine.broker.channel.model.ChannelType
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType
 import com.ph.sintropyengine.broker.channel.service.ChannelService
@@ -12,7 +13,6 @@ import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import java.util.UUID
 
 @Path("/channels")
 @Produces(MediaType.APPLICATION_JSON)
@@ -29,51 +29,38 @@ class ChannelApi(
                 routingKeys = request.routingKeys,
                 consumptionType = request.consumptionType,
             )
-        return Response.status(Response.Status.CREATED).entity(channel).build()
+        return Response.status(Response.Status.CREATED).entity(channel.toResponse()).build()
     }
 
     @GET
-    @Path("/{id}")
-    fun findById(
-        @PathParam("id") id: UUID,
-    ): Response {
-        val channel = channelService.findById(id)
-        return if (channel != null) {
-            Response.ok(channel).build()
-        } else {
-            Response.status(Response.Status.NOT_FOUND).build()
-        }
-    }
-
-    @GET
-    @Path("/name/{name}")
+    @Path("/{name}")
     fun findByName(
         @PathParam("name") name: String,
-    ): Response {
-        val channel = channelService.findByName(name)
-        return if (channel != null) {
-            Response.ok(channel).build()
-        } else {
-            Response.status(Response.Status.NOT_FOUND).build()
-        }
-    }
+    ): Response =
+        channelService
+            .findByName(name)
+            ?.let {
+                Response.ok(it.toResponse()).build()
+            } ?: Response.status(Response.Status.NOT_FOUND).build()
 
     @DELETE
-    @Path("/{id}")
+    @Path("/{name}")
     fun deleteChannel(
-        @PathParam("id") id: UUID,
+        @PathParam("name") name: String,
     ): Response {
-        channelService.deleteChannel(id)
+        channelService.findByName(name)
+            ?: return Response.status(Response.Status.NOT_FOUND).build()
+        channelService.deleteByName(name)
         return Response.noContent().build()
     }
 
     @POST
-    @Path("/{id}/routing-keys")
+    @Path("/{name}/routing-keys")
     fun addRoutingKey(
-        @PathParam("id") id: UUID,
+        @PathParam("name") name: String,
         routingKeyRequest: CreateNewRoutingKeyRequest,
     ): Response {
-        channelService.addRoutingKey(id, routingKeyRequest.routingKey)
+        channelService.addRoutingKeyByName(name, routingKeyRequest.routingKey)
         return Response.noContent().build()
     }
 }

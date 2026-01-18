@@ -1,6 +1,8 @@
 package com.ph.sintropyengine.broker.consumption.api
 
-import com.ph.sintropyengine.broker.consumption.model.ChannelCircuitBreaker
+import com.ph.sintropyengine.broker.channel.service.ChannelService
+import com.ph.sintropyengine.broker.consumption.api.response.CircuitBreakerResponse
+import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.model.CircuitState
 import com.ph.sintropyengine.broker.consumption.service.CircuitBreakerService
 import jakarta.ws.rs.Consumes
@@ -18,12 +20,24 @@ import jakarta.ws.rs.core.Response
 @Consumes(MediaType.APPLICATION_JSON)
 class CircuitBreakerApi(
     private val circuitBreakerService: CircuitBreakerService,
+    private val channelService: ChannelService,
 ) {
     @GET
     @Path("/open")
     fun listOpenCircuits(): Response {
         val circuits = circuitBreakerService.getAllOpenCircuits()
-        return Response.ok(circuits).build()
+
+        val channelIds = circuits.map { it.channelId }.toSet()
+        val channelsById = channelService.findByIds(channelIds)
+
+        val responses =
+            circuits.map { circuit ->
+                val channel =
+                    channelsById[circuit.channelId]
+                        ?: throw IllegalStateException("Channel ${circuit.channelId} not found")
+                circuit.toResponse(channel.name)
+            }
+        return Response.ok(responses).build()
     }
 
     @GET
@@ -32,7 +46,8 @@ class CircuitBreakerApi(
         @PathParam("channelName") channelName: String,
     ): Response {
         val circuits = circuitBreakerService.getCircuitBreakersForChannel(channelName)
-        return Response.ok(circuits).build()
+        val responses = circuits.map { it.toResponse(channelName) }
+        return Response.ok(responses).build()
     }
 
     @GET
@@ -40,10 +55,12 @@ class CircuitBreakerApi(
     fun getCircuitBreaker(
         @PathParam("channelName") channelName: String,
         @PathParam("routingKey") routingKey: String,
-    ): Response {
-        val circuit = circuitBreakerService.getCircuitBreaker(channelName, routingKey)
-        return Response.ok(circuit).build()
-    }
+    ): Response =
+        circuitBreakerService
+            .getCircuitBreaker(channelName, routingKey)
+            ?.let {
+                Response.ok(it.toResponse(channelName)).build()
+            } ?: Response.noContent().build()
 
     @GET
     @Path("/channels/{channelName}/routing-keys/{routingKey}/state")
@@ -73,7 +90,7 @@ class CircuitBreakerApi(
 
 data class CircuitBreakerStateResponse(
     val state: CircuitState,
-    val circuitBreaker: ChannelCircuitBreaker?,
+    val circuitBreaker: CircuitBreakerResponse?,
 )
 
 data class CloseCircuitResponse(

@@ -4,10 +4,8 @@ import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
 import com.ph.sintropyengine.broker.consumption.model.MessageStatus
-import com.ph.sintropyengine.broker.consumption.repository.CircuitBreakerRepository
 import com.ph.sintropyengine.broker.consumption.repository.DeadLetterQueueRepository
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
-import com.ph.sintropyengine.broker.producer.api.PublishMessageRequest
 import com.ph.sintropyengine.broker.producer.model.Producer
 import com.ph.sintropyengine.broker.producer.repository.ProducerRepository
 import jakarta.enterprise.context.ApplicationScoped
@@ -20,7 +18,6 @@ class ProducerService(
     private val channelService: ChannelService,
     private val producerRepository: ProducerRepository,
     private val messageRepository: MessageRepository,
-    private val circuitBreakerRepository: CircuitBreakerRepository,
     private val deadLetterQueueRepository: DeadLetterQueueRepository,
 ) {
     @Transactional
@@ -36,6 +33,8 @@ class ProducerService(
     }
 
     fun findById(consumerId: UUID): Producer? = producerRepository.findById(consumerId)
+
+    fun findByIds(ids: Set<UUID>): Map<UUID, Producer> = producerRepository.findByIds(ids)
 
     fun findByName(name: String): Producer? = producerRepository.findByName(name)
 
@@ -58,33 +57,24 @@ class ProducerService(
             producerRepository.deleteByName(name)
         } ?: throw IllegalStateException("Producer $name not found")
 
-    // TODO: Should get the preStoreMessage
     @Transactional
-    fun publishMessage(request: PublishMessageRequest): Message {
-        val channel = channelService.findByNameAndRoutingKeyStrict(request.channelName, request.routingKey)
+    fun publishMessage(messagePreStore: MessagePreStore): Message {
+        val channel =
+            channelService.findByNameAndRoutingKeyStrict(messagePreStore.channelName, messagePreStore.routingKey)
 
         val producer =
-            producerRepository.findByName(request.producerName)
-                ?: throw IllegalStateException("Producer ${request.producerName} not found")
+            producerRepository.findByName(messagePreStore.producerName)
+                ?: throw IllegalStateException("Producer ${messagePreStore.producerName} not found")
 
         if (producer.channelId != channel.channelId) {
             throw IllegalStateException(
-                "Producer ${request.producerName} is not linked to channel ${request.channelName}",
+                "Producer ${messagePreStore.producerName} is not linked to channel ${messagePreStore.channelName}",
             )
         }
 
-        val messagePreStore =
-            MessagePreStore(
-                channelId = channel.channelId,
-                producerId = producer.producerId!!,
-                routingKey = request.routingKey,
-                message = request.message,
-                headers = request.headers,
-                originMessageId = null,
-            )
-
         if (!channel.canWriteMessage(messagePreStore.routingKey)) {
-            val dlqMessage = deadLetterQueueRepository.save(messagePreStore)
+            val dlqMessage = deadLetterQueueRepository.save(messagePreStore, channel.channelId, producer.producerId!!)
+
             return Message(
                 messageId = dlqMessage.messageId,
                 timestamp = dlqMessage.timestamp,
@@ -99,6 +89,6 @@ class ProducerService(
             )
         }
 
-        return messageRepository.save(messagePreStore)
+        return messageRepository.save(messagePreStore, channel.channelId, producer.producerId!!)
     }
 }

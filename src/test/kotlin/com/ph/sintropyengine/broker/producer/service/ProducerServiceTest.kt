@@ -30,7 +30,7 @@ class ProducerServiceTest : IntegrationTestBase() {
 
         val createdMessage =
             producerService.publishMessage(
-                Fixtures.createMessageRequest(channel.name, producer.name),
+                Fixtures.createMessagePreStore(channel.name, producer.name),
             )
 
         val all = messageRepository.findAll()
@@ -43,7 +43,7 @@ class ProducerServiceTest : IntegrationTestBase() {
         Assertions
             .assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy {
-                producerService.publishMessage(Fixtures.createMessageRequest(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                producerService.publishMessage(Fixtures.createMessagePreStore(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
             }.withMessageContainingAll("Channel", "not found")
     }
 
@@ -55,7 +55,7 @@ class ProducerServiceTest : IntegrationTestBase() {
             .assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy {
                 producerService.publishMessage(
-                    Fixtures.createMessageRequest(
+                    Fixtures.createMessagePreStore(
                         channel.name,
                         producer.name,
                         "test.2",
@@ -73,7 +73,7 @@ class ProducerServiceTest : IntegrationTestBase() {
             .assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy {
                 producerService.publishMessage(
-                    Fixtures.createMessageRequest(
+                    Fixtures.createMessagePreStore(
                         channelName = channel2.name,
                         producerName = producer1.name,
                         routingKey = channel2.routingKeys.first(),
@@ -87,7 +87,7 @@ class ProducerServiceTest : IntegrationTestBase() {
         val (channel, producer) = createChannelWithProducer()
 
         producerService.publishMessage(
-            Fixtures.createMessageRequest(channel.name, producer.name),
+            Fixtures.createMessagePreStore(channel.name, producer.name),
         )
 
         val messages = messageRepository.findAll()

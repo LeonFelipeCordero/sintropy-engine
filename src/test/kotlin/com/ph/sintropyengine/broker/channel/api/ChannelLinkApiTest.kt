@@ -42,8 +42,8 @@ class ChannelLinkApiTest : IntegrationTestBase() {
                 .then()
                 .statusCode(201)
                 .body("channelLinkId", notNullValue())
-                .body("sourceChannelId", equalTo(source.channelId.toString()))
-                .body("targetChannelId", equalTo(target.channelId.toString()))
+                .body("sourceChannelName", equalTo(source.name))
+                .body("targetChannelName", equalTo(target.name))
                 .body("enabled", equalTo(true))
         }
 

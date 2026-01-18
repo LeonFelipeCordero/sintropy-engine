@@ -83,8 +83,9 @@ open class IntegrationTestBase {
     protected fun createChannel(
         channelType: ChannelType = QUEUE,
         consumptionType: ConsumptionType? = if (channelType == QUEUE) STANDARD else null,
+        name: String = UUID.randomUUID().toString(),
     ): Channel {
-        val channel = Fixtures.createChannel(channelType = channelType, consumptionType = consumptionType)
+        val channel = Fixtures.createChannel(name = name, channelType = channelType, consumptionType = consumptionType)
         return channelRepository.save(channel)
     }
 
@@ -127,7 +128,7 @@ open class IntegrationTestBase {
         routingKey: String = channel.routingKeys.first(),
     ): Message =
         producerService.publishMessage(
-            Fixtures.createMessageRequest(
+            Fixtures.createMessagePreStore(
                 channel.name,
                 producer.name,
                 routingKey,
@@ -142,7 +143,7 @@ open class IntegrationTestBase {
         val (channel, producer) = createChannelWithProducer(consumptionType = consumptionType)
 
         return producerService.publishMessage(
-            Fixtures.createMessageRequest(
+            Fixtures.createMessagePreStore(
                 channel.name,
                 producer.name,
                 channel.routingKeys.first(),
@@ -155,7 +156,7 @@ open class IntegrationTestBase {
         val message =
             when (Random.nextInt(1, 4)) {
                 1 -> {
-                    Fixtures.createMessageRequest(
+                    Fixtures.createMessagePreStore(
                         channelName = testData.channel1().name,
                         routingKey = testData.channel1().routingKeys[Random.nextInt(0, 3)],
                         producerName = testData.producer1().name,
@@ -163,7 +164,7 @@ open class IntegrationTestBase {
                 }
 
                 2 -> {
-                    Fixtures.createMessageRequest(
+                    Fixtures.createMessagePreStore(
                         channelName = testData.channel2().name,
                         routingKey = testData.channel2().routingKeys[Random.nextInt(0, 2)],
                         producerName = testData.producer2().name,
@@ -171,7 +172,7 @@ open class IntegrationTestBase {
                 }
 
                 3 -> {
-                    Fixtures.createMessageRequest(
+                    Fixtures.createMessagePreStore(
                         channelName = testData.channel3().name,
                         routingKey = testData.channel3().routingKeys.first(),
                         producerName = testData.producer3().name,

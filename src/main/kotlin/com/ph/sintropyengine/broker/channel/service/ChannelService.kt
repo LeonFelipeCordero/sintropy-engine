@@ -37,6 +37,8 @@ class ChannelService(
 
     fun findById(channelId: UUID): Channel? = channelRepository.findById(channelId)
 
+    fun findByIds(ids: Set<UUID>): Map<UUID, Channel> = channelRepository.findByIds(ids)
+
     fun findByName(name: String): Channel? = channelRepository.findByName(name)
 
     fun findByNameAndRoutingKeyStrict(
@@ -64,11 +66,13 @@ class ChannelService(
     }
 
     @Transactional
-    fun addRoutingKey(
-        id: UUID,
+    fun addRoutingKeyByName(
+        channelName: String,
         routingKey: String,
     ) {
-        val channel = channelRepository.findById(id) ?: throw IllegalStateException("Channel with id $id not found")
+        val channel =
+            channelRepository.findByName(channelName)
+                ?: throw IllegalStateException("Channel with name $channelName not found")
 
         if (channel.containsRoutingKey(routingKey)) {
             throw IllegalStateException("RoutingKey $routingKey already exists")

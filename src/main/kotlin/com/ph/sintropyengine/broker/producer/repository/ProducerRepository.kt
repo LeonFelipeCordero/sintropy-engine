@@ -27,6 +27,13 @@ class ProducerRepository(
             .where(Tables.PRODUCERS.PRODUCER_ID.eq(id))
             .fetchOneInto(Producer::class.java)
 
+    fun findByIds(ids: Set<UUID>): Map<UUID, Producer> =
+        context
+            .selectFrom(Tables.PRODUCERS)
+            .where(Tables.PRODUCERS.PRODUCER_ID.`in`(ids))
+            .fetchInto(Producer::class.java)
+            .associateBy { it.producerId!! }
+
     fun findByName(name: String): Producer? =
         context
             .selectFrom(Tables.PRODUCERS)

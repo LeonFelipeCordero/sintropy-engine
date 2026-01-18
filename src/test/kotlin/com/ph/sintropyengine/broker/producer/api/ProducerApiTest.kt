@@ -36,9 +36,8 @@ class ProducerApiTest : IntegrationTestBase() {
             .post("/producers")
             .then()
             .statusCode(201)
-            .body("producerId", notNullValue())
             .body("name", equalTo("test-producer"))
-            .body("channelId", equalTo(channel.channelId.toString()))
+            .body("channelName", equalTo(channel.name))
     }
 
     @Test
@@ -65,12 +64,11 @@ class ProducerApiTest : IntegrationTestBase() {
 
         given()
             .`when`()
-            .get("/producers/${producer.producerId}")
+            .get("/producers/${producer.name}")
             .then()
             .statusCode(200)
-            .body("producerId", equalTo(producer.producerId.toString()))
             .body("name", equalTo(producer.name))
-            .body("channelId", equalTo(channel.channelId.toString()))
+            .body("channelName", equalTo(channel.name))
     }
 
     @Test
@@ -111,12 +109,12 @@ class ProducerApiTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `GET producers by channel - should fail when channel does not exist`() {
+    fun `GET producers by channel - should return 404 when channel does not exist`() {
         given()
             .`when`()
             .get("/producers/channel/non-existent-channel")
             .then()
-            .statusCode(500)
+            .statusCode(404)
     }
 
     @Test
@@ -126,26 +124,26 @@ class ProducerApiTest : IntegrationTestBase() {
 
         given()
             .`when`()
-            .delete("/producers/${producer.producerId}")
+            .delete("/producers/${producer.name}")
             .then()
             .statusCode(204)
 
         given()
             .`when`()
-            .get("/producers/${producer.producerId}")
+            .get("/producers/${producer.name}")
             .then()
             .statusCode(404)
     }
 
     @Test
-    fun `DELETE producers - should fail when producer does not exist`() {
-        val nonExistentId = UUID.randomUUID()
+    fun `DELETE producers - should return 404 when producer does not exist`() {
+        val nonExistentName = UUID.randomUUID().toString()
 
         given()
             .`when`()
-            .delete("/producers/$nonExistentId")
+            .delete("/producers/$nonExistentName")
             .then()
-            .statusCode(500)
+            .statusCode(404)
     }
 
     @Test
@@ -170,8 +168,8 @@ class ProducerApiTest : IntegrationTestBase() {
             .then()
             .statusCode(201)
             .body("messageId", notNullValue())
-            .body("channelId", equalTo(channel.channelId.toString()))
-            .body("producerId", equalTo(producer.producerId.toString()))
+            .body("channelName", equalTo(channel.name))
+            .body("producerName", equalTo(producer.name))
             .body("routingKey", equalTo(channel.routingKeys.first()))
     }
 

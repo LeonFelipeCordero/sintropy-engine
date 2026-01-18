@@ -181,7 +181,7 @@ class PollingFiFoQueueTest : IntegrationTestBase() {
             )
 
         val secondRoutingKey = "test.2"
-        channelService.addRoutingKey(channel.channelId!!, secondRoutingKey)
+        channelService.addRoutingKeyByName(channel.name, secondRoutingKey)
         val message2 =
             publishMessage(
                 channel,

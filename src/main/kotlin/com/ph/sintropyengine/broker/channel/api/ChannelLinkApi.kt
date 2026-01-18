@@ -1,4 +1,8 @@
+package com.ph.sintropyengine.broker.channel.api
+
+import com.ph.sintropyengine.broker.channel.api.response.toResponse
 import com.ph.sintropyengine.broker.channel.service.ChannelLinkService
+import com.ph.sintropyengine.broker.channel.service.ChannelService
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
@@ -16,6 +20,7 @@ import java.util.UUID
 @Consumes(MediaType.APPLICATION_JSON)
 class ChannelLinkApi(
     private val channelLinkService: ChannelLinkService,
+    private val channelService: ChannelService,
 ) {
     @POST
     @Path("/links")
@@ -27,7 +32,10 @@ class ChannelLinkApi(
                 sourceRoutingKey = request.sourceRoutingKey,
                 targetRoutingKey = request.targetRoutingKey,
             )
-        return Response.status(Response.Status.CREATED).entity(link).build()
+        return Response
+            .status(Response.Status.CREATED)
+            .entity(link.toResponse(request.sourceChannelName, request.targetChannelName))
+            .build()
     }
 
     @GET
@@ -36,8 +44,21 @@ class ChannelLinkApi(
         @PathParam("linkId") linkId: UUID,
     ): Response {
         val link = channelLinkService.findById(linkId)
+
+        val (sourceChannel, targetChannel) =
+            link?.let {
+                val source =
+                    channelService.findById(link.sourceChannelId)
+                        ?: throw IllegalStateException("Source channel ${link.sourceChannelId} not found for link $linkId")
+                val target =
+                    channelService.findById(link.targetChannelId)
+                        ?: throw IllegalStateException("Target channel ${link.sourceChannelId} not found for link $linkId")
+
+                Pair(source, target)
+            } ?: Pair(null, null)
+
         return if (link != null) {
-            Response.ok(link).build()
+            Response.ok(link.toResponse(sourceChannel!!.name, targetChannel!!.name)).build()
         } else {
             Response.status(Response.Status.NOT_FOUND).build()
         }
@@ -49,7 +70,14 @@ class ChannelLinkApi(
         @PathParam("channelName") channelName: String,
     ): Response {
         val links = channelLinkService.getLinksFromChannel(channelName)
-        return Response.ok(links).build()
+        val responses =
+            links.map { link ->
+                val targetChannel =
+                    channelService.findById(link.targetChannelId)
+                        ?: throw IllegalStateException("Target channel not found")
+                link.toResponse(channelName, targetChannel.name)
+            }
+        return Response.ok(responses).build()
     }
 
     @GET
@@ -58,7 +86,14 @@ class ChannelLinkApi(
         @PathParam("channelName") channelName: String,
     ): Response {
         val links = channelLinkService.getLinksToChannel(channelName)
-        return Response.ok(links).build()
+        val responses =
+            links.map { link ->
+                val sourceChannel =
+                    channelService.findById(link.sourceChannelId)
+                        ?: throw IllegalStateException("Source channel not found")
+                link.toResponse(sourceChannel.name, channelName)
+            }
+        return Response.ok(responses).build()
     }
 
     @DELETE

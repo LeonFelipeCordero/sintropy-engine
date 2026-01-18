@@ -27,6 +27,7 @@ docker-compose -f development/docker-compose.yaml up -d
 ## Architecture
 
 Sintropy Engine is a message broker built with Quarkus and Kotlin. It supports two channel types:
+
 - **QUEUE** with STANDARD or FIFO consumption
 - **STREAM** for real-time WebSocket delivery
 
@@ -40,11 +41,13 @@ broker/
 └── iac/         # Infrastructure as Code definitions
 ```
 
-Each domain follows the pattern: `api/` (REST endpoints) → `service/` (business logic) → `repository/` (database access) → `model/` (domain objects).
+Each domain follows the pattern: `api/` (REST endpoints) → `service/` (business logic) → `repository/` (database
+access) → `model/` (domain objects).
 
 ### Key Components
 
-- **PostgreSQL Logical Replication**: Uses `wal2json` plugin to stream message inserts to WebSocket consumers in real-time
+- **PostgreSQL Logical Replication**: Uses `wal2json` plugin to stream message inserts to WebSocket consumers in
+  real-time
 - **Circuit Breaker**: For FIFO channels, when a message fails, the circuit opens and routes subsequent messages to DLQ
 - **Advisory Locks**: PostgreSQL `pg_try_advisory_xact_lock` ensures messages are processed by one consumer at a time
 - **Database Triggers**: Heavy use of triggers for event logging, DLQ routing, and circuit breaker logic
@@ -53,20 +56,27 @@ Each domain follows the pattern: `api/` (REST endpoints) → `service/` (busines
 
 Located in `src/main/resources/db/migration/`:
 
-- **V1.0**: Core schema - `channels` table with `channel_type` enum (QUEUE/STREAM), `routing_keys` table, `queues` table with `consumption_type` enum (STANDARD/FIFO)
+- **V1.0**: Core schema - `channels` table with `channel_type` enum (QUEUE/STREAM), `routing_keys` table, `queues` table
+  with `consumption_type` enum (STANDARD/FIFO)
 - **V1.2**: `producers` table - message publishers linked to channels
-- **V1.3**: `messages` table with `message_status_type` enum (READY/IN_FLIGHT/FAILED), `message_log` table for event sourcing. Triggers: `insert_into_message_log` (copies inserts to log), `mark_as_delivered_in_message_log` (marks processed on delete)
+- **V1.3**: `messages` table with `message_status_type` enum (READY/IN_FLIGHT/FAILED), `message_log` table for event
+  sourcing. Triggers: `insert_into_message_log` (copies inserts to log), `mark_as_delivered_in_message_log` (marks
+  processed on delete)
 - **V1.4**: PostgreSQL publication `messages_pub_insert_only` for logical replication (INSERT only)
 - **V1.5**: `channel_links` table - enables message routing between channels
 - **V1.6**: Trigger `route_message_after_insert` - automatically copies messages to linked target channels
-- **V1.7**: `dead_letter_queue` table. Trigger `auto_delete_on_failed` - when message status changes to FAILED, copies to DLQ, deletes from messages and message_log
+- **V1.7**: `dead_letter_queue` table. Trigger `auto_delete_on_failed` - when message status changes to FAILED, copies
+  to DLQ, deletes from messages and message_log
 - **V1.8**: `iac_files` table - tracks Infrastructure as Code file hashes for change detection
-- **V1.9**: `channel_circuit_breakers` table with `circuit_state` enum (CLOSED/OPEN). Triggers: auto-create/delete circuit breakers with routing keys, `open_circuit_on_failed_delete` - for FIFO channels, opens circuit and moves all remaining messages to DLQ when a FAILED message is deleted
+- **V1.9**: `channel_circuit_breakers` table with `circuit_state` enum (CLOSED/OPEN). Triggers: auto-create/delete
+  circuit breakers with routing keys, `open_circuit_on_failed_delete` - for FIFO channels, opens circuit and moves all
+  remaining messages to DLQ when a FAILED message is deleted
 
 ## JOOQ Guidelines
 
 - Never use `DSL.field()` or `DSL.table()` - always use generated classes from `Tables.*`
 - Insert pattern:
+
 ```kotlin
 context
     .insertInto(
@@ -78,6 +88,7 @@ context
     .fetchOneInto(Producer::class.java)
     ?: throw IllegalStateException("Something went wrong creating a new Producer")
 ```
+
 - Use `.fetchOneInto(Class)` for single results
 - Use `.fetchInto(Class)` for multiple results
 
@@ -93,3 +104,17 @@ context
 - Uses TestContainers with real PostgreSQL instances
 - Test database runs on a random port to avoid conflicts
 - When you need a producer with channel use createChannelWithProducer, pass the consumption type
+
+## Kotlin APIs
+
+- When building an API response for an optional object follow a pattern like this one
+
+```kotlin
+return circuitBreakerService.getCircuitBreaker(channelName, routingKey)
+    ?.let {
+        Response.ok(it.toResponse(channelName)).build()
+    } ?: return Response.noContent().build()
+```
+
+- When getting a channel, if the routing key is available use ChannelService.findByNameAndRoutingKeyStrict(channelName:
+  String, routingKey: String)

@@ -38,7 +38,6 @@ class ChannelApiTest : IntegrationTestBase() {
             .post("/channels")
             .then()
             .statusCode(201)
-            .body("channelId", notNullValue())
             .body("name", equalTo("test-channel"))
             .body("channelType", equalTo("QUEUE"))
             .body("routingKeys", hasSize<String>(1))
@@ -62,7 +61,6 @@ class ChannelApiTest : IntegrationTestBase() {
             .post("/channels")
             .then()
             .statusCode(201)
-            .body("channelId", notNullValue())
             .body("name", equalTo("test-stream"))
             .body("channelType", equalTo("STREAM"))
             .body("consumptionType", equalTo(null))
@@ -115,40 +113,14 @@ class ChannelApiTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `GET channels by id - should return channel when exists`() {
-        val channel = createChannel()
-
-        given()
-            .`when`()
-            .get("/channels/${channel.channelId}")
-            .then()
-            .statusCode(200)
-            .body("channelId", equalTo(channel.channelId.toString()))
-            .body("name", equalTo(channel.name))
-            .body("channelType", equalTo(channel.channelType.name))
-    }
-
-    @Test
-    fun `GET channels by id - should return 404 when channel does not exist`() {
-        val nonExistentId = UUID.randomUUID()
-
-        given()
-            .`when`()
-            .get("/channels/$nonExistentId")
-            .then()
-            .statusCode(404)
-    }
-
-    @Test
     fun `GET channels by name - should return channel when exists`() {
-        val channel = createChannel()
+        val channel = createChannel(name = "test-channel")
 
         given()
             .`when`()
-            .get("/channels/name/${channel.name}")
+            .get("/channels/${channel.name}")
             .then()
             .statusCode(200)
-            .body("channelId", equalTo(channel.channelId.toString()))
             .body("name", equalTo(channel.name))
     }
 
@@ -156,7 +128,7 @@ class ChannelApiTest : IntegrationTestBase() {
     fun `GET channels by name - should return 404 when channel does not exist`() {
         given()
             .`when`()
-            .get("/channels/name/non-existent-channel")
+            .get("/channels/non-existent-channel")
             .then()
             .statusCode(404)
     }
@@ -167,26 +139,26 @@ class ChannelApiTest : IntegrationTestBase() {
 
         given()
             .`when`()
-            .delete("/channels/${channel.channelId}")
+            .delete("/channels/${channel.name}")
             .then()
             .statusCode(204)
 
         given()
             .`when`()
-            .get("/channels/${channel.channelId}")
+            .get("/channels/${channel.name}")
             .then()
             .statusCode(404)
     }
 
     @Test
-    fun `DELETE channels - should fail when channel does not exist`() {
-        val nonExistentId = UUID.randomUUID()
+    fun `DELETE channels - should return 404 when channel does not exist`() {
+        val nonExistentName = UUID.randomUUID().toString()
 
         given()
             .`when`()
-            .delete("/channels/$nonExistentId")
+            .delete("/channels/$nonExistentName")
             .then()
-            .statusCode(500)
+            .statusCode(404)
     }
 
     @Test
@@ -197,13 +169,13 @@ class ChannelApiTest : IntegrationTestBase() {
             .contentType(ContentType.JSON)
             .body("""{"routingKey": "new.routing.key"}""")
             .`when`()
-            .post("/channels/${channel.channelId}/routing-keys")
+            .post("/channels/${channel.name}/routing-keys")
             .then()
             .statusCode(204)
 
         given()
             .`when`()
-            .get("/channels/${channel.channelId}")
+            .get("/channels/${channel.name}")
             .then()
             .statusCode(200)
             .body("routingKeys", hasItem("new.routing.key"))

@@ -64,7 +64,7 @@ class ChannelServiceTest : IntegrationTestBase() {
                 listOf("test.1"),
                 ConsumptionType.STANDARD,
             )
-        channelService.addRoutingKey(createdChannel.channelId!!, "test.2")
+        channelService.addRoutingKeyByName(createdChannel.name, "test.2")
     }
 
     @Test
@@ -77,7 +77,7 @@ class ChannelServiceTest : IntegrationTestBase() {
                 ConsumptionType.STANDARD,
             )
         assertThatExceptionOfType(IllegalStateException::class.java)
-            .isThrownBy { channelService.addRoutingKey(createdChannel.channelId!!, "test.1") }
+            .isThrownBy { channelService.addRoutingKeyByName(createdChannel.name, "test.1") }
             .withMessage("RoutingKey test.1 already exists")
     }
 

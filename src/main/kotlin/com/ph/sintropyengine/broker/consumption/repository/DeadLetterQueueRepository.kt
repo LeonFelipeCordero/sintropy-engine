@@ -85,7 +85,11 @@ class DeadLetterQueueRepository(
         context.deleteFrom(DEAD_LETTER_QUEUE).execute()
     }
 
-    fun save(message: MessagePreStore): DeadLetterMessage =
+    fun save(
+        message: MessagePreStore,
+        channelId: UUID,
+        producerId: UUID,
+    ): DeadLetterMessage =
         context
             .insertInto(
                 DEAD_LETTER_QUEUE,
@@ -97,8 +101,8 @@ class DeadLetterQueueRepository(
                 DEAD_LETTER_QUEUE.ORIGIN_MESSAGE_ID,
                 DEAD_LETTER_QUEUE.DELIVERED_TIMES,
             ).values(
-                message.channelId,
-                message.producerId,
+                channelId,
+                producerId,
                 message.routingKey,
                 JSONB.jsonb(message.message),
                 JSONB.jsonb(message.headers),

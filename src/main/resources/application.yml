@@ -6,7 +6,8 @@ quarkus:
     version: 0.0.1
   log:
     console:
-      format: '%d{yyyy-MM-dd HH:mm:ss} %-5p [%c] (%t) %s%e%n'
+      format: '%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
+#      format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] (%t) %s%e%n' -- this is how prod will be
     level: INFO
   datasource:
     username: postgres

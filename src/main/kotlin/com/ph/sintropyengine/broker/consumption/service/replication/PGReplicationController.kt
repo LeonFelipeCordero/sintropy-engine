@@ -3,8 +3,10 @@ package com.ph.sintropyengine.broker.consumption.service.replication
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ph.sintropyengine.broker.channel.model.ChannelType
 import com.ph.sintropyengine.broker.channel.service.ChannelService
+import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.consumption.service.ConnectionRouter
+import com.ph.sintropyengine.broker.producer.service.ProducerService
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.quarkus.narayana.jta.QuarkusTransaction
@@ -29,6 +31,7 @@ class PGReplicationController(
     private val objectMapper: ObjectMapper,
     private val messageRepository: MessageRepository,
     private val channelService: ChannelService,
+    private val producerService: ProducerService,
 ) {
     @Inject
     private lateinit var openConnections: OpenConnections
@@ -46,33 +49,41 @@ class PGReplicationController(
         scope.launch {
             while (true) {
                 val message = replicationConsumer.channel().receive()
+                try {
+                    // TODO get a method that fetch channel and producer together
+                    val channel =
+                        channelService.findById(message.channelId)
+                            ?: throw IllegalStateException("No channel found for ${message.channelId}")
 
-                val channel =
-                    channelService.findById(message.channelId)
-                        ?: throw IllegalStateException("No channel found for ${message.channelId}")
-
-                if (channel.channelType == ChannelType.QUEUE) {
-                    logger.debug { "Skipping message ${message.messageId} because channel is for queue polling" }
-                    continue
-                }
-
-                val connections = connectionRouter.getByRoutingKey(message.routing())
-
-                // TODO: Create it's out response and catch global exemption to keep coroutine running
-                // TODO: Different object to stream back
-                openConnections
-                    .filter { connections.contains(it.id()) }
-                    .forEach {
-                        val messageString = objectMapper.writeValueAsString(message)
-                        it.sendText(messageString).awaitSuspending()
-                        logger.debug { "message sent ${message.routing()}: $message" }
+                    if (channel.channelType == ChannelType.QUEUE) {
+                        logger.debug { "Skipping message ${message.messageId} because channel is for queue polling" }
+                        continue
                     }
 
-                launch {
-                    QuarkusTransaction.requiringNew().run {
-                        messageRepository.dequeue(message.messageId)
-                        logger.debug { "Removed message ${message.routing()}: $message" }
+                    val connections = connectionRouter.getByRoutingKey(message.routing())
+
+                    val producer =
+                        producerService.findById(message.producerId)
+                            ?: throw IllegalStateException("No producer found for ${message.producerId}")
+
+                    val messageResponse = message.toResponse(channel.name, producer.name)
+
+                    openConnections
+                        .filter { connections.contains(it.id()) }
+                        .forEach {
+                            val messageString = objectMapper.writeValueAsString(messageResponse)
+                            it.sendText(messageString).awaitSuspending()
+                            logger.debug { "message sent ${message.routing()}: $messageResponse" }
+                        }
+
+                    launch {
+                        QuarkusTransaction.requiringNew().run {
+                            messageRepository.dequeue(message.messageId)
+                            logger.debug { "Removed message ${message.routing()}: $message" }
+                        }
                     }
+                } catch (e: Exception) {
+                    logger.error(e) { "Error while receiving & processing message from WAL" }
                 }
             }
         }

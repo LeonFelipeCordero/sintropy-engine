@@ -6,6 +6,8 @@ import com.ph.sintropyengine.IntegrationTestBase
 import com.ph.sintropyengine.TestWithFullReplicationProfile
 import com.ph.sintropyengine.broker.channel.model.Channel
 import com.ph.sintropyengine.broker.channel.model.ChannelType
+import com.ph.sintropyengine.broker.consumption.api.response.MessageResponse
+import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.service.ConnectionRouter
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
@@ -97,36 +99,38 @@ class ConsumerStreamingTest : IntegrationTestBase() {
             val latch = CountDownLatch(5)
             val producer = createProducer(channel)
 
-            val receivedMessages = mutableListOf<Message>()
+            val receivedMessages = mutableListOf<MessageResponse>()
             val sentMessages = mutableListOf<Message>()
             basicWebSocketConnector
                 .baseUri(streamingUri)
                 .executionModel(BasicWebSocketConnector.ExecutionModel.NON_BLOCKING)
                 .onTextMessage { _, message ->
-                    receivedMessages.add(objectMapper.readValue(message, Message::class.java))
+                    receivedMessages.add(objectMapper.readValue(message, MessageResponse::class.java))
                     latch.countDown()
                 }.connectAndAwait()
 
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessageRequest(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessageRequest(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessageRequest(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessageRequest(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessageRequest(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
             )
 
             latch.await()
 
+            val mappedSentMessages = sentMessages.map { it.toResponse(channel.name, producer.name) }
+
             Assertions.assertThat(receivedMessages).hasSize(5)
-            Assertions.assertThat(sentMessages).usingRecursiveComparison().isEqualTo(receivedMessages)
+            Assertions.assertThat(mappedSentMessages).usingRecursiveComparison().isEqualTo(receivedMessages)
         }
 
     @Test
@@ -135,30 +139,30 @@ class ConsumerStreamingTest : IntegrationTestBase() {
             val latch = CountDownLatch(5)
             val producer = createProducer(channel)
 
-            val receivedMessages = mutableListOf<Message>()
+            val receivedMessages = mutableListOf<MessageResponse>()
             val sentMessages = mutableListOf<Message>()
             basicWebSocketConnector
                 .baseUri(streamingUri)
                 .executionModel(BasicWebSocketConnector.ExecutionModel.NON_BLOCKING)
                 .onTextMessage { _, message ->
-                    receivedMessages.add(objectMapper.readValue(message, Message::class.java))
+                    receivedMessages.add(objectMapper.readValue(message, MessageResponse::class.java))
                     latch.countDown()
                 }.connectAndAwait()
 
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessageRequest(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessageRequest(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessageRequest(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessageRequest(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessageRequest(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
             )
 
             latch.await()
@@ -180,6 +184,7 @@ class ConsumerStreamingTest : IntegrationTestBase() {
             Assertions.assertThat(messages).hasSize(0)
 
             val messageLogs = messageRepository.findAllMessageLog()
+
             Assertions.assertThat(messageLogs).hasSize(5)
             Assertions.assertThat(messageLogs.map { it.processed }.toSet().first()).isTrue
         }

@@ -1,8 +1,11 @@
 package com.ph.sintropyengine.broker.consumption.service
 
 import com.ph.sintropyengine.broker.channel.service.ChannelService
+import com.ph.sintropyengine.broker.consumption.api.response.MessageLogResponse
+import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.model.MessageLog
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
+import com.ph.sintropyengine.broker.producer.service.ProducerService
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.quarkus.websockets.next.OpenConnections
@@ -17,6 +20,7 @@ private val logger = KotlinLogging.logger {}
 class MessageRecoveryService(
     private val messageRepository: MessageRepository,
     private val channelService: ChannelService,
+    private val producerService: ProducerService,
     private var openConnections: OpenConnections,
 ) {
     fun retriggerMessage(message: UUID): MessageLog {
@@ -56,7 +60,7 @@ class MessageRecoveryService(
                 page = page,
             )
         if (batchMessages.isNotEmpty()) {
-            connection.sendTextAndAwait(batchMessages)
+            connection.sendTextAndAwait(toMessageLogResponses(batchMessages, channelName))
             page += 1
             Thread.sleep(batchStreamInput.delayInMs.toLong())
         }
@@ -71,7 +75,7 @@ class MessageRecoveryService(
                     pageSize = batchStreamInput.batchSize,
                     page = page,
                 )
-            connection.sendTextAndAwait(batchMessages)
+            connection.sendTextAndAwait(toMessageLogResponses(batchMessages, channelName))
             page += 1
             Thread.sleep(batchStreamInput.delayInMs.toLong())
         }
@@ -101,7 +105,7 @@ class MessageRecoveryService(
             )
 
         if (batchMessages.isNotEmpty()) {
-            connection.sendTextAndAwait(batchMessages)
+            connection.sendTextAndAwait(toMessageLogResponses(batchMessages, channelName))
             page += 1
             Thread.sleep(batchStreamInput.delayInMs.toLong())
         }
@@ -114,9 +118,26 @@ class MessageRecoveryService(
                     pageSize = batchStreamInput.batchSize,
                     page = page,
                 )
-            connection.sendTextAndAwait(batchMessages)
+            connection.sendTextAndAwait(toMessageLogResponses(batchMessages, channelName))
             page += 1
             Thread.sleep(batchStreamInput.delayInMs.toLong())
+        }
+    }
+
+    private fun toMessageLogResponses(
+        messages: List<MessageLog>,
+        channelName: String,
+    ): List<MessageLogResponse> {
+        if (messages.isEmpty()) return emptyList()
+
+        val producerIds = messages.map { it.producerId }.toSet()
+        val producersById = producerService.findByIds(producerIds)
+
+        return messages.map { msg ->
+            val producer =
+                producersById[msg.producerId]
+                    ?: throw IllegalStateException("Producer ${msg.producerId} not found")
+            msg.toResponse(channelName, producer.name)
         }
     }
 }
