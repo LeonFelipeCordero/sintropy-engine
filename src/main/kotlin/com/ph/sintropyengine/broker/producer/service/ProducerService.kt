@@ -8,6 +8,7 @@ import com.ph.sintropyengine.broker.consumption.repository.DeadLetterQueueReposi
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.producer.model.Producer
 import com.ph.sintropyengine.broker.producer.repository.ProducerRepository
+import com.ph.sintropyengine.broker.shared.utils.validForName
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 import java.lang.IllegalStateException
@@ -25,6 +26,8 @@ class ProducerService(
         name: String,
         channelName: String,
     ): Producer {
+        require(name.validForName()) { "Producer name must not contain white spaces" }
+
         val channel =
             channelService.findByName(channelName) ?: throw IllegalStateException("Channel $channelName not found")
 

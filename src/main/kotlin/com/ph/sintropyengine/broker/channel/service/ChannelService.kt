@@ -4,6 +4,7 @@ import com.ph.sintropyengine.broker.channel.model.Channel
 import com.ph.sintropyengine.broker.channel.model.ChannelType
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType
 import com.ph.sintropyengine.broker.channel.repository.ChannelRepository
+import com.ph.sintropyengine.broker.shared.utils.validForName
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 import java.util.UUID
@@ -20,6 +21,7 @@ class ChannelService(
         consumptionType: ConsumptionType? = null,
     ): Channel {
         require(routingKeys.isNotEmpty()) { "At least one routing key must be provided" }
+        require(name.validForName()) { "Channel name must not contain white spaces" }
 
         channelRepository
             .findByName(name)

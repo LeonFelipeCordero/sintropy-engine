@@ -154,4 +154,12 @@ class ChannelServiceTest : IntegrationTestBase() {
         assertThat(foundChannelByName.routingKeysCircuitState[1].routingKey).isEqualTo("test.2")
         assertThat(foundChannelByName.routingKeysCircuitState[1].circuitState).isEqualTo(CircuitState.CLOSED)
     }
+
+    @Test
+    fun `should fail if channel name contains white spaces`() {
+        assertThatExceptionOfType(IllegalArgumentException::class.java)
+            .isThrownBy {
+                channelService.createChannel("test channel", ChannelType.STREAM, listOf("test.1"))
+            }.withMessage("Channel name must not contain white spaces")
+    }
 }
