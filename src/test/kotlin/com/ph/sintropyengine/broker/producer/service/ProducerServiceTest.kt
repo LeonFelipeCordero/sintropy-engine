@@ -5,6 +5,7 @@ import com.ph.sintropyengine.IntegrationTestBase
 import com.ph.sintropyengine.broker.channel.model.ChannelType
 import com.ph.sintropyengine.broker.consumption.model.MessageStatus
 import io.quarkus.test.junit.QuarkusTest
+import jdk.internal.net.http.common.Log.channel
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.BeforeEach
@@ -113,9 +114,11 @@ class ProducerServiceTest : IntegrationTestBase() {
 
     @Test
     fun `should fail if producer name contains white spaces`() {
+        val channel = createChannel()
+
         assertThatExceptionOfType(IllegalArgumentException::class.java)
             .isThrownBy {
-                channelService.createChannel("producer name", ChannelType.STREAM, listOf("test.1"))
+                producerService.createProducer("producer name", channel.name)
             }.withMessage("Producer name must not contain white spaces")
     }
 }
