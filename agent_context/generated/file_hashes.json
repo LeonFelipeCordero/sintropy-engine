@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "files": {
+    "update_instructions.md": "7b1a97c771b586643d8ab5c0574808627a2141013f19c68f652ace7469861c50",
+    "constrains_and_workarounds.md": "fe073fe15e0b205ec36fd8c55eca7dab86862797e3abbaaf90e5fd99ddd531ea",
+    "database.md": "21f148b413f3c6cb413ce07ceecccc8283c7cb882daaf4298790f567763091b2",
+    "decision_log.md": "953e476e3d7b9c1865fe5bcae5d454249409743fe741a677b9813334cd753388",
+    "business_logic.md": "443b0f33cf4837725eedc72f8ba67a2db3a7c212ff4072e93f62a0c909eed094",
+    "api_contracts.md": "c5bdb431b0d4286f81f09e7594d352aa8ee93f4abe4575b10ba69acd5dcb817a",
+    "folder_structure.md": "95bc96c914965124b14d9abdce00dff183f262e93a2c4550d5ef0686000049cb",
+    "architecture.md": "2b98f4b1a792cb56764c2de2db893e135393733c8cd594565371729f1ae4c676"
+  }
+}
