@@ -7,6 +7,7 @@ import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.consumption.service.ConnectionRouter
 import com.ph.sintropyengine.broker.producer.service.ProducerService
+import com.ph.sintropyengine.broker.shared.observability.ObservabilityService
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.quarkus.narayana.jta.QuarkusTransaction
@@ -32,6 +33,7 @@ class PGReplicationController(
     private val messageRepository: MessageRepository,
     private val channelService: ChannelService,
     private val producerService: ProducerService,
+    private val observabilityService: ObservabilityService,
 ) {
     @Inject
     private lateinit var openConnections: OpenConnections
@@ -68,22 +70,31 @@ class PGReplicationController(
 
                     val messageResponse = message.toResponse(channel.name, producer.name)
 
-                    openConnections
-                        .filter { connections.contains(it.id()) }
-                        .forEach {
-                            val messageString = objectMapper.writeValueAsString(messageResponse)
-                            it.sendText(messageString).awaitSuspending()
-                            logger.debug { "message sent ${message.routing()}: $messageResponse" }
-                        }
+                    val connectedClients = openConnections.filter { connections.contains(it.id()) }
+                    val clientCount = connectedClients.count()
+
+                    connectedClients.forEach {
+                        val messageString = objectMapper.writeValueAsString(messageResponse)
+                        it.sendText(messageString).awaitSuspending()
+                        observabilityService.recordMessageStreamed(channel.name, message.routingKey)
+                    }
+
+                    logger.info {
+                        "Streamed message ${message.messageId} to $clientCount clients " +
+                            "[channel=${channel.name}, routingKey=${message.routingKey}, producer=${producer.name}]"
+                    }
 
                     launch {
                         QuarkusTransaction.requiringNew().run {
                             messageRepository.dequeue(message.messageId)
-                            logger.debug { "Removed message ${message.routing()}: $message" }
+                            logger.debug { "Dequeued streamed message ${message.messageId} from ${message.routing()}" }
                         }
                     }
                 } catch (e: Exception) {
-                    logger.error(e) { "Error while receiving & processing message from WAL" }
+                    logger.error(e) {
+                        "Failed to process message from WAL [messageId=${message.messageId}, " +
+                            "channelId=${message.channelId}, routingKey=${message.routingKey}]"
+                    }
                 }
             }
         }

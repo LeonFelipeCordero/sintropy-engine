@@ -4,18 +4,30 @@ import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.model.ChannelCircuitBreaker
 import com.ph.sintropyengine.broker.consumption.model.CircuitState
 import com.ph.sintropyengine.broker.consumption.repository.CircuitBreakerRepository
+import com.ph.sintropyengine.broker.shared.observability.ObservabilityService
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.quarkus.runtime.Startup
+import io.quarkus.scheduler.Scheduled
+import jakarta.annotation.PostConstruct
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 
 private val logger = KotlinLogging.logger {}
 
+@Startup
 @ApplicationScoped
 class CircuitBreakerService(
     private val circuitBreakerRepository: CircuitBreakerRepository,
     private val channelService: ChannelService,
     private val deadLetterQueueService: DeadLetterQueueService,
+    private val observabilityService: ObservabilityService,
 ) {
+    @PostConstruct
+    fun initializeMetrics() {
+        val openCircuits = circuitBreakerRepository.findAllOpen()
+        observabilityService.setOpenCircuitsCount(openCircuits.size)
+        logger.info { "Initialized circuit breaker metrics: ${openCircuits.size} circuits currently open" }
+    }
     fun getCircuitState(
         channelName: String,
         routingKey: String,
@@ -51,12 +63,14 @@ class CircuitBreakerService(
 
         val currentState = circuitBreakerRepository.getCircuitState(channel.channelId!!, routingKey)
         if (currentState == CircuitState.CLOSED) {
-            logger.info { "Circuit for $channelName/$routingKey is already closed" }
+            logger.debug { "Circuit already closed [channel=$channelName, routingKey=$routingKey]" }
             return
         }
 
         circuitBreakerRepository.closeCircuit(channel.channelId, routingKey)
-        logger.info { "Closed circuit for $channelName/$routingKey" }
+        observabilityService.recordCircuitClosed(channelName, routingKey)
+
+        logger.info { "Circuit breaker closed [channel=$channelName, routingKey=$routingKey]" }
     }
 
     @Transactional
@@ -68,17 +82,30 @@ class CircuitBreakerService(
 
         val currentState = circuitBreakerRepository.getCircuitState(channel.channelId!!, routingKey)
         if (currentState == CircuitState.CLOSED) {
-            logger.info { "Circuit for $channelName/$routingKey is already closed" }
+            logger.debug { "Circuit already closed [channel=$channelName, routingKey=$routingKey]" }
             return 0
         }
 
-        // Close the circuit first
         circuitBreakerRepository.closeCircuit(channel.channelId, routingKey)
+        observabilityService.recordCircuitClosed(channelName, routingKey)
 
-        // Recover messages from DLQ
         val recoveredMessages = deadLetterQueueService.recoverAllForChannelAndRoutingKey(channelName, routingKey)
-        logger.info { "Closed circuit for $channelName/$routingKey and recovered ${recoveredMessages.size} messages" }
+
+        logger.info {
+            "Circuit breaker closed with recovery [channel=$channelName, routingKey=$routingKey, " +
+                "recoveredMessages=${recoveredMessages.size}]"
+        }
 
         return recoveredMessages.size
+    }
+
+    @Scheduled(every = "30s")
+    fun syncOpenCircuitsGauge() {
+        val openCircuits = circuitBreakerRepository.findAllOpen()
+        val currentCount = openCircuits.size
+        observabilityService.setOpenCircuitsCount(currentCount)
+        if (currentCount > 0) {
+            logger.debug { "Circuit breaker gauge synced: $currentCount circuits open" }
+        }
     }
 }

@@ -112,9 +112,24 @@ context
 ```kotlin
 return circuitBreakerService.getCircuitBreaker(channelName, routingKey)
     ?.let {
-        Response.ok(it.toResponse(channelName)).build()
-    } ?: return Response.noContent().build()
+        Response.ok(it.toResponse(channelName)).build() 
+     ?: return Response.status(Response.Status.NOT_FOUND).entity("Message not found").build()
 ```
 
 - When getting a channel, if the routing key is available use ChannelService.findByNameAndRoutingKeyStrict(channelName:
   String, routingKey: String)
+
+## Code standards
+
+- Use guard clauses with early returns or early error over nested if statement
+- Elvis operator ?: over if(obj == null)
+- Use domain exceptions over standard ones
+
+## Documentation
+
+- Every new feature should be added to the agent_context. Choose the file that fits the best
+
+## Code review
+
+- When asked to do code review, write your findings in ./review.md by overriding all existing content in the file.
+

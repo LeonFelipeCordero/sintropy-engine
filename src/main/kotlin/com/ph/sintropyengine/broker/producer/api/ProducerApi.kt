@@ -5,6 +5,8 @@ import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
 import com.ph.sintropyengine.broker.producer.api.response.toResponse
 import com.ph.sintropyengine.broker.producer.service.ProducerService
+import com.ph.sintropyengine.broker.shared.observability.ObservabilityService
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
@@ -15,16 +17,21 @@ import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 
+private val logger = KotlinLogging.logger {}
+
 @Path("/producers")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 class ProducerApi(
     private val producerService: ProducerService,
     private val channelService: ChannelService,
+    private val observabilityService: ObservabilityService,
 ) {
     @POST
     fun createProducer(request: CreateProducerRequest): Response {
+        logger.info { "Creating producer [name=${request.name}, channel=${request.channelName}]" }
         val producer = producerService.createProducer(request.name, request.channelName)
+        logger.info { "Producer created [name=${request.name}, channel=${request.channelName}, id=${producer.producerId}]" }
         return Response
             .status(Response.Status.CREATED)
             .entity(producer.toResponse(request.channelName))
@@ -73,7 +80,24 @@ class ProducerApi(
     @POST
     @Path("/messages")
     fun publishMessage(request: PublishMessageRequest): Response {
+        logger.debug {
+            "Publishing message [channel=${request.channelName}, producer=${request.producerName}, " +
+                "routingKey=${request.routingKey}]"
+        }
+
         val publishedMessage = producerService.publishMessage(request.toMessagePreStore())
+
+        observabilityService.recordMessagePublished(
+            channelName = request.channelName,
+            routingKey = request.routingKey,
+            producerName = request.producerName,
+        )
+
+        logger.info {
+            "Message published [messageId=${publishedMessage.messageId}, channel=${request.channelName}, " +
+                "routingKey=${request.routingKey}, producer=${request.producerName}]"
+        }
+
         return Response
             .status(Response.Status.CREATED)
             .entity(publishedMessage.toResponse(request.channelName, request.producerName))

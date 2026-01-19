@@ -5,6 +5,7 @@ import com.ph.sintropyengine.broker.consumption.model.DeadLetterMessage
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.repository.DeadLetterQueueRepository
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
+import com.ph.sintropyengine.broker.shared.observability.ObservabilityService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
@@ -17,6 +18,7 @@ class DeadLetterQueueService(
     private val dlqRepository: DeadLetterQueueRepository,
     private val messageRepository: MessageRepository,
     private val channelService: ChannelService,
+    private val observabilityService: ObservabilityService,
 ) {
     fun findByChannelAndRoutingKey(
         channelName: String,
@@ -40,11 +42,23 @@ class DeadLetterQueueService(
             dlqRepository.findByMessageId(messageId)
                 ?: throw IllegalStateException("Message with id $messageId not found in dead letter queue")
 
-        logger.info { "Recovering message ${dlqEntry.messageId} from DLQ" }
+        val channel = channelService.findById(dlqEntry.channelId)
+            ?: throw IllegalStateException("Channel with id ${dlqEntry.channelId} not found")
 
         dlqRepository.delete(dlqEntry.dlqEntryId)
+        val recovered = messageRepository.reinsertFromDlq(dlqEntry)
 
-        return messageRepository.reinsertFromDlq(dlqEntry)
+        observabilityService.recordMessageRecoveredFromDlq(
+            channelName = channel.name,
+            routingKey = dlqEntry.routingKey,
+            count = 1,
+        )
+
+        logger.info {
+            "Recovered message from DLQ [messageId=${dlqEntry.messageId}, channel=${channel.name}, routingKey=${dlqEntry.routingKey}]"
+        }
+
+        return recovered
     }
 
     @Transactional
@@ -55,11 +69,26 @@ class DeadLetterQueueService(
             throw IllegalStateException("No messages found in dead letter queue for provided IDs")
         }
 
-        logger.info { "Recovering ${dlqEntries.size} messages from DLQ" }
+        val channelIds = dlqEntries.map { it.channelId }.toSet()
+        val channelsById = channelService.findByIds(channelIds)
 
         dlqRepository.deleteByIds(dlqEntries.map { it.dlqEntryId })
 
-        return dlqEntries.map { messageRepository.reinsertFromDlq(it) }
+        val recovered = dlqEntries.map { messageRepository.reinsertFromDlq(it) }
+
+        dlqEntries.groupBy { Pair(it.channelId, it.routingKey) }.forEach { (key, entries) ->
+            val (channelId, routingKey) = key
+            val channelName = channelsById[channelId]?.name ?: "unknown"
+            observabilityService.recordMessageRecoveredFromDlq(
+                channelName = channelName,
+                routingKey = routingKey,
+                count = entries.size,
+            )
+        }
+
+        logger.info { "Recovered ${recovered.size} messages from DLQ [messageIds=$messageIds]" }
+
+        return recovered
     }
 
     @Transactional
@@ -76,14 +105,24 @@ class DeadLetterQueueService(
             )
 
         if (dlqEntries.isEmpty()) {
-            logger.info { "No messages to recover for $channelName/$routingKey" }
+            logger.debug { "No messages to recover from DLQ [channel=$channelName, routingKey=$routingKey]" }
             return emptyList()
         }
 
-        logger.info { "Recovering ${dlqEntries.size} messages for $channelName/$routingKey from DLQ" }
-
         dlqRepository.deleteByChannelIdAndRoutingKey(channel.channelId, routingKey)
 
-        return dlqEntries.map { messageRepository.reinsertFromDlq(it) }
+        val recovered = dlqEntries.map { messageRepository.reinsertFromDlq(it) }
+
+        observabilityService.recordMessageRecoveredFromDlq(
+            channelName = channelName,
+            routingKey = routingKey,
+            count = recovered.size,
+        )
+
+        logger.info {
+            "Recovered ${recovered.size} messages from DLQ [channel=$channelName, routingKey=$routingKey]"
+        }
+
+        return recovered
     }
 }

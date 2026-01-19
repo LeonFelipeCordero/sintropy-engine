@@ -9,6 +9,11 @@ import kotlinx.coroutines.sync.withLock
 
 private val logger = KotlinLogging.logger {}
 
+data class RoutingTarget(
+    val channelName: String,
+    val routingKey: String,
+)
+
 @Singleton
 class ConnectionRouter(
     private val channelService: ChannelService,
@@ -18,6 +23,8 @@ class ConnectionRouter(
     private val routingTable: MutableMap<String, MutableList<String>> = mutableMapOf()
 
     private val connectionsTable: MutableMap<String, String> = mutableMapOf()
+
+    private val connectionMetadata: MutableMap<String, RoutingTarget> = mutableMapOf()
 
     suspend fun add(
         connectionId: String,
@@ -32,6 +39,7 @@ class ConnectionRouter(
             val connections = routingTable[routing]
 
             connectionsTable[connectionId] = routing
+            connectionMetadata[connectionId] = RoutingTarget(channelName, routingKey)
 
             if (connections == null) {
                 routingTable[routing] = mutableListOf(connectionId)
@@ -42,25 +50,26 @@ class ConnectionRouter(
         }
     }
 
-    suspend fun remove(connectionId: String) {
+    suspend fun remove(connectionId: String): RoutingTarget? =
         mutex.withLock {
             val routing = connectionsTable[connectionId]
             if (routing == null) {
-                logger.info { "Connection not found in connections table: $routing" }
-                return
+                logger.debug { "Connection not found in connections table: $connectionId" }
+                return@withLock null
             }
 
             val connections = routingTable[routing]
             if (connections == null) {
-                logger.info { "Connection not found routing table: $routing" }
-                return
+                logger.debug { "Connection not found routing table: $routing" }
+                return@withLock null
             }
 
             routingTable[routing]!!.removeIf { it == connectionId }
             connectionsTable.remove(connectionId)
-            logger.info { "Removed Connection from routing table: $connectionId" }
+            val metadata = connectionMetadata.remove(connectionId)
+            logger.debug { "Removed connection from routing table: $connectionId" }
+            metadata
         }
-    }
 
     suspend fun getByRoutingKey(routing: String): List<String> = mutex.withLock { routingTable[routing] ?: emptyList() }
 }

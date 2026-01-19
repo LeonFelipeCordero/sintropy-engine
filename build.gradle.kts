@@ -19,7 +19,8 @@ val coroutinesVersion = "1.10.2"
 dependencies {
     implementation(enforcedPlatform("$quarkusPlatformGroupId:$quarkusPlatformArtifactId:$quarkusPlatformVersion"))
     implementation("io.quarkus:quarkus-config-yaml")
-//    implementation("io.quarkus:quarkus-opentelemetry")
+    implementation("io.quarkus:quarkus-opentelemetry")
+    implementation("io.quarkiverse.micrometer.registry:quarkus-micrometer-registry-otlp:3.4.1")
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-logging-json")
     implementation("io.quarkus:quarkus-vertx")
@@ -27,6 +28,7 @@ dependencies {
     implementation("io.quarkus:quarkus-websockets-next")
     implementation("io.quarkus:quarkus-rest")
     implementation("io.quarkus:quarkus-rest-jackson")
+    implementation("io.quarkus:quarkus-scheduler")
 
     implementation("io.smallrye.reactive:mutiny-kotlin:3.0.1")
 

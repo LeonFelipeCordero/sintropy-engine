@@ -22,6 +22,28 @@ quarkus:
   http:
     port: 8080
 
+  # OpenTelemetry configuration
+  otel:
+    exporter:
+      otlp:
+        endpoint: http://localhost:4317
+        traces:
+          endpoint: http://localhost:4317
+    logs:
+      exporter: otlp
+
+  # Micrometer OTLP metrics configuration
+  micrometer:
+    export:
+      otlp:
+        enabled: true
+        url: http://localhost:4318/v1/metrics
+    binder:
+      http-server:
+        enabled: true
+      jvm: true
+      system: true
+
 syen:
   feature-flags:
     with-full-replication: false
@@ -30,3 +52,10 @@ syen:
   quarkus:
     log:
       level: INFO
+    otel:
+      sdk:
+        disabled: true
+    micrometer:
+      export:
+        otlp:
+          enabled: false
