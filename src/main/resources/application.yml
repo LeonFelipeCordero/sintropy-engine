@@ -7,6 +7,8 @@ quarkus:
   log:
     console:
       format: '%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
+      json:
+        enabled: false
 #      format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] (%t) %s%e%n' -- this is how prod will be
     level: INFO
   datasource:
@@ -21,6 +23,12 @@ quarkus:
     dialect: POSTGRES
   http:
     port: 8080
+  swagger-ui:
+    always-include: true
+  smallrye-openapi:
+    info-title: Sintropy Engine API
+    info-version: ${quarkus.application.version}
+    info-description: Message broker supporting QUEUE and STREAM channel types
 
   # OpenTelemetry configuration
   otel:
@@ -30,7 +38,7 @@ quarkus:
         traces:
           endpoint: http://localhost:4317
     logs:
-      exporter: otlp
+      exporter: none
 
   # Micrometer OTLP metrics configuration
   micrometer:
