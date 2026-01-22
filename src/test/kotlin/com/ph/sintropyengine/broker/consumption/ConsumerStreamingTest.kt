@@ -110,19 +110,19 @@ class ConsumerStreamingTest : IntegrationTestBase() {
                 }.connectAndAwait()
 
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name))!!,
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name))!!,
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name))!!,
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name))!!,
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name))!!,
             )
 
             latch.await()
@@ -150,19 +150,19 @@ class ConsumerStreamingTest : IntegrationTestBase() {
                 }.connectAndAwait()
 
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name))!!,
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name))!!,
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name))!!,
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name))!!,
             )
             sentMessages.add(
-                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name)),
+                producerService.publishMessage(Fixtures.createMessagePreStore(channel.name, producer.name))!!,
             )
 
             latch.await()

@@ -7,15 +7,16 @@ CREATE CAST (VARCHAR AS circuit_state) WITH INOUT AS IMPLICIT;
 
 CREATE TABLE channel_circuit_breakers
 (
-    circuit_id        UUID PRIMARY KEY       DEFAULT gen_random_uuid(),
-    channel_id        UUID          NOT NULL REFERENCES channels (channel_id) ON DELETE CASCADE,
-    routing_key       VARCHAR(128)  NOT NULL,
-    state             circuit_state NOT NULL DEFAULT 'CLOSED',
-    opened_at         TIMESTAMPTZ,
-    failed_message_id UUID,
+    circuit_breaker_id   bigserial PRIMARY KEY,
+    circuit_breaker_uuid UUID          NOT NULL DEFAULT gen_random_uuid() UNIQUE,
+    channel_id           BIGINT        NOT NULL REFERENCES channels (channel_id) ON DELETE CASCADE,
+    routing_key          VARCHAR(128)  NOT NULL,
+    state                circuit_state NOT NULL DEFAULT 'CLOSED',
+    opened_at            TIMESTAMPTZ            default now(),
+    failed_message_id    bigint,
 
-    created_at        TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
-    updated_at        TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+    created_at           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+    updated_at           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
 
     UNIQUE (channel_id, routing_key)
 );
@@ -47,7 +48,8 @@ CREATE OR REPLACE FUNCTION delete_circuit_breaker_for_routing_key()
     RETURNS trigger AS
 $$
 BEGIN
-    DELETE FROM channel_circuit_breakers
+    DELETE
+    FROM channel_circuit_breakers
     WHERE channel_id = OLD.channel_id
       AND routing_key = OLD.routing_key;
 
@@ -74,13 +76,12 @@ BEGIN
     END IF;
 
     -- Check if channel is FIFO (stream or queue with FIFO consumption)
-    SELECT EXISTS(
-        SELECT 1
-        FROM channels c
-        LEFT JOIN queues q ON q.channel_id = c.channel_id
-        WHERE c.channel_id = OLD.channel_id
-          AND (c.channel_type = 'STREAM' OR q.consumption_type = 'FIFO')
-    ) INTO v_is_fifo;
+    SELECT EXISTS(SELECT 1
+                  FROM channels c
+                           LEFT JOIN queues q ON q.channel_id = c.channel_id
+                  WHERE c.channel_id = OLD.channel_id
+                    AND (c.channel_type = 'STREAM' OR q.consumption_type = 'FIFO'))
+    INTO v_is_fifo;
 
     IF NOT v_is_fifo THEN
         RETURN OLD;
@@ -98,22 +99,24 @@ BEGIN
     -- Move all remaining messages to DLQ in a single statement
     WITH messages_to_move AS (
         DELETE FROM messages
-        WHERE channel_id = OLD.channel_id
-          AND routing_key = OLD.routing_key
-          AND status IN ('READY', 'IN_FLIGHT')
-        RETURNING *
-    )
-    INSERT INTO dead_letter_queue(message_id,
-                                  timestamp,
-                                  channel_id,
-                                  producer_id,
-                                  routing_key,
-                                  message,
-                                  headers,
-                                  origin_message_id,
-                                  delivered_times,
-                                  failed_at)
+            WHERE channel_id = OLD.channel_id
+                AND routing_key = OLD.routing_key
+                AND status IN ('READY', 'IN_FLIGHT')
+            RETURNING *)
+    INSERT
+    INTO dead_letter_queue(message_id,
+                           message_uuid,
+                           timestamp,
+                           channel_id,
+                           producer_id,
+                           routing_key,
+                           message,
+                           headers,
+                           origin_message_id,
+                           delivered_times,
+                           failed_at)
     SELECT message_id,
+           message_uuid,
            timestamp,
            channel_id,
            producer_id,
@@ -126,14 +129,13 @@ BEGIN
     FROM messages_to_move;
 
     -- Clean up message_log for moved messages
-    DELETE FROM message_log
-    WHERE message_id IN (
-        SELECT message_id
-        FROM dead_letter_queue
-        WHERE channel_id = OLD.channel_id
-          AND routing_key = OLD.routing_key
-          AND message_id != OLD.message_id
-    );
+    DELETE
+    FROM message_log
+    WHERE message_id IN (SELECT message_id
+                           FROM dead_letter_queue
+                           WHERE channel_id = OLD.channel_id
+                             AND routing_key = OLD.routing_key
+                             AND message_id != OLD.message_id);
 
     RETURN OLD;
 END;

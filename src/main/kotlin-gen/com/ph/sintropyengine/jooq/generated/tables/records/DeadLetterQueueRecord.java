@@ -25,183 +25,197 @@ public class DeadLetterQueueRecord extends UpdatableRecordImpl<DeadLetterQueueRe
     /**
      * Setter for <code>public.dead_letter_queue.dlq_entry_id</code>.
      */
-    public void setDlqEntryId(UUID value) {
+    public void setDlqEntryId(Long value) {
         set(0, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.dlq_entry_id</code>.
      */
-    public UUID getDlqEntryId() {
-        return (UUID) get(0);
+    public Long getDlqEntryId() {
+        return (Long) get(0);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.message_id</code>.
      */
-    public void setMessageId(UUID value) {
+    public void setMessageId(Long value) {
         set(1, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.message_id</code>.
      */
-    public UUID getMessageId() {
-        return (UUID) get(1);
+    public Long getMessageId() {
+        return (Long) get(1);
+    }
+
+    /**
+     * Setter for <code>public.dead_letter_queue.message_uuid</code>.
+     */
+    public void setMessageUuid(UUID value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>public.dead_letter_queue.message_uuid</code>.
+     */
+    public UUID getMessageUuid() {
+        return (UUID) get(2);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.timestamp</code>.
      */
     public void setTimestamp(OffsetDateTime value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.timestamp</code>.
      */
     public OffsetDateTime getTimestamp() {
-        return (OffsetDateTime) get(2);
+        return (OffsetDateTime) get(3);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.channel_id</code>.
      */
-    public void setChannelId(UUID value) {
-        set(3, value);
+    public void setChannelId(Long value) {
+        set(4, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.channel_id</code>.
      */
-    public UUID getChannelId() {
-        return (UUID) get(3);
+    public Long getChannelId() {
+        return (Long) get(4);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.producer_id</code>.
      */
-    public void setProducerId(UUID value) {
-        set(4, value);
+    public void setProducerId(Long value) {
+        set(5, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.producer_id</code>.
      */
-    public UUID getProducerId() {
-        return (UUID) get(4);
+    public Long getProducerId() {
+        return (Long) get(5);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.routing_key</code>.
      */
     public void setRoutingKey(String value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.routing_key</code>.
      */
     public String getRoutingKey() {
-        return (String) get(5);
+        return (String) get(6);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.message</code>.
      */
     public void setMessage(JSONB value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.message</code>.
      */
     public JSONB getMessage() {
-        return (JSONB) get(6);
+        return (JSONB) get(7);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.headers</code>.
      */
     public void setHeaders(JSONB value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.headers</code>.
      */
     public JSONB getHeaders() {
-        return (JSONB) get(7);
+        return (JSONB) get(8);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.origin_message_id</code>.
      */
     public void setOriginMessageId(UUID value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.origin_message_id</code>.
      */
     public UUID getOriginMessageId() {
-        return (UUID) get(8);
+        return (UUID) get(9);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.delivered_times</code>.
      */
     public void setDeliveredTimes(Integer value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.delivered_times</code>.
      */
     public Integer getDeliveredTimes() {
-        return (Integer) get(9);
+        return (Integer) get(10);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.failed_at</code>.
      */
     public void setFailedAt(OffsetDateTime value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.failed_at</code>.
      */
     public OffsetDateTime getFailedAt() {
-        return (OffsetDateTime) get(10);
+        return (OffsetDateTime) get(11);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(11, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(11);
+        return (OffsetDateTime) get(12);
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(12, value);
+        set(13, value);
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(12);
+        return (OffsetDateTime) get(13);
     }
 
     // -------------------------------------------------------------------------
@@ -209,7 +223,7 @@ public class DeadLetterQueueRecord extends UpdatableRecordImpl<DeadLetterQueueRe
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<UUID> key() {
+    public Record1<Long> key() {
         return (Record1) super.key();
     }
 
@@ -227,11 +241,12 @@ public class DeadLetterQueueRecord extends UpdatableRecordImpl<DeadLetterQueueRe
     /**
      * Create a detached, initialised DeadLetterQueueRecord
      */
-    public DeadLetterQueueRecord(UUID dlqEntryId, UUID messageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, JSONB message, JSONB headers, UUID originMessageId, Integer deliveredTimes, OffsetDateTime failedAt, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public DeadLetterQueueRecord(Long dlqEntryId, Long messageId, UUID messageUuid, OffsetDateTime timestamp, Long channelId, Long producerId, String routingKey, JSONB message, JSONB headers, UUID originMessageId, Integer deliveredTimes, OffsetDateTime failedAt, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(DeadLetterQueue.DEAD_LETTER_QUEUE);
 
         setDlqEntryId(dlqEntryId);
         setMessageId(messageId);
+        setMessageUuid(messageUuid);
         setTimestamp(timestamp);
         setChannelId(channelId);
         setProducerId(producerId);
@@ -255,6 +270,7 @@ public class DeadLetterQueueRecord extends UpdatableRecordImpl<DeadLetterQueueRe
         if (value != null) {
             setDlqEntryId(value.getDlqEntryId());
             setMessageId(value.getMessageId());
+            setMessageUuid(value.getMessageUuid());
             setTimestamp(value.getTimestamp());
             setChannelId(value.getChannelId());
             setProducerId(value.getProducerId());

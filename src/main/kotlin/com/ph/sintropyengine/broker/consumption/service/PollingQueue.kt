@@ -5,7 +5,6 @@ import com.ph.sintropyengine.broker.consumption.model.MessageStatus
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
-import java.util.UUID
 
 private val logger = KotlinLogging.logger {}
 
@@ -14,19 +13,19 @@ interface PollingQueue {
 
     @Transactional
     fun poll(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
         pollingCount: Int = 1,
     ): List<Message>
 
     @Transactional
-    fun markAsFailed(messageId: UUID) {
+    fun markAsFailed(messageId: Long) {
         messageRepository.markAsFailed(messageId)
         logger.info { "marked message as failed $messageId" }
     }
 
     @Transactional
-    fun dequeue(messageId: UUID) {
+    fun dequeue(messageId: Long) {
         messageRepository.findById(messageId)?.also {
             if (it.status == MessageStatus.READY) {
                 throw IllegalStateException("Message with id $messageId is still in status READY")

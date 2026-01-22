@@ -2,13 +2,13 @@ package com.ph.sintropyengine.broker.channel.service
 
 import com.ph.sintropyengine.IntegrationTestBase
 import io.quarkus.test.junit.QuarkusTest
-import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.UUID
+import kotlin.random.Random
 
 @QuarkusTest
 class ChannelLinkServiceTest : IntegrationTestBase() {
@@ -51,7 +51,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
                     target.routingKeys.first(),
                 )
 
-            assertThat(link.channelLinkId).isNotNull()
+            assertThat(link.channelLinkUuid).isNotNull()
         }
 
         @Test
@@ -67,7 +67,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
                     target.routingKeys.first(),
                 )
 
-            assertThat(link.channelLinkId).isNotNull()
+            assertThat(link.channelLinkUuid).isNotNull()
         }
 
         @Test
@@ -83,7 +83,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
                     target.routingKeys.first(),
                 )
 
-            assertThat(link.channelLinkId).isNotNull()
+            assertThat(link.channelLinkUuid).isNotNull()
         }
 
         @Test
@@ -99,7 +99,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
                     target.routingKeys.first(),
                 )
 
-            assertThat(link.channelLinkId).isNotNull()
+            assertThat(link.channelLinkUuid).isNotNull()
         }
 
         @Test
@@ -115,7 +115,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
                     target.routingKeys.first(),
                 )
 
-            assertThat(link.channelLinkId).isNotNull()
+            assertThat(link.channelLinkUuid).isNotNull()
         }
 
         @Test
@@ -131,7 +131,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
                     target.routingKeys.first(),
                 )
 
-            assertThat(link.channelLinkId).isNotNull()
+            assertThat(link.channelLinkUuid).isNotNull()
         }
 
         @Test
@@ -252,7 +252,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
 
         @Test
         fun `should return null when link not found`() {
-            val found = channelLinkService.findById(UUID.randomUUID())
+            val found = channelLinkService.findById(Random.nextLong())
 
             assertThat(found).isNull()
         }
@@ -330,7 +330,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
             val target = createStandardQueueChannel()
             val link = createChannelLink(source, target)
 
-            channelLinkService.unlinkChannels(link.channelLinkId!!)
+            channelLinkService.unlinkChannels(link.channelLinkUuid!!)
 
             val found = channelLinkService.findById(link.channelLinkId!!)
             assertThat(found).isNull()
@@ -343,7 +343,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
             assertThatExceptionOfType(IllegalStateException::class.java)
                 .isThrownBy {
                     channelLinkService.unlinkChannels(nonExistentId)
-                }.withMessage("Channel link with id $nonExistentId not found")
+                }.withMessage("Channel link with uuid $nonExistentId not found")
         }
     }
 
@@ -356,7 +356,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
             val link = createChannelLink(source, target)
             channelLinkRepository.setEnabled(link.channelLinkId!!, false)
 
-            channelLinkService.enableLink(link.channelLinkId!!)
+            channelLinkService.enableLink(link.channelLinkUuid!!)
 
             val found = channelLinkService.findById(link.channelLinkId!!)
             assertThat(found?.enabled).isTrue()
@@ -368,7 +368,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
             val target = createStandardQueueChannel()
             val link = createChannelLink(source, target)
 
-            channelLinkService.disableLink(link.channelLinkId!!)
+            channelLinkService.disableLink(link.channelLinkUuid!!)
 
             val found = channelLinkService.findById(link.channelLinkId!!)
             assertThat(found?.enabled).isFalse()
@@ -414,7 +414,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
             assertThat(routedMessage).isNotNull
             assertThat(routedMessage?.routingKey).isEqualTo(target.routingKeys.first())
             assertThat(routedMessage?.message).isEqualTo(originalMessage.message)
-            assertThat(routedMessage?.originMessageId).isEqualTo(originalMessage.messageId)
+            assertThat(routedMessage?.originMessageId).isEqualTo(originalMessage.messageUuid)
         }
 
         @Test

@@ -13,7 +13,6 @@ import com.ph.sintropyengine.jooq.generated.tables.records.QueuesRecord;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
@@ -61,7 +60,7 @@ public class Queues extends TableImpl<QueuesRecord> {
     /**
      * The column <code>public.queues.channel_id</code>.
      */
-    public final TableField<QueuesRecord, UUID> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<QueuesRecord, Long> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.queues.consumption_type</code>.
@@ -136,8 +135,8 @@ public class Queues extends TableImpl<QueuesRecord> {
     }
 
     @Override
-    public UniqueKey<QueuesRecord> getPrimaryKey() {
-        return Keys.QUEUES_PKEY;
+    public List<UniqueKey<QueuesRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.QUEUES_CHANNEL_ID_KEY);
     }
 
     @Override

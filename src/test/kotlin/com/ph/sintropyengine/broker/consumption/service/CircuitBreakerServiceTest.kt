@@ -1,7 +1,6 @@
 package com.ph.sintropyengine.broker.consumption.service
 
 import com.ph.sintropyengine.IntegrationTestBase
-import com.ph.sintropyengine.broker.channel.model.ConsumptionType
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType.FIFO
 import com.ph.sintropyengine.broker.consumption.model.CircuitState
 import io.quarkus.test.junit.QuarkusTest
@@ -91,7 +90,7 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
             assertThat(circuit!!.channelId).isEqualTo(channel.channelId)
             assertThat(circuit.routingKey).isEqualTo(channel.routingKeys.first())
             assertThat(circuit.state).isEqualTo(CircuitState.OPEN)
-            assertThat(circuit.failedMessageId).isEqualTo(message.messageId)
+            assertThat(circuit.failedMessageId).isEqualTo(message.messageUuid)
         }
 
         @Test
@@ -328,7 +327,8 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
             pollingFifoQueue.poll(channel.channelId!!, channel.routingKeys.first())
             pollingFifoQueue.markAsFailed(message1.messageId)
 
-            val newMessage = publishMessage(channel, producer)
+            val newMessage = publishMessageForOpenCircuit(channel, producer)
+            assertThat(newMessage).isNull()
 
             val messagesInQueue = messageRepository.findAll()
             assertThat(messagesInQueue).isEmpty()
@@ -338,7 +338,10 @@ class CircuitBreakerServiceTest : IntegrationTestBase() {
                     channel.channelId,
                     channel.routingKeys.first(),
                 )
-            assertThat(dlqMessages.map { it.messageId }).contains(newMessage.messageId)
+            assertThat(dlqMessages[0].messageId).isEqualTo(message1.messageId)
+            assertThat(dlqMessages[0].messageUuid).isEqualTo(message1.messageUuid)
+            assertThat(dlqMessages[1].messageId).isNull()
+            assertThat(dlqMessages[1].messageUuid).isNull()
         }
 
         @Test

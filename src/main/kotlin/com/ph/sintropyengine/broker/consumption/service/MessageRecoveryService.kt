@@ -23,10 +23,10 @@ class MessageRecoveryService(
     private val producerService: ProducerService,
     private var openConnections: OpenConnections,
 ) {
-    fun retriggerMessage(message: UUID): MessageLog {
+    fun retriggerMessage(messageUUID: UUID): MessageLog {
         val message =
-            messageRepository.findMessageLogById(message)
-                ?: throw IllegalStateException("Message with id $message was not found")
+            messageRepository.findMessageLogById(messageUUID)
+                ?: throw IllegalStateException("Message with id $messageUUID was not found")
 
         logger.info { "Retriggering message: $message" }
 

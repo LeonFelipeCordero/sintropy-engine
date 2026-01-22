@@ -1,6 +1,7 @@
 CREATE TABLE iac_files
 (
-    file_id    UUID         NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+    file_id    bigserial    NOT NULL PRIMARY KEY,
+    file_uuid  UUID         NOT NULL DEFAULT gen_random_uuid() UNIQUE,
     file_name  VARCHAR(256) NOT NULL,
     hash       VARCHAR(64)  NOT NULL,
 

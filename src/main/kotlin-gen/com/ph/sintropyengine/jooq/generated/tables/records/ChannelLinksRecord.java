@@ -24,113 +24,127 @@ public class ChannelLinksRecord extends UpdatableRecordImpl<ChannelLinksRecord> 
     /**
      * Setter for <code>public.channel_links.channel_link_id</code>.
      */
-    public void setChannelLinkId(UUID value) {
+    public void setChannelLinkId(Long value) {
         set(0, value);
     }
 
     /**
      * Getter for <code>public.channel_links.channel_link_id</code>.
      */
-    public UUID getChannelLinkId() {
-        return (UUID) get(0);
+    public Long getChannelLinkId() {
+        return (Long) get(0);
+    }
+
+    /**
+     * Setter for <code>public.channel_links.channel_link_uuid</code>.
+     */
+    public void setChannelLinkUuid(UUID value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>public.channel_links.channel_link_uuid</code>.
+     */
+    public UUID getChannelLinkUuid() {
+        return (UUID) get(1);
     }
 
     /**
      * Setter for <code>public.channel_links.source_channel_id</code>.
      */
-    public void setSourceChannelId(UUID value) {
-        set(1, value);
+    public void setSourceChannelId(Long value) {
+        set(2, value);
     }
 
     /**
      * Getter for <code>public.channel_links.source_channel_id</code>.
      */
-    public UUID getSourceChannelId() {
-        return (UUID) get(1);
+    public Long getSourceChannelId() {
+        return (Long) get(2);
     }
 
     /**
      * Setter for <code>public.channel_links.target_channel_id</code>.
      */
-    public void setTargetChannelId(UUID value) {
-        set(2, value);
+    public void setTargetChannelId(Long value) {
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.channel_links.target_channel_id</code>.
      */
-    public UUID getTargetChannelId() {
-        return (UUID) get(2);
+    public Long getTargetChannelId() {
+        return (Long) get(3);
     }
 
     /**
      * Setter for <code>public.channel_links.source_routing_key</code>.
      */
     public void setSourceRoutingKey(String value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>public.channel_links.source_routing_key</code>.
      */
     public String getSourceRoutingKey() {
-        return (String) get(3);
+        return (String) get(4);
     }
 
     /**
      * Setter for <code>public.channel_links.target_routing_key</code>.
      */
     public void setTargetRoutingKey(String value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>public.channel_links.target_routing_key</code>.
      */
     public String getTargetRoutingKey() {
-        return (String) get(4);
+        return (String) get(5);
     }
 
     /**
      * Setter for <code>public.channel_links.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>public.channel_links.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(5);
+        return (OffsetDateTime) get(6);
     }
 
     /**
      * Setter for <code>public.channel_links.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>public.channel_links.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(6);
+        return (OffsetDateTime) get(7);
     }
 
     /**
      * Setter for <code>public.channel_links.enabled</code>.
      */
     public void setEnabled(Boolean value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>public.channel_links.enabled</code>.
      */
     public Boolean getEnabled() {
-        return (Boolean) get(7);
+        return (Boolean) get(8);
     }
 
     // -------------------------------------------------------------------------
@@ -138,7 +152,7 @@ public class ChannelLinksRecord extends UpdatableRecordImpl<ChannelLinksRecord> 
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<UUID> key() {
+    public Record1<Long> key() {
         return (Record1) super.key();
     }
 
@@ -156,10 +170,11 @@ public class ChannelLinksRecord extends UpdatableRecordImpl<ChannelLinksRecord> 
     /**
      * Create a detached, initialised ChannelLinksRecord
      */
-    public ChannelLinksRecord(UUID channelLinkId, UUID sourceChannelId, UUID targetChannelId, String sourceRoutingKey, String targetRoutingKey, OffsetDateTime createdAt, OffsetDateTime updatedAt, Boolean enabled) {
+    public ChannelLinksRecord(Long channelLinkId, UUID channelLinkUuid, Long sourceChannelId, Long targetChannelId, String sourceRoutingKey, String targetRoutingKey, OffsetDateTime createdAt, OffsetDateTime updatedAt, Boolean enabled) {
         super(ChannelLinks.CHANNEL_LINKS);
 
         setChannelLinkId(channelLinkId);
+        setChannelLinkUuid(channelLinkUuid);
         setSourceChannelId(sourceChannelId);
         setTargetChannelId(targetChannelId);
         setSourceRoutingKey(sourceRoutingKey);
@@ -178,6 +193,7 @@ public class ChannelLinksRecord extends UpdatableRecordImpl<ChannelLinksRecord> 
 
         if (value != null) {
             setChannelLinkId(value.getChannelLinkId());
+            setChannelLinkUuid(value.getChannelLinkUuid());
             setSourceChannelId(value.getSourceChannelId());
             setTargetChannelId(value.getTargetChannelId());
             setSourceRoutingKey(value.getSourceRoutingKey());

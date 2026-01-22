@@ -6,7 +6,8 @@ import java.util.UUID
 
 // TODO create different data classes for queue and stream that extend from Channel which will be an interface
 data class Channel(
-    val channelId: UUID? = null,
+    val channelId: Long? = null,
+    val channelUuid: UUID? = null,
     val name: String,
     val channelType: ChannelType,
     val routingKeys: MutableList<String>,

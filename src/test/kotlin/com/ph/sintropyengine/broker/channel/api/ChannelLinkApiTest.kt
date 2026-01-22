@@ -101,10 +101,10 @@ class ChannelLinkApiTest : IntegrationTestBase() {
 
             given()
                 .`when`()
-                .get("/channels/links/${link.channelLinkId}")
+                .get("/channels/links/${link.channelLinkUuid}")
                 .then()
                 .statusCode(200)
-                .body("channelLinkId", equalTo(link.channelLinkId.toString()))
+                .body("channelLinkId", equalTo(link.channelLinkUuid.toString()))
         }
 
         @Test
@@ -191,7 +191,7 @@ class ChannelLinkApiTest : IntegrationTestBase() {
 
             given()
                 .`when`()
-                .delete("/channels/links/${link.channelLinkId}")
+                .delete("/channels/links/${link.channelLinkUuid}")
                 .then()
                 .statusCode(204)
         }
@@ -217,7 +217,7 @@ class ChannelLinkApiTest : IntegrationTestBase() {
 
             given()
                 .`when`()
-                .put("/channels/links/${link.channelLinkId}/enable")
+                .put("/channels/links/${link.channelLinkUuid}/enable")
                 .then()
                 .statusCode(204)
         }
@@ -242,7 +242,7 @@ class ChannelLinkApiTest : IntegrationTestBase() {
 
             given()
                 .`when`()
-                .put("/channels/links/${link.channelLinkId}/disable")
+                .put("/channels/links/${link.channelLinkUuid}/disable")
                 .then()
                 .statusCode(204)
         }

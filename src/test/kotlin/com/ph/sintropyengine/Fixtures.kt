@@ -12,6 +12,7 @@ import com.ph.sintropyengine.broker.producer.api.PublishMessageRequest
 import com.ph.sintropyengine.broker.producer.model.Producer
 import org.jooq.JSONB
 import java.util.UUID
+import kotlin.random.Random
 
 object Fixtures {
     const val DEFAULT_ROUTING_KEY = "test.1"
@@ -21,7 +22,8 @@ object Fixtures {
     const val DEFAULT_ATTRIBUTES = """{"header1": "12345", "header2": "abcdefg"}"""
 
     fun createChannel(
-        channelId: UUID? = null,
+        channelId: Long? = null,
+        channelUUUID: UUID? = null,
         channelType: ChannelType = QUEUE,
         routingKeys: List<String> = listOf(DEFAULT_ROUTING_KEY),
         consumptionType: ConsumptionType? = if (channelType == QUEUE) STANDARD else null,
@@ -29,6 +31,7 @@ object Fixtures {
     ): Channel =
         Channel(
             channelId = channelId,
+            channelUuid = channelUUUID,
             name = name,
             channelType = channelType,
             routingKeys = routingKeys.toMutableList(),
@@ -36,22 +39,25 @@ object Fixtures {
         )
 
     fun createProducer(
-        channelId: UUID,
-        producerId: UUID? = null,
+        channelId: Long,
+        producerId: Long? = null,
+        producerUUID: UUID? = null,
     ): Producer =
         Producer(
             producerId = producerId,
+            producerUuid = producerUUID,
             name = UUID.randomUUID().toString(),
             channelId = channelId,
         )
 
     fun createMessage(
-        channelId: UUID,
-        producerId: UUID,
+        channelId: Long,
+        producerId: Long,
         routingKey: String = DEFAULT_ROUTING_KEY,
     ): Message =
         Message(
-            messageId = UUID.randomUUID(),
+            messageId = Random.nextLong(),
+            messageUuid = UUID.randomUUID(),
             channelId = channelId,
             producerId = producerId,
             routingKey = routingKey,

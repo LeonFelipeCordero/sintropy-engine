@@ -17,7 +17,8 @@ public class IacFiles implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private UUID fileId;
+    private Long fileId;
+    private UUID fileUuid;
     private String fileName;
     private String hash;
     private OffsetDateTime createdAt;
@@ -27,6 +28,7 @@ public class IacFiles implements Serializable {
 
     public IacFiles(IacFiles value) {
         this.fileId = value.fileId;
+        this.fileUuid = value.fileUuid;
         this.fileName = value.fileName;
         this.hash = value.hash;
         this.createdAt = value.createdAt;
@@ -34,13 +36,15 @@ public class IacFiles implements Serializable {
     }
 
     public IacFiles(
-        UUID fileId,
+        Long fileId,
+        UUID fileUuid,
         String fileName,
         String hash,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
     ) {
         this.fileId = fileId;
+        this.fileUuid = fileUuid;
         this.fileName = fileName;
         this.hash = hash;
         this.createdAt = createdAt;
@@ -50,15 +54,29 @@ public class IacFiles implements Serializable {
     /**
      * Getter for <code>public.iac_files.file_id</code>.
      */
-    public UUID getFileId() {
+    public Long getFileId() {
         return this.fileId;
     }
 
     /**
      * Setter for <code>public.iac_files.file_id</code>.
      */
-    public void setFileId(UUID fileId) {
+    public void setFileId(Long fileId) {
         this.fileId = fileId;
+    }
+
+    /**
+     * Getter for <code>public.iac_files.file_uuid</code>.
+     */
+    public UUID getFileUuid() {
+        return this.fileUuid;
+    }
+
+    /**
+     * Setter for <code>public.iac_files.file_uuid</code>.
+     */
+    public void setFileUuid(UUID fileUuid) {
+        this.fileUuid = fileUuid;
     }
 
     /**
@@ -132,6 +150,12 @@ public class IacFiles implements Serializable {
         }
         else if (!this.fileId.equals(other.fileId))
             return false;
+        if (this.fileUuid == null) {
+            if (other.fileUuid != null)
+                return false;
+        }
+        else if (!this.fileUuid.equals(other.fileUuid))
+            return false;
         if (this.fileName == null) {
             if (other.fileName != null)
                 return false;
@@ -164,6 +188,7 @@ public class IacFiles implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((this.fileId == null) ? 0 : this.fileId.hashCode());
+        result = prime * result + ((this.fileUuid == null) ? 0 : this.fileUuid.hashCode());
         result = prime * result + ((this.fileName == null) ? 0 : this.fileName.hashCode());
         result = prime * result + ((this.hash == null) ? 0 : this.hash.hashCode());
         result = prime * result + ((this.createdAt == null) ? 0 : this.createdAt.hashCode());
@@ -176,6 +201,7 @@ public class IacFiles implements Serializable {
         StringBuilder sb = new StringBuilder("IacFiles (");
 
         sb.append(fileId);
+        sb.append(", ").append(fileUuid);
         sb.append(", ").append(fileName);
         sb.append(", ").append(hash);
         sb.append(", ").append(createdAt);

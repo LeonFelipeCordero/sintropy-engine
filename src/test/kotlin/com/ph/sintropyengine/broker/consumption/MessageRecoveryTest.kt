@@ -119,9 +119,9 @@ class MessageRecoveryTest : IntegrationTestBase() {
 
             assertThat(receivedMessages).hasSize(3)
             assertThat(receivedMessages.map { it.messageId }).containsExactlyInAnyOrder(
-                message1.messageId,
-                message2.messageId,
-                message3.messageId,
+                message1.messageUuid,
+                message2.messageUuid,
+                message3.messageUuid,
             )
             assertThat(streamingComplete).isTrue()
         }
@@ -173,8 +173,8 @@ class MessageRecoveryTest : IntegrationTestBase() {
 
             assertThat(receivedMessages).hasSize(2)
             assertThat(receivedMessages.map { it.messageId }).containsExactlyInAnyOrder(
-                message1.messageId,
-                message2.messageId,
+                message1.messageUuid,
+                message2.messageUuid,
             )
         }
 
@@ -225,9 +225,9 @@ class MessageRecoveryTest : IntegrationTestBase() {
 
             assertThat(receivedMessages).hasSize(3)
             assertThat(receivedMessages.map { it.messageId }).containsExactlyInAnyOrder(
-                message1.messageId,
-                message2.messageId,
-                message3.messageId,
+                message1.messageUuid,
+                message2.messageUuid,
+                message3.messageUuid,
             )
         }
 
@@ -476,10 +476,10 @@ class MessageRecoveryTest : IntegrationTestBase() {
 
             assertThat(receivedMessages).hasSize(2)
             assertThat(receivedMessages.map { it.messageId }).containsExactlyInAnyOrder(
-                message1.messageId,
-                message3.messageId,
+                message1.messageUuid,
+                message3.messageUuid,
             )
-            assertThat(receivedMessages.map { it.messageId }).doesNotContain(message2.messageId)
+            assertThat(receivedMessages.map { it.messageId }).doesNotContain(message2.messageUuid)
         }
 
     @Test
@@ -515,10 +515,10 @@ class MessageRecoveryTest : IntegrationTestBase() {
         given()
             .contentType(ContentType.JSON)
             .`when`()
-            .post("/recovery/messages/${message.messageId}/retrigger")
+            .post("/recovery/messages/${message.messageUuid}/retrigger")
             .then()
             .statusCode(200)
-            .body("messageId", equalTo(message.messageId.toString()))
+            .body("messageId", equalTo(message.messageUuid.toString()))
             .body("channelName", equalTo(channel.name))
             .body("producerName", equalTo(producer.name))
             .body("routingKey", equalTo(message.routingKey))

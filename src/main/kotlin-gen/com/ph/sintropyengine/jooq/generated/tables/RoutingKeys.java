@@ -12,7 +12,6 @@ import com.ph.sintropyengine.jooq.generated.tables.records.RoutingKeysRecord;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
@@ -65,7 +64,7 @@ public class RoutingKeys extends TableImpl<RoutingKeysRecord> {
     /**
      * The column <code>public.routing_keys.channel_id</code>.
      */
-    public final TableField<RoutingKeysRecord, UUID> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<RoutingKeysRecord, Long> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     private RoutingKeys(Name alias, Table<RoutingKeysRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -135,8 +134,8 @@ public class RoutingKeys extends TableImpl<RoutingKeysRecord> {
     }
 
     @Override
-    public UniqueKey<RoutingKeysRecord> getPrimaryKey() {
-        return Keys.ROUTING_KEYS_PKEY;
+    public List<UniqueKey<RoutingKeysRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.ROUTING_KEYS_ROUTING_KEY_CHANNEL_ID_KEY);
     }
 
     @Override

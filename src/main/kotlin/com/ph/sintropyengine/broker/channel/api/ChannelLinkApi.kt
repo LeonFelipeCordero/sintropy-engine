@@ -43,7 +43,7 @@ class ChannelLinkApi(
     fun findById(
         @PathParam("linkId") linkId: UUID,
     ): Response {
-        val link = channelLinkService.findById(linkId)
+        val link = channelLinkService.findByUUID(linkId)
 
         val (sourceChannel, targetChannel) =
             link?.let {

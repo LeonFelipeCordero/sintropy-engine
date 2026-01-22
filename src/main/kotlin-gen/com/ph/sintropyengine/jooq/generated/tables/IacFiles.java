@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.PlainSQL;
@@ -58,7 +59,12 @@ public class IacFiles extends TableImpl<IacFilesRecord> {
     /**
      * The column <code>public.iac_files.file_id</code>.
      */
-    public final TableField<IacFilesRecord, UUID> FILE_ID = createField(DSL.name("file_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<IacFilesRecord, Long> FILE_ID = createField(DSL.name("file_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+    /**
+     * The column <code>public.iac_files.file_uuid</code>.
+     */
+    public final TableField<IacFilesRecord, UUID> FILE_UUID = createField(DSL.name("file_uuid"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.iac_files.file_name</code>.
@@ -120,8 +126,18 @@ public class IacFiles extends TableImpl<IacFilesRecord> {
     }
 
     @Override
+    public Identity<IacFilesRecord, Long> getIdentity() {
+        return (Identity<IacFilesRecord, Long>) super.getIdentity();
+    }
+
+    @Override
     public UniqueKey<IacFilesRecord> getPrimaryKey() {
         return Keys.IAC_FILES_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<IacFilesRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.IAC_FILES_FILE_UUID_KEY);
     }
 
     @Override

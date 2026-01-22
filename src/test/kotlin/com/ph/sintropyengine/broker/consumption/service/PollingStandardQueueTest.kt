@@ -3,7 +3,6 @@ package com.ph.sintropyengine.broker.consumption.service
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType
-import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import io.quarkus.test.junit.QuarkusTest
@@ -20,7 +19,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.UUID
+import kotlin.random.Random
 
 @QuarkusTest
 class PollingStandardQueueTest : IntegrationTestBase() {
@@ -94,7 +93,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
 
     @Test
     fun `should poll from an empty queue and do not fail`() {
-        val polledMessage = pollingQueue.poll(UUID.randomUUID(), Fixtures.DEFAULT_ROUTING_KEY)
+        val polledMessage = pollingQueue.poll(Random.nextLong(), Fixtures.DEFAULT_ROUTING_KEY)
 
         assertThat(polledMessage).isEmpty()
     }
@@ -255,7 +254,7 @@ class PollingStandardQueueTest : IntegrationTestBase() {
     @Test
     fun `should fail to dequeue if message is not found`() {
         assertThatExceptionOfType(IllegalStateException::class.java)
-            .isThrownBy { pollingQueue.dequeue(UUID.randomUUID()) }
+            .isThrownBy { pollingQueue.dequeue(Random.nextLong()) }
             .withMessageContainingAll("Message with id", "not found")
     }
 

@@ -37,10 +37,10 @@ class DeadLetterQueueService(
     }
 
     @Transactional
-    fun recoverMessage(messageId: UUID): Message {
+    fun recoverMessage(messageUUID: UUID): Message {
         val dlqEntry =
-            dlqRepository.findByMessageId(messageId)
-                ?: throw IllegalStateException("Message with id $messageId not found in dead letter queue")
+            dlqRepository.findByMessageUUID(messageUUID)
+                ?: throw IllegalStateException("Message with id $messageUUID not found in dead letter queue")
 
         val channel = channelService.findById(dlqEntry.channelId)
             ?: throw IllegalStateException("Channel with id ${dlqEntry.channelId} not found")
@@ -63,7 +63,7 @@ class DeadLetterQueueService(
 
     @Transactional
     fun recoverMessages(messageIds: List<UUID>): List<Message> {
-        val dlqEntries = messageIds.mapNotNull { dlqRepository.findByMessageId(it) }
+        val dlqEntries = messageIds.mapNotNull { dlqRepository.findByMessageUUID(it) }
 
         if (dlqEntries.isEmpty()) {
             throw IllegalStateException("No messages found in dead letter queue for provided IDs")

@@ -19,6 +19,7 @@ import java.util.UUID;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.Name;
@@ -63,17 +64,22 @@ public class ChannelLinks extends TableImpl<ChannelLinksRecord> {
     /**
      * The column <code>public.channel_links.channel_link_id</code>.
      */
-    public final TableField<ChannelLinksRecord, UUID> CHANNEL_LINK_ID = createField(DSL.name("channel_link_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<ChannelLinksRecord, Long> CHANNEL_LINK_ID = createField(DSL.name("channel_link_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+    /**
+     * The column <code>public.channel_links.channel_link_uuid</code>.
+     */
+    public final TableField<ChannelLinksRecord, UUID> CHANNEL_LINK_UUID = createField(DSL.name("channel_link_uuid"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.channel_links.source_channel_id</code>.
      */
-    public final TableField<ChannelLinksRecord, UUID> SOURCE_CHANNEL_ID = createField(DSL.name("source_channel_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<ChannelLinksRecord, Long> SOURCE_CHANNEL_ID = createField(DSL.name("source_channel_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.channel_links.target_channel_id</code>.
      */
-    public final TableField<ChannelLinksRecord, UUID> TARGET_CHANNEL_ID = createField(DSL.name("target_channel_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<ChannelLinksRecord, Long> TARGET_CHANNEL_ID = createField(DSL.name("target_channel_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.channel_links.source_routing_key</code>.
@@ -169,7 +175,12 @@ public class ChannelLinks extends TableImpl<ChannelLinksRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.IDX_CHANNEL_LINKS_SOURCE, Indexes.IDX_CHANNEL_LINKS_TARGET);
+        return Arrays.asList(Indexes.CHANNEL_LINKS_CHANNEL_UUID_IDX, Indexes.CHANNEL_LINKS_SOURCE_IDX, Indexes.CHANNEL_LINKS_TARGET_IDX);
+    }
+
+    @Override
+    public Identity<ChannelLinksRecord, Long> getIdentity() {
+        return (Identity<ChannelLinksRecord, Long>) super.getIdentity();
     }
 
     @Override
@@ -179,7 +190,7 @@ public class ChannelLinks extends TableImpl<ChannelLinksRecord> {
 
     @Override
     public List<UniqueKey<ChannelLinksRecord>> getUniqueKeys() {
-        return Arrays.asList(Keys.CHANNEL_LINKS_SOURCE_CHANNEL_ID_TARGET_CHANNEL_ID_SOURCE_RO_KEY);
+        return Arrays.asList(Keys.CHANNEL_LINKS_CHANNEL_LINK_UUID_KEY, Keys.CHANNEL_LINKS_SOURCE_CHANNEL_ID_TARGET_CHANNEL_ID_SOURCE_RO_KEY);
     }
 
     @Override

@@ -19,19 +19,21 @@ public class ChannelCircuitBreakers implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private UUID circuitId;
-    private UUID channelId;
+    private Long circuitBreakerId;
+    private UUID circuitBreakerUuid;
+    private Long channelId;
     private String routingKey;
     private CircuitState state;
     private OffsetDateTime openedAt;
-    private UUID failedMessageId;
+    private Long failedMessageId;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
     public ChannelCircuitBreakers() {}
 
     public ChannelCircuitBreakers(ChannelCircuitBreakers value) {
-        this.circuitId = value.circuitId;
+        this.circuitBreakerId = value.circuitBreakerId;
+        this.circuitBreakerUuid = value.circuitBreakerUuid;
         this.channelId = value.channelId;
         this.routingKey = value.routingKey;
         this.state = value.state;
@@ -42,16 +44,18 @@ public class ChannelCircuitBreakers implements Serializable {
     }
 
     public ChannelCircuitBreakers(
-        UUID circuitId,
-        UUID channelId,
+        Long circuitBreakerId,
+        UUID circuitBreakerUuid,
+        Long channelId,
         String routingKey,
         CircuitState state,
         OffsetDateTime openedAt,
-        UUID failedMessageId,
+        Long failedMessageId,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
     ) {
-        this.circuitId = circuitId;
+        this.circuitBreakerId = circuitBreakerId;
+        this.circuitBreakerUuid = circuitBreakerUuid;
         this.channelId = channelId;
         this.routingKey = routingKey;
         this.state = state;
@@ -62,30 +66,48 @@ public class ChannelCircuitBreakers implements Serializable {
     }
 
     /**
-     * Getter for <code>public.channel_circuit_breakers.circuit_id</code>.
+     * Getter for
+     * <code>public.channel_circuit_breakers.circuit_breaker_id</code>.
      */
-    public UUID getCircuitId() {
-        return this.circuitId;
+    public Long getCircuitBreakerId() {
+        return this.circuitBreakerId;
     }
 
     /**
-     * Setter for <code>public.channel_circuit_breakers.circuit_id</code>.
+     * Setter for
+     * <code>public.channel_circuit_breakers.circuit_breaker_id</code>.
      */
-    public void setCircuitId(UUID circuitId) {
-        this.circuitId = circuitId;
+    public void setCircuitBreakerId(Long circuitBreakerId) {
+        this.circuitBreakerId = circuitBreakerId;
+    }
+
+    /**
+     * Getter for
+     * <code>public.channel_circuit_breakers.circuit_breaker_uuid</code>.
+     */
+    public UUID getCircuitBreakerUuid() {
+        return this.circuitBreakerUuid;
+    }
+
+    /**
+     * Setter for
+     * <code>public.channel_circuit_breakers.circuit_breaker_uuid</code>.
+     */
+    public void setCircuitBreakerUuid(UUID circuitBreakerUuid) {
+        this.circuitBreakerUuid = circuitBreakerUuid;
     }
 
     /**
      * Getter for <code>public.channel_circuit_breakers.channel_id</code>.
      */
-    public UUID getChannelId() {
+    public Long getChannelId() {
         return this.channelId;
     }
 
     /**
      * Setter for <code>public.channel_circuit_breakers.channel_id</code>.
      */
-    public void setChannelId(UUID channelId) {
+    public void setChannelId(Long channelId) {
         this.channelId = channelId;
     }
 
@@ -135,7 +157,7 @@ public class ChannelCircuitBreakers implements Serializable {
      * Getter for
      * <code>public.channel_circuit_breakers.failed_message_id</code>.
      */
-    public UUID getFailedMessageId() {
+    public Long getFailedMessageId() {
         return this.failedMessageId;
     }
 
@@ -143,7 +165,7 @@ public class ChannelCircuitBreakers implements Serializable {
      * Setter for
      * <code>public.channel_circuit_breakers.failed_message_id</code>.
      */
-    public void setFailedMessageId(UUID failedMessageId) {
+    public void setFailedMessageId(Long failedMessageId) {
         this.failedMessageId = failedMessageId;
     }
 
@@ -184,11 +206,17 @@ public class ChannelCircuitBreakers implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         final ChannelCircuitBreakers other = (ChannelCircuitBreakers) obj;
-        if (this.circuitId == null) {
-            if (other.circuitId != null)
+        if (this.circuitBreakerId == null) {
+            if (other.circuitBreakerId != null)
                 return false;
         }
-        else if (!this.circuitId.equals(other.circuitId))
+        else if (!this.circuitBreakerId.equals(other.circuitBreakerId))
+            return false;
+        if (this.circuitBreakerUuid == null) {
+            if (other.circuitBreakerUuid != null)
+                return false;
+        }
+        else if (!this.circuitBreakerUuid.equals(other.circuitBreakerUuid))
             return false;
         if (this.channelId == null) {
             if (other.channelId != null)
@@ -239,7 +267,8 @@ public class ChannelCircuitBreakers implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((this.circuitId == null) ? 0 : this.circuitId.hashCode());
+        result = prime * result + ((this.circuitBreakerId == null) ? 0 : this.circuitBreakerId.hashCode());
+        result = prime * result + ((this.circuitBreakerUuid == null) ? 0 : this.circuitBreakerUuid.hashCode());
         result = prime * result + ((this.channelId == null) ? 0 : this.channelId.hashCode());
         result = prime * result + ((this.routingKey == null) ? 0 : this.routingKey.hashCode());
         result = prime * result + ((this.state == null) ? 0 : this.state.hashCode());
@@ -254,7 +283,8 @@ public class ChannelCircuitBreakers implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder("ChannelCircuitBreakers (");
 
-        sb.append(circuitId);
+        sb.append(circuitBreakerId);
+        sb.append(", ").append(circuitBreakerUuid);
         sb.append(", ").append(channelId);
         sb.append(", ").append(routingKey);
         sb.append(", ").append(state);

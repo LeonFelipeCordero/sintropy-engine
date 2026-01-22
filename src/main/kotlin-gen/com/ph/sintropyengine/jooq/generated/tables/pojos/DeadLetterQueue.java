@@ -19,11 +19,12 @@ public class DeadLetterQueue implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private UUID dlqEntryId;
-    private UUID messageId;
+    private Long dlqEntryId;
+    private Long messageId;
+    private UUID messageUuid;
     private OffsetDateTime timestamp;
-    private UUID channelId;
-    private UUID producerId;
+    private Long channelId;
+    private Long producerId;
     private String routingKey;
     private JSONB message;
     private JSONB headers;
@@ -38,6 +39,7 @@ public class DeadLetterQueue implements Serializable {
     public DeadLetterQueue(DeadLetterQueue value) {
         this.dlqEntryId = value.dlqEntryId;
         this.messageId = value.messageId;
+        this.messageUuid = value.messageUuid;
         this.timestamp = value.timestamp;
         this.channelId = value.channelId;
         this.producerId = value.producerId;
@@ -52,11 +54,12 @@ public class DeadLetterQueue implements Serializable {
     }
 
     public DeadLetterQueue(
-        UUID dlqEntryId,
-        UUID messageId,
+        Long dlqEntryId,
+        Long messageId,
+        UUID messageUuid,
         OffsetDateTime timestamp,
-        UUID channelId,
-        UUID producerId,
+        Long channelId,
+        Long producerId,
         String routingKey,
         JSONB message,
         JSONB headers,
@@ -68,6 +71,7 @@ public class DeadLetterQueue implements Serializable {
     ) {
         this.dlqEntryId = dlqEntryId;
         this.messageId = messageId;
+        this.messageUuid = messageUuid;
         this.timestamp = timestamp;
         this.channelId = channelId;
         this.producerId = producerId;
@@ -84,29 +88,43 @@ public class DeadLetterQueue implements Serializable {
     /**
      * Getter for <code>public.dead_letter_queue.dlq_entry_id</code>.
      */
-    public UUID getDlqEntryId() {
+    public Long getDlqEntryId() {
         return this.dlqEntryId;
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.dlq_entry_id</code>.
      */
-    public void setDlqEntryId(UUID dlqEntryId) {
+    public void setDlqEntryId(Long dlqEntryId) {
         this.dlqEntryId = dlqEntryId;
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.message_id</code>.
      */
-    public UUID getMessageId() {
+    public Long getMessageId() {
         return this.messageId;
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.message_id</code>.
      */
-    public void setMessageId(UUID messageId) {
+    public void setMessageId(Long messageId) {
         this.messageId = messageId;
+    }
+
+    /**
+     * Getter for <code>public.dead_letter_queue.message_uuid</code>.
+     */
+    public UUID getMessageUuid() {
+        return this.messageUuid;
+    }
+
+    /**
+     * Setter for <code>public.dead_letter_queue.message_uuid</code>.
+     */
+    public void setMessageUuid(UUID messageUuid) {
+        this.messageUuid = messageUuid;
     }
 
     /**
@@ -126,28 +144,28 @@ public class DeadLetterQueue implements Serializable {
     /**
      * Getter for <code>public.dead_letter_queue.channel_id</code>.
      */
-    public UUID getChannelId() {
+    public Long getChannelId() {
         return this.channelId;
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.channel_id</code>.
      */
-    public void setChannelId(UUID channelId) {
+    public void setChannelId(Long channelId) {
         this.channelId = channelId;
     }
 
     /**
      * Getter for <code>public.dead_letter_queue.producer_id</code>.
      */
-    public UUID getProducerId() {
+    public Long getProducerId() {
         return this.producerId;
     }
 
     /**
      * Setter for <code>public.dead_letter_queue.producer_id</code>.
      */
-    public void setProducerId(UUID producerId) {
+    public void setProducerId(Long producerId) {
         this.producerId = producerId;
     }
 
@@ -284,6 +302,12 @@ public class DeadLetterQueue implements Serializable {
         }
         else if (!this.messageId.equals(other.messageId))
             return false;
+        if (this.messageUuid == null) {
+            if (other.messageUuid != null)
+                return false;
+        }
+        else if (!this.messageUuid.equals(other.messageUuid))
+            return false;
         if (this.timestamp == null) {
             if (other.timestamp != null)
                 return false;
@@ -359,6 +383,7 @@ public class DeadLetterQueue implements Serializable {
         int result = 1;
         result = prime * result + ((this.dlqEntryId == null) ? 0 : this.dlqEntryId.hashCode());
         result = prime * result + ((this.messageId == null) ? 0 : this.messageId.hashCode());
+        result = prime * result + ((this.messageUuid == null) ? 0 : this.messageUuid.hashCode());
         result = prime * result + ((this.timestamp == null) ? 0 : this.timestamp.hashCode());
         result = prime * result + ((this.channelId == null) ? 0 : this.channelId.hashCode());
         result = prime * result + ((this.producerId == null) ? 0 : this.producerId.hashCode());
@@ -379,6 +404,7 @@ public class DeadLetterQueue implements Serializable {
 
         sb.append(dlqEntryId);
         sb.append(", ").append(messageId);
+        sb.append(", ").append(messageUuid);
         sb.append(", ").append(timestamp);
         sb.append(", ").append(channelId);
         sb.append(", ").append(producerId);

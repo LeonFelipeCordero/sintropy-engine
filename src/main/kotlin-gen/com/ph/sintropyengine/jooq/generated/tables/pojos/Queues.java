@@ -7,7 +7,6 @@ package com.ph.sintropyengine.jooq.generated.tables.pojos;
 import com.ph.sintropyengine.jooq.generated.enums.ConsumptionType;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 
 /**
@@ -18,7 +17,7 @@ public class Queues implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private UUID channelId;
+    private Long channelId;
     private ConsumptionType consumptionType;
 
     public Queues() {}
@@ -29,7 +28,7 @@ public class Queues implements Serializable {
     }
 
     public Queues(
-        UUID channelId,
+        Long channelId,
         ConsumptionType consumptionType
     ) {
         this.channelId = channelId;
@@ -39,14 +38,14 @@ public class Queues implements Serializable {
     /**
      * Getter for <code>public.queues.channel_id</code>.
      */
-    public UUID getChannelId() {
+    public Long getChannelId() {
         return this.channelId;
     }
 
     /**
      * Setter for <code>public.queues.channel_id</code>.
      */
-    public void setChannelId(UUID channelId) {
+    public void setChannelId(Long channelId) {
         this.channelId = channelId;
     }
 

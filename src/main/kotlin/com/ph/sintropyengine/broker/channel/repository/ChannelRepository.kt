@@ -14,7 +14,6 @@ import jakarta.enterprise.context.ApplicationScoped
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.Result
-import java.util.UUID
 
 @ApplicationScoped
 class ChannelRepository(
@@ -56,6 +55,7 @@ class ChannelRepository(
 
         return Channel(
             channelId = channelRecord!!.channelId,
+            channelUuid = channelRecord.channelUuid,
             name = channelRecord.name,
             channelType = channelRecord.channelType.toDomainEnum(),
             routingKeys = routingKeyRecords.map { it.routingKey },
@@ -63,7 +63,7 @@ class ChannelRepository(
         )
     }
 
-    fun findById(id: UUID): Channel? {
+    fun findById(id: Long): Channel? {
         val records =
             context
                 .select(
@@ -77,7 +77,7 @@ class ChannelRepository(
                 .leftJoin(QUEUES)
                 .on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
                 .leftJoin(CHANNEL_CIRCUIT_BREAKERS)
-                .on(CHANNELS.CHANNEL_ID.eq(CHANNELS.CHANNEL_ID))
+                .on(CHANNELS.CHANNEL_ID.eq(CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID))
                 .where(CHANNELS.CHANNEL_ID.eq(id))
                 .groupBy(
                     CHANNELS.CHANNEL_ID,
@@ -89,7 +89,7 @@ class ChannelRepository(
         return mapRecordsWithKeysToDTO(records).firstOrNull()
     }
 
-    fun findByIds(ids: Set<UUID>): Map<UUID, Channel> {
+    fun findByIds(ids: Set<Long>): Map<Long, Channel> {
         val records =
             context
                 .select(
@@ -103,7 +103,7 @@ class ChannelRepository(
                 .leftJoin(QUEUES)
                 .on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
                 .leftJoin(CHANNEL_CIRCUIT_BREAKERS)
-                .on(CHANNELS.CHANNEL_ID.eq(CHANNELS.CHANNEL_ID))
+                .on(CHANNELS.CHANNEL_ID.eq(CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID))
                 .where(CHANNELS.CHANNEL_ID.`in`(ids))
                 .groupBy(
                     CHANNELS.CHANNEL_ID,
@@ -129,7 +129,7 @@ class ChannelRepository(
                 .leftJoin(QUEUES)
                 .on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
                 .leftJoin(CHANNEL_CIRCUIT_BREAKERS)
-                .on(CHANNELS.CHANNEL_ID.eq(CHANNELS.CHANNEL_ID))
+                .on(CHANNELS.CHANNEL_ID.eq(CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID))
                 .where(CHANNELS.NAME.eq(name))
                 .groupBy(
                     CHANNELS.CHANNEL_ID,
@@ -158,7 +158,7 @@ class ChannelRepository(
                 .leftJoin(QUEUES)
                 .on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
                 .leftJoin(CHANNEL_CIRCUIT_BREAKERS)
-                .on(CHANNELS.CHANNEL_ID.eq(CHANNELS.CHANNEL_ID))
+                .on(CHANNELS.CHANNEL_ID.eq(CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID))
                 .where(CHANNELS.NAME.eq(name))
                 .and(ROUTING_KEYS.ROUTING_KEY.eq(routingKey))
                 .groupBy(
@@ -171,7 +171,7 @@ class ChannelRepository(
         return mapRecordsWithKeysToDTO(records).firstOrNull()
     }
 
-    fun delete(channelId: UUID) {
+    fun delete(channelId: Long) {
         context
             .delete(ROUTING_KEYS)
             .where(ROUTING_KEYS.CHANNEL_ID.eq(channelId))
@@ -189,7 +189,7 @@ class ChannelRepository(
     }
 
     fun addRoutingKey(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
     ) {
         context
@@ -212,7 +212,7 @@ class ChannelRepository(
                 .leftJoin(QUEUES)
                 .on(CHANNELS.CHANNEL_ID.eq(QUEUES.CHANNEL_ID))
                 .leftJoin(CHANNEL_CIRCUIT_BREAKERS)
-                .on(CHANNELS.CHANNEL_ID.eq(CHANNELS.CHANNEL_ID))
+                .on(CHANNELS.CHANNEL_ID.eq(CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID))
                 .groupBy(
                     CHANNELS.CHANNEL_ID,
                     ROUTING_KEYS.ROUTING_KEY,
@@ -236,6 +236,7 @@ class ChannelRepository(
             }.map { (key, rows) ->
                 Channel(
                     channelId = key.first,
+                    channelUuid = rows.first()[CHANNELS.CHANNEL_UUID],
                     name = key.second,
                     channelType = key.third.toDomainEnum(),
                     routingKeys = rows.map { it[ROUTING_KEYS.ROUTING_KEY] }.toMutableList(),

@@ -6,7 +6,6 @@ import com.ph.sintropyengine.jooq.generated.Tables
 import jakarta.enterprise.context.ApplicationScoped
 import org.jooq.DSLContext
 import java.time.OffsetDateTime
-import java.util.UUID
 import com.ph.sintropyengine.jooq.generated.enums.CircuitState as JooqCircuitState
 
 @ApplicationScoped
@@ -14,7 +13,7 @@ class CircuitBreakerRepository(
     private val context: DSLContext,
 ) {
     fun findByChannelIdAndRoutingKey(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
     ): ChannelCircuitBreaker? =
         context
@@ -29,14 +28,14 @@ class CircuitBreakerRepository(
             .where(Tables.CHANNEL_CIRCUIT_BREAKERS.STATE.eq(JooqCircuitState.OPEN))
             .fetchInto(ChannelCircuitBreaker::class.java)
 
-    fun findAllByChannelId(channelId: UUID): List<ChannelCircuitBreaker> =
+    fun findAllByChannelId(channelId: Long): List<ChannelCircuitBreaker> =
         context
             .selectFrom(Tables.CHANNEL_CIRCUIT_BREAKERS)
             .where(Tables.CHANNEL_CIRCUIT_BREAKERS.CHANNEL_ID.eq(channelId))
             .fetchInto(ChannelCircuitBreaker::class.java)
 
     fun getCircuitState(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
     ): CircuitState {
         val state =
@@ -51,7 +50,7 @@ class CircuitBreakerRepository(
     }
 
     fun closeCircuit(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
     ) {
         context

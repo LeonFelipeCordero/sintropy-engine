@@ -23,117 +23,135 @@ public class ChannelCircuitBreakersRecord extends UpdatableRecordImpl<ChannelCir
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>public.channel_circuit_breakers.circuit_id</code>.
+     * Setter for
+     * <code>public.channel_circuit_breakers.circuit_breaker_id</code>.
      */
-    public void setCircuitId(UUID value) {
+    public void setCircuitBreakerId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>public.channel_circuit_breakers.circuit_id</code>.
+     * Getter for
+     * <code>public.channel_circuit_breakers.circuit_breaker_id</code>.
      */
-    public UUID getCircuitId() {
-        return (UUID) get(0);
+    public Long getCircuitBreakerId() {
+        return (Long) get(0);
+    }
+
+    /**
+     * Setter for
+     * <code>public.channel_circuit_breakers.circuit_breaker_uuid</code>.
+     */
+    public void setCircuitBreakerUuid(UUID value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for
+     * <code>public.channel_circuit_breakers.circuit_breaker_uuid</code>.
+     */
+    public UUID getCircuitBreakerUuid() {
+        return (UUID) get(1);
     }
 
     /**
      * Setter for <code>public.channel_circuit_breakers.channel_id</code>.
      */
-    public void setChannelId(UUID value) {
-        set(1, value);
+    public void setChannelId(Long value) {
+        set(2, value);
     }
 
     /**
      * Getter for <code>public.channel_circuit_breakers.channel_id</code>.
      */
-    public UUID getChannelId() {
-        return (UUID) get(1);
+    public Long getChannelId() {
+        return (Long) get(2);
     }
 
     /**
      * Setter for <code>public.channel_circuit_breakers.routing_key</code>.
      */
     public void setRoutingKey(String value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.channel_circuit_breakers.routing_key</code>.
      */
     public String getRoutingKey() {
-        return (String) get(2);
+        return (String) get(3);
     }
 
     /**
      * Setter for <code>public.channel_circuit_breakers.state</code>.
      */
     public void setState(CircuitState value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>public.channel_circuit_breakers.state</code>.
      */
     public CircuitState getState() {
-        return (CircuitState) get(3);
+        return (CircuitState) get(4);
     }
 
     /**
      * Setter for <code>public.channel_circuit_breakers.opened_at</code>.
      */
     public void setOpenedAt(OffsetDateTime value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>public.channel_circuit_breakers.opened_at</code>.
      */
     public OffsetDateTime getOpenedAt() {
-        return (OffsetDateTime) get(4);
+        return (OffsetDateTime) get(5);
     }
 
     /**
      * Setter for
      * <code>public.channel_circuit_breakers.failed_message_id</code>.
      */
-    public void setFailedMessageId(UUID value) {
-        set(5, value);
+    public void setFailedMessageId(Long value) {
+        set(6, value);
     }
 
     /**
      * Getter for
      * <code>public.channel_circuit_breakers.failed_message_id</code>.
      */
-    public UUID getFailedMessageId() {
-        return (UUID) get(5);
+    public Long getFailedMessageId() {
+        return (Long) get(6);
     }
 
     /**
      * Setter for <code>public.channel_circuit_breakers.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>public.channel_circuit_breakers.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(6);
+        return (OffsetDateTime) get(7);
     }
 
     /**
      * Setter for <code>public.channel_circuit_breakers.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>public.channel_circuit_breakers.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(7);
+        return (OffsetDateTime) get(8);
     }
 
     // -------------------------------------------------------------------------
@@ -141,7 +159,7 @@ public class ChannelCircuitBreakersRecord extends UpdatableRecordImpl<ChannelCir
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<UUID> key() {
+    public Record1<Long> key() {
         return (Record1) super.key();
     }
 
@@ -159,10 +177,11 @@ public class ChannelCircuitBreakersRecord extends UpdatableRecordImpl<ChannelCir
     /**
      * Create a detached, initialised ChannelCircuitBreakersRecord
      */
-    public ChannelCircuitBreakersRecord(UUID circuitId, UUID channelId, String routingKey, CircuitState state, OffsetDateTime openedAt, UUID failedMessageId, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public ChannelCircuitBreakersRecord(Long circuitBreakerId, UUID circuitBreakerUuid, Long channelId, String routingKey, CircuitState state, OffsetDateTime openedAt, Long failedMessageId, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS);
 
-        setCircuitId(circuitId);
+        setCircuitBreakerId(circuitBreakerId);
+        setCircuitBreakerUuid(circuitBreakerUuid);
         setChannelId(channelId);
         setRoutingKey(routingKey);
         setState(state);
@@ -180,7 +199,8 @@ public class ChannelCircuitBreakersRecord extends UpdatableRecordImpl<ChannelCir
         super(ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS);
 
         if (value != null) {
-            setCircuitId(value.getCircuitId());
+            setCircuitBreakerId(value.getCircuitBreakerId());
+            setCircuitBreakerUuid(value.getCircuitBreakerUuid());
             setChannelId(value.getChannelId());
             setRoutingKey(value.getRoutingKey());
             setState(value.getState());

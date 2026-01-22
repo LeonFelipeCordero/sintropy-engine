@@ -18,8 +18,8 @@ class MessageRepository(
 ) {
     fun save(
         message: MessagePreStore,
-        channelId: UUID,
-        producerId: UUID,
+        channelId: Long,
+        producerId: Long,
     ): Message =
         context
             .insertInto(
@@ -40,7 +40,7 @@ class MessageRepository(
             ?: throw IllegalStateException("Something went wrong persisting the message")
 
     fun pollFromStandardChannelByRoutingKey(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
         pollingCount: Int,
     ): List<Message> {
@@ -72,7 +72,7 @@ class MessageRepository(
     }
 
     fun pollFromFifoChannelByRoutingKey(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
         pollingCount: Int,
     ): List<Message> {
@@ -107,7 +107,7 @@ class MessageRepository(
             .fetchInto(Message::class.java)
     }
 
-    fun markAsFailed(messageId: UUID) {
+    fun markAsFailed(messageId: Long) {
         context
             .update(Tables.MESSAGES)
             .set(Tables.MESSAGES.STATUS, MessageStatusType.FAILED)
@@ -116,7 +116,7 @@ class MessageRepository(
             .execute()
     }
 
-    fun dequeue(messageId: UUID) {
+    fun dequeue(messageId: Long) {
         context
             .delete(Tables.MESSAGES)
             .where(Tables.MESSAGES.MESSAGE_ID.eq(messageId))
@@ -128,6 +128,7 @@ class MessageRepository(
             .insertInto(
                 Tables.MESSAGES,
                 Tables.MESSAGES.MESSAGE_ID,
+                Tables.MESSAGES.MESSAGE_UUID,
                 Tables.MESSAGES.TIMESTAMP,
                 Tables.MESSAGES.CHANNEL_ID,
                 Tables.MESSAGES.PRODUCER_ID,
@@ -140,6 +141,7 @@ class MessageRepository(
                 Tables.MESSAGES.ORIGIN_MESSAGE_ID,
             ).values(
                 dlqEntry.messageId,
+                dlqEntry.messageUuid,
                 dlqEntry.timestamp,
                 dlqEntry.channelId,
                 dlqEntry.producerId,
@@ -154,20 +156,26 @@ class MessageRepository(
             .fetchOneInto(Message::class.java)
             ?: throw IllegalStateException("Failed to reinsert message from DLQ")
 
-    fun findById(messageId: UUID): Message? =
+    fun findById(messageId: Long): Message? =
         context
             .selectFrom(Tables.MESSAGES)
             .where(Tables.MESSAGES.MESSAGE_ID.eq(messageId))
             .fetchOneInto(Message::class.java)
 
-    fun findMessageLogById(messageId: UUID): MessageLog? =
+    fun findByUUID(messageUUID: UUID): Message? =
+        context
+            .selectFrom(Tables.MESSAGES)
+            .where(Tables.MESSAGES.MESSAGE_UUID.eq(messageUUID))
+            .fetchOneInto(Message::class.java)
+
+    fun findMessageLogById(messageUUID: UUID): MessageLog? =
         context
             .selectFrom(Tables.MESSAGE_LOG)
-            .where(Tables.MESSAGE_LOG.MESSAGE_ID.eq(messageId))
+            .where(Tables.MESSAGE_LOG.MESSAGE_UUID.eq(messageUUID))
             .fetchOneInto(MessageLog::class.java)
 
     fun findMessageLogFromToByChannelIdAndRoutingKey(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
         from: OffsetDateTime,
         to: OffsetDateTime?,
@@ -192,7 +200,7 @@ class MessageRepository(
     }
 
     fun findAllMessagesByChannelIdAndRoutingKey(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
         pageSize: Int,
         page: Int,
@@ -219,7 +227,7 @@ class MessageRepository(
     /**
      * Testing only
      */
-    fun setMessageDeliveriesOutOfScope(messageId: UUID) {
+    fun setMessageDeliveriesOutOfScope(messageId: Long) {
         context
             .update(Tables.MESSAGES)
             .set(Tables.MESSAGES.STATUS, MessageStatusType.IN_FLIGHT)
@@ -231,7 +239,7 @@ class MessageRepository(
     }
 
     private fun hashCode(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
     ): Int = (channelId.toString() + routingKey).hashCode()
 }

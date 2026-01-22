@@ -20,6 +20,7 @@ import java.util.UUID;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.Name;
@@ -62,14 +63,21 @@ public class ChannelCircuitBreakers extends TableImpl<ChannelCircuitBreakersReco
     }
 
     /**
-     * The column <code>public.channel_circuit_breakers.circuit_id</code>.
+     * The column
+     * <code>public.channel_circuit_breakers.circuit_breaker_id</code>.
      */
-    public final TableField<ChannelCircuitBreakersRecord, UUID> CIRCUIT_ID = createField(DSL.name("circuit_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<ChannelCircuitBreakersRecord, Long> CIRCUIT_BREAKER_ID = createField(DSL.name("circuit_breaker_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+    /**
+     * The column
+     * <code>public.channel_circuit_breakers.circuit_breaker_uuid</code>.
+     */
+    public final TableField<ChannelCircuitBreakersRecord, UUID> CIRCUIT_BREAKER_UUID = createField(DSL.name("circuit_breaker_uuid"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.channel_circuit_breakers.channel_id</code>.
      */
-    public final TableField<ChannelCircuitBreakersRecord, UUID> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<ChannelCircuitBreakersRecord, Long> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.channel_circuit_breakers.routing_key</code>.
@@ -84,13 +92,13 @@ public class ChannelCircuitBreakers extends TableImpl<ChannelCircuitBreakersReco
     /**
      * The column <code>public.channel_circuit_breakers.opened_at</code>.
      */
-    public final TableField<ChannelCircuitBreakersRecord, OffsetDateTime> OPENED_AT = createField(DSL.name("opened_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6), this, "");
+    public final TableField<ChannelCircuitBreakersRecord, OffsetDateTime> OPENED_AT = createField(DSL.name("opened_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
 
     /**
      * The column
      * <code>public.channel_circuit_breakers.failed_message_id</code>.
      */
-    public final TableField<ChannelCircuitBreakersRecord, UUID> FAILED_MESSAGE_ID = createField(DSL.name("failed_message_id"), SQLDataType.UUID, this, "");
+    public final TableField<ChannelCircuitBreakersRecord, Long> FAILED_MESSAGE_ID = createField(DSL.name("failed_message_id"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.channel_circuit_breakers.created_at</code>.
@@ -177,13 +185,18 @@ public class ChannelCircuitBreakers extends TableImpl<ChannelCircuitBreakersReco
     }
 
     @Override
+    public Identity<ChannelCircuitBreakersRecord, Long> getIdentity() {
+        return (Identity<ChannelCircuitBreakersRecord, Long>) super.getIdentity();
+    }
+
+    @Override
     public UniqueKey<ChannelCircuitBreakersRecord> getPrimaryKey() {
         return Keys.CHANNEL_CIRCUIT_BREAKERS_PKEY;
     }
 
     @Override
     public List<UniqueKey<ChannelCircuitBreakersRecord>> getUniqueKeys() {
-        return Arrays.asList(Keys.CHANNEL_CIRCUIT_BREAKERS_CHANNEL_ID_ROUTING_KEY_KEY);
+        return Arrays.asList(Keys.CHANNEL_CIRCUIT_BREAKERS_CHANNEL_ID_ROUTING_KEY_KEY, Keys.CHANNEL_CIRCUIT_BREAKERS_CIRCUIT_BREAKER_UUID_KEY);
     }
 
     @Override

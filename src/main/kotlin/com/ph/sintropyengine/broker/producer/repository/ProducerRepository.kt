@@ -4,7 +4,6 @@ import com.ph.sintropyengine.broker.producer.model.Producer
 import com.ph.sintropyengine.jooq.generated.Tables
 import jakarta.enterprise.context.ApplicationScoped
 import org.jooq.DSLContext
-import java.util.UUID
 
 @ApplicationScoped
 class ProducerRepository(
@@ -21,13 +20,13 @@ class ProducerRepository(
             .fetchOneInto(Producer::class.java)
             ?: throw IllegalStateException("Something went wrong creating a new Producer")
 
-    fun findById(id: UUID): Producer? =
+    fun findById(id: Long): Producer? =
         context
             .selectFrom(Tables.PRODUCERS)
             .where(Tables.PRODUCERS.PRODUCER_ID.eq(id))
             .fetchOneInto(Producer::class.java)
 
-    fun findByIds(ids: Set<UUID>): Map<UUID, Producer> =
+    fun findByIds(ids: Set<Long>): Map<Long, Producer> =
         context
             .selectFrom(Tables.PRODUCERS)
             .where(Tables.PRODUCERS.PRODUCER_ID.`in`(ids))
@@ -54,7 +53,7 @@ class ProducerRepository(
             .selectFrom(Tables.PRODUCERS)
             .fetchInto(Producer::class.java)
 
-    fun delete(id: UUID) =
+    fun delete(id: Long) =
         context
             .deleteFrom(Tables.PRODUCERS)
             .where(Tables.PRODUCERS.PRODUCER_ID.eq(id))

@@ -21,11 +21,12 @@ public class Messages implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private UUID messageId;
+    private Long messageId;
+    private UUID messageUuid;
     private UUID originMessageId;
     private OffsetDateTime timestamp;
-    private UUID channelId;
-    private UUID producerId;
+    private Long channelId;
+    private Long producerId;
     private String routingKey;
     private JSONB message;
     private JSONB headers;
@@ -39,6 +40,7 @@ public class Messages implements Serializable {
 
     public Messages(Messages value) {
         this.messageId = value.messageId;
+        this.messageUuid = value.messageUuid;
         this.originMessageId = value.originMessageId;
         this.timestamp = value.timestamp;
         this.channelId = value.channelId;
@@ -54,11 +56,12 @@ public class Messages implements Serializable {
     }
 
     public Messages(
-        UUID messageId,
+        Long messageId,
+        UUID messageUuid,
         UUID originMessageId,
         OffsetDateTime timestamp,
-        UUID channelId,
-        UUID producerId,
+        Long channelId,
+        Long producerId,
         String routingKey,
         JSONB message,
         JSONB headers,
@@ -69,6 +72,7 @@ public class Messages implements Serializable {
         OffsetDateTime updatedAt
     ) {
         this.messageId = messageId;
+        this.messageUuid = messageUuid;
         this.originMessageId = originMessageId;
         this.timestamp = timestamp;
         this.channelId = channelId;
@@ -86,15 +90,29 @@ public class Messages implements Serializable {
     /**
      * Getter for <code>public.messages.message_id</code>.
      */
-    public UUID getMessageId() {
+    public Long getMessageId() {
         return this.messageId;
     }
 
     /**
      * Setter for <code>public.messages.message_id</code>.
      */
-    public void setMessageId(UUID messageId) {
+    public void setMessageId(Long messageId) {
         this.messageId = messageId;
+    }
+
+    /**
+     * Getter for <code>public.messages.message_uuid</code>.
+     */
+    public UUID getMessageUuid() {
+        return this.messageUuid;
+    }
+
+    /**
+     * Setter for <code>public.messages.message_uuid</code>.
+     */
+    public void setMessageUuid(UUID messageUuid) {
+        this.messageUuid = messageUuid;
     }
 
     /**
@@ -128,28 +146,28 @@ public class Messages implements Serializable {
     /**
      * Getter for <code>public.messages.channel_id</code>.
      */
-    public UUID getChannelId() {
+    public Long getChannelId() {
         return this.channelId;
     }
 
     /**
      * Setter for <code>public.messages.channel_id</code>.
      */
-    public void setChannelId(UUID channelId) {
+    public void setChannelId(Long channelId) {
         this.channelId = channelId;
     }
 
     /**
      * Getter for <code>public.messages.producer_id</code>.
      */
-    public UUID getProducerId() {
+    public Long getProducerId() {
         return this.producerId;
     }
 
     /**
      * Setter for <code>public.messages.producer_id</code>.
      */
-    public void setProducerId(UUID producerId) {
+    public void setProducerId(Long producerId) {
         this.producerId = producerId;
     }
 
@@ -280,6 +298,12 @@ public class Messages implements Serializable {
         }
         else if (!this.messageId.equals(other.messageId))
             return false;
+        if (this.messageUuid == null) {
+            if (other.messageUuid != null)
+                return false;
+        }
+        else if (!this.messageUuid.equals(other.messageUuid))
+            return false;
         if (this.originMessageId == null) {
             if (other.originMessageId != null)
                 return false;
@@ -360,6 +384,7 @@ public class Messages implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((this.messageId == null) ? 0 : this.messageId.hashCode());
+        result = prime * result + ((this.messageUuid == null) ? 0 : this.messageUuid.hashCode());
         result = prime * result + ((this.originMessageId == null) ? 0 : this.originMessageId.hashCode());
         result = prime * result + ((this.timestamp == null) ? 0 : this.timestamp.hashCode());
         result = prime * result + ((this.channelId == null) ? 0 : this.channelId.hashCode());
@@ -380,6 +405,7 @@ public class Messages implements Serializable {
         StringBuilder sb = new StringBuilder("Messages (");
 
         sb.append(messageId);
+        sb.append(", ").append(messageUuid);
         sb.append(", ").append(originMessageId);
         sb.append(", ").append(timestamp);
         sb.append(", ").append(channelId);

@@ -12,7 +12,6 @@ import com.ph.sintropyengine.broker.shared.utils.validForName
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 import java.lang.IllegalStateException
-import java.util.UUID
 
 @ApplicationScoped
 class ProducerService(
@@ -35,9 +34,9 @@ class ProducerService(
         return producerRepository.save(producer)
     }
 
-    fun findById(consumerId: UUID): Producer? = producerRepository.findById(consumerId)
+    fun findById(producerId: Long): Producer? = producerRepository.findById(producerId)
 
-    fun findByIds(ids: Set<UUID>): Map<UUID, Producer> = producerRepository.findByIds(ids)
+    fun findByIds(ids: Set<Long>): Map<Long, Producer> = producerRepository.findByIds(ids)
 
     fun findByName(name: String): Producer? = producerRepository.findByName(name)
 
@@ -49,7 +48,7 @@ class ProducerService(
         } ?: throw IllegalStateException("Channel $channelName not found")
 
     @Transactional
-    fun deleteProducer(producerId: UUID) =
+    fun deleteProducer(producerId: Long) =
         producerRepository.findById(producerId)?.let {
             producerRepository.delete(producerId)
         } ?: throw IllegalStateException("Producer $producerId not found")
@@ -60,8 +59,13 @@ class ProducerService(
             producerRepository.deleteByName(name)
         } ?: throw IllegalStateException("Producer $name not found")
 
+    /**
+     * When a message is to be published, it has first to be verified in the validity of channel, routing key and producer
+     * When a channel-routing_key has the circuit open, the messages goes to the DQL if the channel is FIFO, in that case
+     * the message will not be created and this functions return null
+     */
     @Transactional
-    fun publishMessage(messagePreStore: MessagePreStore): Message {
+    fun publishMessage(messagePreStore: MessagePreStore): Message? {
         val channel =
             channelService.findByNameAndRoutingKeyStrict(messagePreStore.channelName, messagePreStore.routingKey)
 
@@ -76,20 +80,8 @@ class ProducerService(
         }
 
         if (!channel.canWriteMessage(messagePreStore.routingKey)) {
-            val dlqMessage = deadLetterQueueRepository.save(messagePreStore, channel.channelId, producer.producerId!!)
-
-            return Message(
-                messageId = dlqMessage.messageId,
-                timestamp = dlqMessage.timestamp,
-                channelId = dlqMessage.channelId,
-                producerId = dlqMessage.producerId,
-                routingKey = dlqMessage.routingKey,
-                message = dlqMessage.message,
-                headers = dlqMessage.headers,
-                status = MessageStatus.FAILED,
-                originMessageId = dlqMessage.originMessageId,
-                deliveredTimes = dlqMessage.deliveredTimes,
-            )
+            deadLetterQueueRepository.save(messagePreStore, channel.channelId, producer.producerId!!)
+            return null
         }
 
         return messageRepository.save(messagePreStore, channel.channelId, producer.producerId!!)

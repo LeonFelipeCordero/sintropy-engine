@@ -3,11 +3,9 @@ package com.ph.sintropyengine.broker.shared.utils
 import com.ph.sintropyengine.broker.channel.model.Channel
 import com.ph.sintropyengine.broker.consumption.model.Message
 import com.ph.sintropyengine.broker.consumption.model.MessageLog
-import java.util.UUID
-
 object Patterns {
     fun routing(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
     ) = "$channelId|$routingKey"
 

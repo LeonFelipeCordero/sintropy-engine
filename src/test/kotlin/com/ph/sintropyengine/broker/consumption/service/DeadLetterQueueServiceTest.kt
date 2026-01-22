@@ -55,7 +55,7 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
             pollingQueue.poll(channel.channelId!!, channel.routingKeys.first())
             pollingQueue.markAsFailed(message.messageId)
 
-            val messageLog = messageRepository.findMessageLogById(message.messageId)
+            val messageLog = messageRepository.findMessageLogById(message.messageUuid)
             assertThat(messageLog).isNull()
         }
 
@@ -67,7 +67,7 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
             pollingQueue.poll(channel.channelId!!, channel.routingKeys.first())
             pollingQueue.dequeue(message.messageId)
 
-            val messageLog = messageRepository.findMessageLogById(message.messageId)
+            val messageLog = messageRepository.findMessageLogById(message.messageUuid)
             assertThat(messageLog).isNotNull
             assertThat(messageLog?.processed).isTrue
 
@@ -99,7 +99,7 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
             pollingQueue.poll(channel.channelId!!, channel.routingKeys.first())
             pollingQueue.markAsFailed(message.messageId)
 
-            val recoveredMessage = dlqService.recoverMessage(message.messageId)
+            val recoveredMessage = dlqService.recoverMessage(message.messageUuid)
 
             assertThat(recoveredMessage.messageId).isEqualTo(message.messageId)
             assertThat(recoveredMessage.status).isEqualTo(MessageStatus.READY)
@@ -128,7 +128,7 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
             pollingQueue.poll(channel.channelId!!, channel.routingKeys.first())
             pollingQueue.markAsFailed(message.messageId)
 
-            dlqService.recoverMessage(message.messageId)
+            dlqService.recoverMessage(message.messageUuid)
 
             val polledMessages = pollingQueue.poll(channel.channelId, channel.routingKeys.first())
             assertThat(polledMessages).hasSize(1)
@@ -148,7 +148,7 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
             pollingQueue.markAsFailed(message1.messageId)
             pollingQueue.markAsFailed(message2.messageId)
 
-            val recovered = dlqService.recoverMessages(listOf(message1.messageId, message2.messageId))
+            val recovered = dlqService.recoverMessages(listOf(message1.messageUuid, message2.messageUuid))
 
             assertThat(recovered).hasSize(2)
             assertThat(recovered.map { it.messageId }).containsExactlyInAnyOrder(

@@ -32,6 +32,7 @@ class ChannelLinkRepository(
 
         return ChannelLink(
             channelLinkId = record!!.channelLinkId,
+            channelLinkUuid = record.channelLinkUuid,
             sourceChannelId = record.sourceChannelId,
             targetChannelId = record.targetChannelId,
             sourceRoutingKey = record.sourceRoutingKey,
@@ -42,25 +43,31 @@ class ChannelLinkRepository(
         )
     }
 
-    fun findById(channelLinkId: UUID) =
+    fun findById(channelLinkId: Long) =
         context
             .selectFrom(CHANNEL_LINKS)
             .where(CHANNEL_LINKS.CHANNEL_LINK_ID.eq(channelLinkId))
             .fetchOneInto(ChannelLink::class.java)
 
-    fun findBySourceChannelId(sourceChannelId: UUID): List<ChannelLink> =
+    fun findByUUID(channelLinkUUID: UUID) =
+        context
+            .selectFrom(CHANNEL_LINKS)
+            .where(CHANNEL_LINKS.CHANNEL_LINK_UUID.eq(channelLinkUUID))
+            .fetchOneInto(ChannelLink::class.java)
+
+    fun findBySourceChannelId(sourceChannelId: Long): List<ChannelLink> =
         context
             .selectFrom(CHANNEL_LINKS)
             .where(CHANNEL_LINKS.SOURCE_CHANNEL_ID.eq(sourceChannelId))
             .fetchInto(ChannelLink::class.java)
 
-    fun findByTargetChannelId(targetChannelId: UUID): List<ChannelLink> =
+    fun findByTargetChannelId(targetChannelId: Long): List<ChannelLink> =
         context
             .selectFrom(CHANNEL_LINKS)
             .where(CHANNEL_LINKS.TARGET_CHANNEL_ID.eq(targetChannelId))
             .fetchInto(ChannelLink::class.java)
 
-    fun delete(channelLinkId: UUID) {
+    fun delete(channelLinkId: Long) {
         context
             .deleteFrom(CHANNEL_LINKS)
             .where(CHANNEL_LINKS.CHANNEL_LINK_ID.eq(channelLinkId))
@@ -68,7 +75,7 @@ class ChannelLinkRepository(
     }
 
     fun setEnabled(
-        channelLinkId: UUID,
+        channelLinkId: Long,
         enabled: Boolean,
     ) {
         context

@@ -22,6 +22,7 @@ import java.util.UUID;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.Name;
@@ -66,7 +67,12 @@ public class Producers extends TableImpl<ProducersRecord> {
     /**
      * The column <code>public.producers.producer_id</code>.
      */
-    public final TableField<ProducersRecord, UUID> PRODUCER_ID = createField(DSL.name("producer_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<ProducersRecord, Long> PRODUCER_ID = createField(DSL.name("producer_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+    /**
+     * The column <code>public.producers.producer_uuid</code>.
+     */
+    public final TableField<ProducersRecord, UUID> PRODUCER_UUID = createField(DSL.name("producer_uuid"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.producers.name</code>.
@@ -76,7 +82,7 @@ public class Producers extends TableImpl<ProducersRecord> {
     /**
      * The column <code>public.producers.channel_id</code>.
      */
-    public final TableField<ProducersRecord, UUID> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<ProducersRecord, Long> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.producers.created_at</code>.
@@ -161,8 +167,18 @@ public class Producers extends TableImpl<ProducersRecord> {
     }
 
     @Override
+    public Identity<ProducersRecord, Long> getIdentity() {
+        return (Identity<ProducersRecord, Long>) super.getIdentity();
+    }
+
+    @Override
     public UniqueKey<ProducersRecord> getPrimaryKey() {
         return Keys.PRODUCERS_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<ProducersRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.PRODUCERS_PRODUCER_UUID_KEY);
     }
 
     @Override

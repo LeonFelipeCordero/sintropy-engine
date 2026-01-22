@@ -20,6 +20,7 @@ import java.util.UUID;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.JSONB;
@@ -65,12 +66,17 @@ public class DeadLetterQueue extends TableImpl<DeadLetterQueueRecord> {
     /**
      * The column <code>public.dead_letter_queue.dlq_entry_id</code>.
      */
-    public final TableField<DeadLetterQueueRecord, UUID> DLQ_ENTRY_ID = createField(DSL.name("dlq_entry_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<DeadLetterQueueRecord, Long> DLQ_ENTRY_ID = createField(DSL.name("dlq_entry_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.dead_letter_queue.message_id</code>.
      */
-    public final TableField<DeadLetterQueueRecord, UUID> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<DeadLetterQueueRecord, Long> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column <code>public.dead_letter_queue.message_uuid</code>.
+     */
+    public final TableField<DeadLetterQueueRecord, UUID> MESSAGE_UUID = createField(DSL.name("message_uuid"), SQLDataType.UUID, this, "");
 
     /**
      * The column <code>public.dead_letter_queue.timestamp</code>.
@@ -80,12 +86,12 @@ public class DeadLetterQueue extends TableImpl<DeadLetterQueueRecord> {
     /**
      * The column <code>public.dead_letter_queue.channel_id</code>.
      */
-    public final TableField<DeadLetterQueueRecord, UUID> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<DeadLetterQueueRecord, Long> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.dead_letter_queue.producer_id</code>.
      */
-    public final TableField<DeadLetterQueueRecord, UUID> PRODUCER_ID = createField(DSL.name("producer_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<DeadLetterQueueRecord, Long> PRODUCER_ID = createField(DSL.name("producer_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.dead_letter_queue.routing_key</code>.
@@ -196,7 +202,12 @@ public class DeadLetterQueue extends TableImpl<DeadLetterQueueRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.DLQ_CHANNEL_ROUTING_IDX, Indexes.DLQ_FAILED_AT_IDX, Indexes.DLQ_MESSAGE_ID_IDX);
+        return Arrays.asList(Indexes.DLQ_CHANNEL_ROUTING_IDX, Indexes.DLQ_FAILED_AT_IDX, Indexes.DLQ_MESSAGE_ID_IDX, Indexes.DQL_MESSAGE_UUID_IDX);
+    }
+
+    @Override
+    public Identity<DeadLetterQueueRecord, Long> getIdentity() {
+        return (Identity<DeadLetterQueueRecord, Long>) super.getIdentity();
     }
 
     @Override

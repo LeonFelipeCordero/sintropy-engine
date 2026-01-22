@@ -37,9 +37,9 @@ class ChannelService(
         return channelRepository.save(channel)
     }
 
-    fun findById(channelId: UUID): Channel? = channelRepository.findById(channelId)
+    fun findById(channelId: Long): Channel? = channelRepository.findById(channelId)
 
-    fun findByIds(ids: Set<UUID>): Map<UUID, Channel> = channelRepository.findByIds(ids)
+    fun findByIds(ids: Set<Long>): Map<Long, Channel> = channelRepository.findByIds(ids)
 
     fun findByName(name: String): Channel? = channelRepository.findByName(name)
 
@@ -61,7 +61,7 @@ class ChannelService(
     }
 
     @Transactional
-    fun deleteChannel(id: UUID) {
+    fun deleteChannel(id: Long) {
         channelRepository.findById(id) ?: throw IllegalStateException("Channel with id $id not found")
 
         channelRepository.delete(id)

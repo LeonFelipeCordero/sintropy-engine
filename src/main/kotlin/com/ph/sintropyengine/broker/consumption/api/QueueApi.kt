@@ -2,7 +2,6 @@ package com.ph.sintropyengine.broker.consumption.api
 
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType
 import com.ph.sintropyengine.broker.channel.service.ChannelService
-import com.ph.sintropyengine.broker.consumption.api.response.MessageResponse
 import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.consumption.service.PollingFifoQueue
@@ -31,6 +30,7 @@ class QueueApi(
     private val pollingFifoQueue: PollingFifoQueue,
     private val pollingStandardQueue: PollingStandardQueue,
     private val observabilityService: ObservabilityService,
+   // TODO: Make a service for this, we can't access the repo from the api
     private val messageRepository: MessageRepository,
 ) {
     data class PollRequest(
@@ -97,14 +97,14 @@ class QueueApi(
     fun markAsFailed(
         @PathParam("messageId") messageId: UUID,
     ): Response {
-        val message = messageRepository.findById(messageId)
+        val message = messageRepository.findByUUID(messageId)
             ?: return Response.status(Response.Status.NOT_FOUND).entity("Message not found").build()
 
         val channel = channelService.findById(message.channelId)
 
         logger.info { "Marking message as failed [messageId=$messageId, channel=${channel?.name}, routingKey=${message.routingKey}]" }
 
-        pollingStandardQueue.markAsFailed(messageId)
+        pollingStandardQueue.markAsFailed(message.messageId)
 
         observabilityService.recordMessageFailed(
             channelName = channel!!.name,
@@ -119,14 +119,14 @@ class QueueApi(
     fun dequeue(
         @PathParam("messageId") messageId: UUID,
     ): Response {
-        val message = messageRepository.findById(messageId)
+        val message = messageRepository.findByUUID(messageId)
             ?: return Response.status(Response.Status.NOT_FOUND).entity("Message not found").build()
 
         val channel = channelService.findById(message.channelId)
 
         logger.info { "Dequeue request received [messageId=$messageId, channel=${channel?.name}, routingKey=${message.routingKey}]" }
 
-        pollingStandardQueue.dequeue(messageId)
+        pollingStandardQueue.dequeue(message.messageId)
 
         observabilityService.recordMessageDequeued(
             channelName = channel!!.name,

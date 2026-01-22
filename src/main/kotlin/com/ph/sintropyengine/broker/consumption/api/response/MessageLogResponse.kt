@@ -21,7 +21,7 @@ fun MessageLog.toResponse(
     producerName: String,
 ): MessageLogResponse =
     MessageLogResponse(
-        messageId = messageId,
+        messageId = messageUuid,
         timestamp = timestamp,
         channelName = channelName,
         producerName = producerName,

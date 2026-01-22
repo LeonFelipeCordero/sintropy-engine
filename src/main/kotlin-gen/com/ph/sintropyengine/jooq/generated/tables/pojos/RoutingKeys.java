@@ -5,7 +5,6 @@ package com.ph.sintropyengine.jooq.generated.tables.pojos;
 
 
 import java.io.Serializable;
-import java.util.UUID;
 
 
 /**
@@ -17,7 +16,7 @@ public class RoutingKeys implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String routingKey;
-    private UUID channelId;
+    private Long channelId;
 
     public RoutingKeys() {}
 
@@ -28,7 +27,7 @@ public class RoutingKeys implements Serializable {
 
     public RoutingKeys(
         String routingKey,
-        UUID channelId
+        Long channelId
     ) {
         this.routingKey = routingKey;
         this.channelId = channelId;
@@ -51,14 +50,14 @@ public class RoutingKeys implements Serializable {
     /**
      * Getter for <code>public.routing_keys.channel_id</code>.
      */
-    public UUID getChannelId() {
+    public Long getChannelId() {
         return this.channelId;
     }
 
     /**
      * Setter for <code>public.routing_keys.channel_id</code>.
      */
-    public void setChannelId(UUID channelId) {
+    public void setChannelId(Long channelId) {
         this.channelId = channelId;
     }
 

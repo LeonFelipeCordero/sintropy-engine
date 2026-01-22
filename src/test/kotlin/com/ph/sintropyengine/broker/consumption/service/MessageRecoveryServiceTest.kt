@@ -19,10 +19,11 @@ class MessageRecoveryServiceTest : IntegrationTestBase() {
     fun `should retrigger message and return message when it exists`() {
         val message = publishMessage()
 
-        val retriggeredMessage = messageRecoveryService.retriggerMessage(message.messageId)
+        val retriggeredMessage = messageRecoveryService.retriggerMessage(message.messageUuid)
 
         assertThat(retriggeredMessage).isNotNull
         assertThat(retriggeredMessage.messageId).isEqualTo(message.messageId)
+        assertThat(retriggeredMessage.messageUuid).isEqualTo(message.messageUuid)
         assertThat(retriggeredMessage.channelId).isEqualTo(message.channelId)
         assertThat(retriggeredMessage.producerId).isEqualTo(message.producerId)
         assertThat(retriggeredMessage.routingKey).isEqualTo(message.routingKey)

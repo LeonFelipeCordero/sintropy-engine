@@ -3,11 +3,12 @@ create cast (varchar as message_status_type) with inout as implicit;
 
 create table messages
 (
-    message_id        uuid                not null default gen_random_uuid(),
+    message_id        bigserial           not null primary key,
+    message_uuid      uuid                not null default gen_random_uuid() unique,
     origin_message_id uuid,
     timestamp         timestamptz         not null default now(),
-    channel_id        uuid                not null references channels (channel_id),
-    producer_id       uuid                not null references producers (producer_id),
+    channel_id        bigint              not null references channels (channel_id),
+    producer_id       bigint              not null references producers (producer_id),
     routing_key       varchar(128)        not null,
     message           jsonb               not null,
     headers           jsonb               not null,
@@ -16,20 +17,20 @@ create table messages
     delivered_times   int4                not null default 0,
 
     created_at        timestamptz         not null default now(),
-    updated_at        timestamptz         not null default now(),
-
-    constraint messages_message_id_pk primary key (message_id)
+    updated_at        timestamptz         not null default now()
 );
+
 create index messages_polling_idx on messages (channel_id, routing_key, status, last_delivered, delivered_times);
 create index messages_origin_message_idx on messages (origin_message_id);
 
 create table message_log
 (
-    message_id        uuid         not null,
+    message_id        bigserial    not null primary key,
+    message_uuid      uuid         not null,
     origin_message_id uuid,
     timestamp         timestamptz  not null,
-    channel_id        uuid         not null references channels (channel_id),
-    producer_id       uuid         not null references producers (producer_id),
+    channel_id        bigint       not null references channels (channel_id),
+    producer_id       bigint       not null references producers (producer_id),
     routing_key       varchar(128) not null,
     message           jsonb        not null,
     headers           jsonb        not null,
@@ -38,7 +39,7 @@ create table message_log
     created_at        timestamptz  not null,
     updated_at        timestamptz  not null,
 
-    constraint message_log_message_id_timestamp_pk primary key (message_id, timestamp, channel_id)
+    unique (message_uuid, timestamp, channel_id)
 );
 
 create or replace function messages_to_message_log()
@@ -46,6 +47,7 @@ create or replace function messages_to_message_log()
 $$
 begin
     insert into message_log(message_id,
+                            message_uuid,
                             origin_message_id,
                             timestamp,
                             channel_id,
@@ -57,6 +59,7 @@ begin
                             created_at,
                             updated_at)
     values (new.message_id,
+            new.message_uuid,
             new.origin_message_id,
             new.timestamp,
             new.channel_id,
@@ -102,4 +105,3 @@ create trigger mark_as_delivered_in_message_log
     on messages
     for each row
 execute function mark_message_log_item_as_processed();
-

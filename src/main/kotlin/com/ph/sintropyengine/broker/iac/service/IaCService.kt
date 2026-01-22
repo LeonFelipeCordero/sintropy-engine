@@ -109,7 +109,7 @@ class IaCService(
                 }
             }.forEach { link ->
                 logger.info { "Deleting channel link ${link.channelLinkId}" }
-                channelLinkService.unlinkChannels(link.channelLinkId!!)
+                channelLinkService.unlinkChannels(link.channelLinkUuid!!)
             }
 
         existingProducers

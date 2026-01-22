@@ -9,11 +9,12 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 data class DeadLetterMessage(
-    val dlqEntryId: UUID,
-    val messageId: UUID,
+    val dlqEntryId: Long,
+    val messageId: Long? = null,
+    val messageUuid: UUID? = null,
     val timestamp: OffsetDateTime,
-    val channelId: UUID,
-    val producerId: UUID,
+    val channelId: Long,
+    val producerId: Long,
     val routingKey: String,
     @param:JsonSerialize(using = JsonbSerializer::class)
     @param:JsonDeserialize(using = JsonbDeserializer::class)

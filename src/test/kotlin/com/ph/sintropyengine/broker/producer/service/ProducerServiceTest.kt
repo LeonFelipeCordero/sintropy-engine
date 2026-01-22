@@ -2,15 +2,13 @@ package com.ph.sintropyengine.broker.producer.service
 
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
-import com.ph.sintropyengine.broker.channel.model.ChannelType
 import com.ph.sintropyengine.broker.consumption.model.MessageStatus
 import io.quarkus.test.junit.QuarkusTest
-import jdk.internal.net.http.common.Log.channel
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
 
 @QuarkusTest
 class ProducerServiceTest : IntegrationTestBase() {
@@ -24,7 +22,7 @@ class ProducerServiceTest : IntegrationTestBase() {
         val channel = createChannel()
         val producer = producerService.createProducer(channel.name, channel.name)
         val fetchedProducer = producerService.findById(producer.producerId!!)
-        Assertions.assertThat(producer).usingRecursiveComparison().isEqualTo(fetchedProducer)
+        assertThat(producer).usingRecursiveComparison().isEqualTo(fetchedProducer)
     }
 
     @Test
@@ -37,14 +35,13 @@ class ProducerServiceTest : IntegrationTestBase() {
             )
 
         val all = messageRepository.findAll()
-        Assertions.assertThat(all).hasSize(1)
-        Assertions.assertThat(createdMessage).usingRecursiveComparison().isEqualTo(all.first())
+        assertThat(all).hasSize(1)
+        assertThat(createdMessage).usingRecursiveComparison().isEqualTo(all.first())
     }
 
     @Test
     fun `should fail if message doesn't exist`() {
-        Assertions
-            .assertThatExceptionOfType(IllegalStateException::class.java)
+        assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy {
                 producerService.publishMessage(Fixtures.createMessagePreStore(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
             }.withMessageContainingAll("Channel", "not found")
@@ -54,8 +51,7 @@ class ProducerServiceTest : IntegrationTestBase() {
     fun `should fail if routing key is incorrect`() {
         val (channel, producer) = createChannelWithProducer()
 
-        Assertions
-            .assertThatExceptionOfType(IllegalStateException::class.java)
+        assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy {
                 producerService.publishMessage(
                     Fixtures.createMessagePreStore(
@@ -72,8 +68,7 @@ class ProducerServiceTest : IntegrationTestBase() {
         val (channel1, producer1) = createChannelWithProducer()
         val channel2 = createChannel()
 
-        Assertions
-            .assertThatExceptionOfType(IllegalStateException::class.java)
+        assertThatExceptionOfType(IllegalStateException::class.java)
             .isThrownBy {
                 producerService.publishMessage(
                     Fixtures.createMessagePreStore(
@@ -95,21 +90,22 @@ class ProducerServiceTest : IntegrationTestBase() {
 
         val messages = messageRepository.findAll()
         val messageLogs = messageRepository.findAllMessageLog()
-        Assertions.assertThat(messages).hasSize(1)
-        Assertions.assertThat(messageLogs).hasSize(1)
+        assertThat(messages).hasSize(1)
+        assertThat(messageLogs).hasSize(1)
         val message = messages.first()
         val messageLog = messageLogs.first()
-        Assertions.assertThat(message.messageId).isEqualTo(messageLog.messageId)
-        Assertions.assertThat(message.timestamp).isEqualTo(messageLog.timestamp)
-        Assertions.assertThat(message.channelId).isEqualTo(messageLog.channelId)
-        Assertions.assertThat(message.producerId).isEqualTo(messageLog.producerId)
-        Assertions.assertThat(message.routingKey).isEqualTo(messageLog.routingKey)
+        assertThat(message.messageId).isEqualTo(messageLog.messageId)
+        assertThat(message.messageUuid).isEqualTo(messageLog.messageUuid)
+        assertThat(message.timestamp).isEqualTo(messageLog.timestamp)
+        assertThat(message.channelId).isEqualTo(messageLog.channelId)
+        assertThat(message.producerId).isEqualTo(messageLog.producerId)
+        assertThat(message.routingKey).isEqualTo(messageLog.routingKey)
 
-        Assertions.assertThat(message.status).isEqualTo(MessageStatus.READY)
-        Assertions.assertThat(message.lastDelivered).isNull()
-        Assertions.assertThat(message.deliveredTimes).isZero
+        assertThat(message.status).isEqualTo(MessageStatus.READY)
+        assertThat(message.lastDelivered).isNull()
+        assertThat(message.deliveredTimes).isZero
 
-        Assertions.assertThat(messageLog.processed).isFalse
+        assertThat(messageLog.processed).isFalse
     }
 
     @Test

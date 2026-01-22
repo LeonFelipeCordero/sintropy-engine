@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import org.jooq.JSONB;
-import org.jooq.Record3;
+import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -25,155 +25,169 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
     /**
      * Setter for <code>public.message_log.message_id</code>.
      */
-    public void setMessageId(UUID value) {
+    public void setMessageId(Long value) {
         set(0, value);
     }
 
     /**
      * Getter for <code>public.message_log.message_id</code>.
      */
-    public UUID getMessageId() {
-        return (UUID) get(0);
+    public Long getMessageId() {
+        return (Long) get(0);
+    }
+
+    /**
+     * Setter for <code>public.message_log.message_uuid</code>.
+     */
+    public void setMessageUuid(UUID value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>public.message_log.message_uuid</code>.
+     */
+    public UUID getMessageUuid() {
+        return (UUID) get(1);
     }
 
     /**
      * Setter for <code>public.message_log.origin_message_id</code>.
      */
     public void setOriginMessageId(UUID value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>public.message_log.origin_message_id</code>.
      */
     public UUID getOriginMessageId() {
-        return (UUID) get(1);
+        return (UUID) get(2);
     }
 
     /**
      * Setter for <code>public.message_log.timestamp</code>.
      */
     public void setTimestamp(OffsetDateTime value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.message_log.timestamp</code>.
      */
     public OffsetDateTime getTimestamp() {
-        return (OffsetDateTime) get(2);
+        return (OffsetDateTime) get(3);
     }
 
     /**
      * Setter for <code>public.message_log.channel_id</code>.
      */
-    public void setChannelId(UUID value) {
-        set(3, value);
+    public void setChannelId(Long value) {
+        set(4, value);
     }
 
     /**
      * Getter for <code>public.message_log.channel_id</code>.
      */
-    public UUID getChannelId() {
-        return (UUID) get(3);
+    public Long getChannelId() {
+        return (Long) get(4);
     }
 
     /**
      * Setter for <code>public.message_log.producer_id</code>.
      */
-    public void setProducerId(UUID value) {
-        set(4, value);
+    public void setProducerId(Long value) {
+        set(5, value);
     }
 
     /**
      * Getter for <code>public.message_log.producer_id</code>.
      */
-    public UUID getProducerId() {
-        return (UUID) get(4);
+    public Long getProducerId() {
+        return (Long) get(5);
     }
 
     /**
      * Setter for <code>public.message_log.routing_key</code>.
      */
     public void setRoutingKey(String value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>public.message_log.routing_key</code>.
      */
     public String getRoutingKey() {
-        return (String) get(5);
+        return (String) get(6);
     }
 
     /**
      * Setter for <code>public.message_log.message</code>.
      */
     public void setMessage(JSONB value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>public.message_log.message</code>.
      */
     public JSONB getMessage() {
-        return (JSONB) get(6);
+        return (JSONB) get(7);
     }
 
     /**
      * Setter for <code>public.message_log.headers</code>.
      */
     public void setHeaders(JSONB value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>public.message_log.headers</code>.
      */
     public JSONB getHeaders() {
-        return (JSONB) get(7);
+        return (JSONB) get(8);
     }
 
     /**
      * Setter for <code>public.message_log.processed</code>.
      */
     public void setProcessed(Boolean value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>public.message_log.processed</code>.
      */
     public Boolean getProcessed() {
-        return (Boolean) get(8);
+        return (Boolean) get(9);
     }
 
     /**
      * Setter for <code>public.message_log.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>public.message_log.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(9);
+        return (OffsetDateTime) get(10);
     }
 
     /**
      * Setter for <code>public.message_log.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>public.message_log.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(10);
+        return (OffsetDateTime) get(11);
     }
 
     // -------------------------------------------------------------------------
@@ -181,8 +195,8 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record3<UUID, OffsetDateTime, UUID> key() {
-        return (Record3) super.key();
+    public Record1<Long> key() {
+        return (Record1) super.key();
     }
 
     // -------------------------------------------------------------------------
@@ -199,10 +213,11 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
     /**
      * Create a detached, initialised MessageLogRecord
      */
-    public MessageLogRecord(UUID messageId, UUID originMessageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, JSONB message, JSONB headers, Boolean processed, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public MessageLogRecord(Long messageId, UUID messageUuid, UUID originMessageId, OffsetDateTime timestamp, Long channelId, Long producerId, String routingKey, JSONB message, JSONB headers, Boolean processed, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(MessageLog.MESSAGE_LOG);
 
         setMessageId(messageId);
+        setMessageUuid(messageUuid);
         setOriginMessageId(originMessageId);
         setTimestamp(timestamp);
         setChannelId(channelId);
@@ -224,6 +239,7 @@ public class MessageLogRecord extends UpdatableRecordImpl<MessageLogRecord> {
 
         if (value != null) {
             setMessageId(value.getMessageId());
+            setMessageUuid(value.getMessageUuid());
             setOriginMessageId(value.getOriginMessageId());
             setTimestamp(value.getTimestamp());
             setChannelId(value.getChannelId());

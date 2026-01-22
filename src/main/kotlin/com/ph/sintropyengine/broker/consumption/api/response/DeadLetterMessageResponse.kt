@@ -1,6 +1,5 @@
 package com.ph.sintropyengine.broker.consumption.api.response
 
-import com.fasterxml.jackson.annotation.JsonRawValue
 import com.ph.sintropyengine.broker.consumption.model.DeadLetterMessage
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -11,9 +10,7 @@ data class DeadLetterMessageResponse(
     val channelName: String,
     val producerName: String,
     val routingKey: String,
-    @get:JsonRawValue
     val message: String,
-    @get:JsonRawValue
     val headers: String,
     val originMessageId: UUID?,
     val deliveredTimes: Int,
@@ -25,7 +22,7 @@ fun DeadLetterMessage.toResponse(
     producerName: String,
 ): DeadLetterMessageResponse =
     DeadLetterMessageResponse(
-        messageId = messageId,
+        messageId = messageUuid!!,
         timestamp = timestamp,
         channelName = channelName,
         producerName = producerName,

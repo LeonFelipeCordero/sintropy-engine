@@ -9,10 +9,11 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 data class Message(
-    val messageId: UUID,
+    val messageId: Long,
+    val messageUuid: UUID,
     val timestamp: OffsetDateTime? = null,
-    val channelId: UUID,
-    val producerId: UUID,
+    val channelId: Long,
+    val producerId: Long,
     val routingKey: String,
     @param:JsonSerialize(using = JsonbSerializer::class)
     @param:JsonDeserialize(using = JsonbDeserializer::class)

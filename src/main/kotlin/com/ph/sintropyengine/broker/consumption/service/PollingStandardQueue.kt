@@ -6,8 +6,6 @@ import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
-import java.util.UUID
-
 private val logger = KotlinLogging.logger {}
 
 @ApplicationScoped
@@ -16,7 +14,7 @@ class PollingStandardQueue(
 ) : PollingQueue {
     @Transactional
     override fun poll(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
         pollingCount: Int,
     ): List<Message> {

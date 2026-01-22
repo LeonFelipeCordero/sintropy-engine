@@ -25,7 +25,7 @@ BEGIN
                                   status,
                                   created_at,
                                   updated_at)
-            VALUES (NEW.message_id,
+            VALUES (NEW.message_uuid,
                     NEW.timestamp,
                     link.target_channel_id,
                     NEW.producer_id,

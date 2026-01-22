@@ -19,6 +19,7 @@ import java.util.UUID;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.InverseForeignKey;
 import org.jooq.JSONB;
 import org.jooq.Name;
@@ -63,7 +64,12 @@ public class MessageLog extends TableImpl<MessageLogRecord> {
     /**
      * The column <code>public.message_log.message_id</code>.
      */
-    public final TableField<MessageLogRecord, UUID> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<MessageLogRecord, Long> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+    /**
+     * The column <code>public.message_log.message_uuid</code>.
+     */
+    public final TableField<MessageLogRecord, UUID> MESSAGE_UUID = createField(DSL.name("message_uuid"), SQLDataType.UUID.nullable(false), this, "");
 
     /**
      * The column <code>public.message_log.origin_message_id</code>.
@@ -78,12 +84,12 @@ public class MessageLog extends TableImpl<MessageLogRecord> {
     /**
      * The column <code>public.message_log.channel_id</code>.
      */
-    public final TableField<MessageLogRecord, UUID> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<MessageLogRecord, Long> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.message_log.producer_id</code>.
      */
-    public final TableField<MessageLogRecord, UUID> PRODUCER_ID = createField(DSL.name("producer_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<MessageLogRecord, Long> PRODUCER_ID = createField(DSL.name("producer_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.message_log.routing_key</code>.
@@ -183,8 +189,18 @@ public class MessageLog extends TableImpl<MessageLogRecord> {
     }
 
     @Override
+    public Identity<MessageLogRecord, Long> getIdentity() {
+        return (Identity<MessageLogRecord, Long>) super.getIdentity();
+    }
+
+    @Override
     public UniqueKey<MessageLogRecord> getPrimaryKey() {
-        return Keys.MESSAGE_LOG_MESSAGE_ID_TIMESTAMP_PK;
+        return Keys.MESSAGE_LOG_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<MessageLogRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.MESSAGE_LOG_MESSAGE_UUID_TIMESTAMP_CHANNEL_ID_KEY);
     }
 
     @Override

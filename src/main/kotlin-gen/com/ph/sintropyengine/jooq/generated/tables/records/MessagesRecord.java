@@ -26,183 +26,197 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
     /**
      * Setter for <code>public.messages.message_id</code>.
      */
-    public void setMessageId(UUID value) {
+    public void setMessageId(Long value) {
         set(0, value);
     }
 
     /**
      * Getter for <code>public.messages.message_id</code>.
      */
-    public UUID getMessageId() {
-        return (UUID) get(0);
+    public Long getMessageId() {
+        return (Long) get(0);
+    }
+
+    /**
+     * Setter for <code>public.messages.message_uuid</code>.
+     */
+    public void setMessageUuid(UUID value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>public.messages.message_uuid</code>.
+     */
+    public UUID getMessageUuid() {
+        return (UUID) get(1);
     }
 
     /**
      * Setter for <code>public.messages.origin_message_id</code>.
      */
     public void setOriginMessageId(UUID value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>public.messages.origin_message_id</code>.
      */
     public UUID getOriginMessageId() {
-        return (UUID) get(1);
+        return (UUID) get(2);
     }
 
     /**
      * Setter for <code>public.messages.timestamp</code>.
      */
     public void setTimestamp(OffsetDateTime value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.messages.timestamp</code>.
      */
     public OffsetDateTime getTimestamp() {
-        return (OffsetDateTime) get(2);
+        return (OffsetDateTime) get(3);
     }
 
     /**
      * Setter for <code>public.messages.channel_id</code>.
      */
-    public void setChannelId(UUID value) {
-        set(3, value);
+    public void setChannelId(Long value) {
+        set(4, value);
     }
 
     /**
      * Getter for <code>public.messages.channel_id</code>.
      */
-    public UUID getChannelId() {
-        return (UUID) get(3);
+    public Long getChannelId() {
+        return (Long) get(4);
     }
 
     /**
      * Setter for <code>public.messages.producer_id</code>.
      */
-    public void setProducerId(UUID value) {
-        set(4, value);
+    public void setProducerId(Long value) {
+        set(5, value);
     }
 
     /**
      * Getter for <code>public.messages.producer_id</code>.
      */
-    public UUID getProducerId() {
-        return (UUID) get(4);
+    public Long getProducerId() {
+        return (Long) get(5);
     }
 
     /**
      * Setter for <code>public.messages.routing_key</code>.
      */
     public void setRoutingKey(String value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>public.messages.routing_key</code>.
      */
     public String getRoutingKey() {
-        return (String) get(5);
+        return (String) get(6);
     }
 
     /**
      * Setter for <code>public.messages.message</code>.
      */
     public void setMessage(JSONB value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>public.messages.message</code>.
      */
     public JSONB getMessage() {
-        return (JSONB) get(6);
+        return (JSONB) get(7);
     }
 
     /**
      * Setter for <code>public.messages.headers</code>.
      */
     public void setHeaders(JSONB value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>public.messages.headers</code>.
      */
     public JSONB getHeaders() {
-        return (JSONB) get(7);
+        return (JSONB) get(8);
     }
 
     /**
      * Setter for <code>public.messages.status</code>.
      */
     public void setStatus(MessageStatusType value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>public.messages.status</code>.
      */
     public MessageStatusType getStatus() {
-        return (MessageStatusType) get(8);
+        return (MessageStatusType) get(9);
     }
 
     /**
      * Setter for <code>public.messages.last_delivered</code>.
      */
     public void setLastDelivered(OffsetDateTime value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>public.messages.last_delivered</code>.
      */
     public OffsetDateTime getLastDelivered() {
-        return (OffsetDateTime) get(9);
+        return (OffsetDateTime) get(10);
     }
 
     /**
      * Setter for <code>public.messages.delivered_times</code>.
      */
     public void setDeliveredTimes(Integer value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>public.messages.delivered_times</code>.
      */
     public Integer getDeliveredTimes() {
-        return (Integer) get(10);
+        return (Integer) get(11);
     }
 
     /**
      * Setter for <code>public.messages.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(11, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>public.messages.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(11);
+        return (OffsetDateTime) get(12);
     }
 
     /**
      * Setter for <code>public.messages.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(12, value);
+        set(13, value);
     }
 
     /**
      * Getter for <code>public.messages.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(12);
+        return (OffsetDateTime) get(13);
     }
 
     // -------------------------------------------------------------------------
@@ -210,7 +224,7 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<UUID> key() {
+    public Record1<Long> key() {
         return (Record1) super.key();
     }
 
@@ -228,10 +242,11 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
     /**
      * Create a detached, initialised MessagesRecord
      */
-    public MessagesRecord(UUID messageId, UUID originMessageId, OffsetDateTime timestamp, UUID channelId, UUID producerId, String routingKey, JSONB message, JSONB headers, MessageStatusType status, OffsetDateTime lastDelivered, Integer deliveredTimes, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public MessagesRecord(Long messageId, UUID messageUuid, UUID originMessageId, OffsetDateTime timestamp, Long channelId, Long producerId, String routingKey, JSONB message, JSONB headers, MessageStatusType status, OffsetDateTime lastDelivered, Integer deliveredTimes, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(Messages.MESSAGES);
 
         setMessageId(messageId);
+        setMessageUuid(messageUuid);
         setOriginMessageId(originMessageId);
         setTimestamp(timestamp);
         setChannelId(channelId);
@@ -255,6 +270,7 @@ public class MessagesRecord extends UpdatableRecordImpl<MessagesRecord> {
 
         if (value != null) {
             setMessageId(value.getMessageId());
+            setMessageUuid(value.getMessageUuid());
             setOriginMessageId(value.getOriginMessageId());
             setTimestamp(value.getTimestamp());
             setChannelId(value.getChannelId());

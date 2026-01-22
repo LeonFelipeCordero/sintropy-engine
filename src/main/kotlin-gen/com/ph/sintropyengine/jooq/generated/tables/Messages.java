@@ -21,6 +21,7 @@ import java.util.UUID;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.JSONB;
@@ -66,7 +67,12 @@ public class Messages extends TableImpl<MessagesRecord> {
     /**
      * The column <code>public.messages.message_id</code>.
      */
-    public final TableField<MessagesRecord, UUID> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<MessagesRecord, Long> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+    /**
+     * The column <code>public.messages.message_uuid</code>.
+     */
+    public final TableField<MessagesRecord, UUID> MESSAGE_UUID = createField(DSL.name("message_uuid"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.messages.origin_message_id</code>.
@@ -81,12 +87,12 @@ public class Messages extends TableImpl<MessagesRecord> {
     /**
      * The column <code>public.messages.channel_id</code>.
      */
-    public final TableField<MessagesRecord, UUID> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<MessagesRecord, Long> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.messages.producer_id</code>.
      */
-    public final TableField<MessagesRecord, UUID> PRODUCER_ID = createField(DSL.name("producer_id"), SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<MessagesRecord, Long> PRODUCER_ID = createField(DSL.name("producer_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.messages.routing_key</code>.
@@ -201,8 +207,18 @@ public class Messages extends TableImpl<MessagesRecord> {
     }
 
     @Override
+    public Identity<MessagesRecord, Long> getIdentity() {
+        return (Identity<MessagesRecord, Long>) super.getIdentity();
+    }
+
+    @Override
     public UniqueKey<MessagesRecord> getPrimaryKey() {
-        return Keys.MESSAGES_MESSAGE_ID_PK;
+        return Keys.MESSAGES_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<MessagesRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.MESSAGES_MESSAGE_UUID_KEY);
     }
 
     @Override

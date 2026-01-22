@@ -4,29 +4,36 @@ import com.ph.sintropyengine.broker.consumption.model.DeadLetterMessage
 import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
 import com.ph.sintropyengine.jooq.generated.Tables.DEAD_LETTER_QUEUE
 import jakarta.enterprise.context.ApplicationScoped
+import java.util.UUID
 import org.jooq.DSLContext
 import org.jooq.JSONB
-import java.util.UUID
 
 @ApplicationScoped
 class DeadLetterQueueRepository(
     private val context: DSLContext,
 ) {
-    fun findById(dlqEntryId: UUID): DeadLetterMessage? =
+    fun findById(dlqEntryId: Long): DeadLetterMessage? =
         context
             .selectFrom(DEAD_LETTER_QUEUE)
             .where(DEAD_LETTER_QUEUE.DLQ_ENTRY_ID.eq(dlqEntryId))
             .fetchOneInto(DeadLetterMessage::class.java)
 
-    fun findByMessageId(messageId: UUID): DeadLetterMessage? =
+    fun findByMessageId(messageId: Long): DeadLetterMessage? =
         context
             .selectFrom(DEAD_LETTER_QUEUE)
             .where(DEAD_LETTER_QUEUE.MESSAGE_ID.eq(messageId))
             .orderBy(DEAD_LETTER_QUEUE.FAILED_AT.desc())
             .fetchOneInto(DeadLetterMessage::class.java)
 
+    fun findByMessageUUID(messageUUID: UUID): DeadLetterMessage? =
+        context
+            .selectFrom(DEAD_LETTER_QUEUE)
+            .where(DEAD_LETTER_QUEUE.MESSAGE_UUID.eq(messageUUID))
+            .orderBy(DEAD_LETTER_QUEUE.FAILED_AT.desc())
+            .fetchOneInto(DeadLetterMessage::class.java)
+
     fun findByChannelIdAndRoutingKey(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
         pageSize: Int = 100,
         page: Int = 0,
@@ -41,7 +48,7 @@ class DeadLetterQueueRepository(
             .fetchInto(DeadLetterMessage::class.java)
 
     fun findAllByChannelIdAndRoutingKey(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
     ): List<DeadLetterMessage> =
         context
@@ -51,14 +58,14 @@ class DeadLetterQueueRepository(
             .orderBy(DEAD_LETTER_QUEUE.TIMESTAMP)
             .fetchInto(DeadLetterMessage::class.java)
 
-    fun delete(dlqEntryId: UUID) {
+    fun delete(dlqEntryId: Long) {
         context
             .deleteFrom(DEAD_LETTER_QUEUE)
             .where(DEAD_LETTER_QUEUE.DLQ_ENTRY_ID.eq(dlqEntryId))
             .execute()
     }
 
-    fun deleteByIds(dlqEntryIds: List<UUID>) {
+    fun deleteByIds(dlqEntryIds: List<Long>) {
         context
             .deleteFrom(DEAD_LETTER_QUEUE)
             .where(DEAD_LETTER_QUEUE.DLQ_ENTRY_ID.`in`(dlqEntryIds))
@@ -66,7 +73,7 @@ class DeadLetterQueueRepository(
     }
 
     fun deleteByChannelIdAndRoutingKey(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
     ) {
         context
@@ -87,8 +94,8 @@ class DeadLetterQueueRepository(
 
     fun save(
         message: MessagePreStore,
-        channelId: UUID,
-        producerId: UUID,
+        channelId: Long,
+        producerId: Long,
     ): DeadLetterMessage =
         context
             .insertInto(

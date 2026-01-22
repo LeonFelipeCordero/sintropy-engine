@@ -17,9 +17,10 @@ public class Producers implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private UUID producerId;
+    private Long producerId;
+    private UUID producerUuid;
     private String name;
-    private UUID channelId;
+    private Long channelId;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
@@ -27,6 +28,7 @@ public class Producers implements Serializable {
 
     public Producers(Producers value) {
         this.producerId = value.producerId;
+        this.producerUuid = value.producerUuid;
         this.name = value.name;
         this.channelId = value.channelId;
         this.createdAt = value.createdAt;
@@ -34,13 +36,15 @@ public class Producers implements Serializable {
     }
 
     public Producers(
-        UUID producerId,
+        Long producerId,
+        UUID producerUuid,
         String name,
-        UUID channelId,
+        Long channelId,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
     ) {
         this.producerId = producerId;
+        this.producerUuid = producerUuid;
         this.name = name;
         this.channelId = channelId;
         this.createdAt = createdAt;
@@ -50,15 +54,29 @@ public class Producers implements Serializable {
     /**
      * Getter for <code>public.producers.producer_id</code>.
      */
-    public UUID getProducerId() {
+    public Long getProducerId() {
         return this.producerId;
     }
 
     /**
      * Setter for <code>public.producers.producer_id</code>.
      */
-    public void setProducerId(UUID producerId) {
+    public void setProducerId(Long producerId) {
         this.producerId = producerId;
+    }
+
+    /**
+     * Getter for <code>public.producers.producer_uuid</code>.
+     */
+    public UUID getProducerUuid() {
+        return this.producerUuid;
+    }
+
+    /**
+     * Setter for <code>public.producers.producer_uuid</code>.
+     */
+    public void setProducerUuid(UUID producerUuid) {
+        this.producerUuid = producerUuid;
     }
 
     /**
@@ -78,14 +96,14 @@ public class Producers implements Serializable {
     /**
      * Getter for <code>public.producers.channel_id</code>.
      */
-    public UUID getChannelId() {
+    public Long getChannelId() {
         return this.channelId;
     }
 
     /**
      * Setter for <code>public.producers.channel_id</code>.
      */
-    public void setChannelId(UUID channelId) {
+    public void setChannelId(Long channelId) {
         this.channelId = channelId;
     }
 
@@ -132,6 +150,12 @@ public class Producers implements Serializable {
         }
         else if (!this.producerId.equals(other.producerId))
             return false;
+        if (this.producerUuid == null) {
+            if (other.producerUuid != null)
+                return false;
+        }
+        else if (!this.producerUuid.equals(other.producerUuid))
+            return false;
         if (this.name == null) {
             if (other.name != null)
                 return false;
@@ -164,6 +188,7 @@ public class Producers implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((this.producerId == null) ? 0 : this.producerId.hashCode());
+        result = prime * result + ((this.producerUuid == null) ? 0 : this.producerUuid.hashCode());
         result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
         result = prime * result + ((this.channelId == null) ? 0 : this.channelId.hashCode());
         result = prime * result + ((this.createdAt == null) ? 0 : this.createdAt.hashCode());
@@ -176,6 +201,7 @@ public class Producers implements Serializable {
         StringBuilder sb = new StringBuilder("Producers (");
 
         sb.append(producerId);
+        sb.append(", ").append(producerUuid);
         sb.append(", ").append(name);
         sb.append(", ").append(channelId);
         sb.append(", ").append(createdAt);

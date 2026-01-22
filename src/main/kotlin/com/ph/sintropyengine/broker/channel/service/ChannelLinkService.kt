@@ -39,7 +39,9 @@ class ChannelLinkService(
         return channelLinkRepository.save(channelLink)
     }
 
-    fun findById(channelLinkId: UUID): ChannelLink? = channelLinkRepository.findById(channelLinkId)
+    fun findById(channelLinkId: Long): ChannelLink? = channelLinkRepository.findById(channelLinkId)
+
+    fun findByUUID(channelLinkUUID: UUID): ChannelLink? = channelLinkRepository.findByUUID(channelLinkUUID)
 
     fun findAll(): List<ChannelLink> = channelLinkRepository.findAll()
 
@@ -60,27 +62,27 @@ class ChannelLinkService(
     }
 
     @Transactional
-    fun unlinkChannels(channelLinkId: UUID) {
-        channelLinkRepository.findById(channelLinkId)
-            ?: throw IllegalStateException("Channel link with id $channelLinkId not found")
+    fun unlinkChannels(channelLinkUUID: UUID) {
+        val channelLink = channelLinkRepository.findByUUID(channelLinkUUID)
+            ?: throw IllegalStateException("Channel link with uuid $channelLinkUUID not found")
 
-        channelLinkRepository.delete(channelLinkId)
+        channelLinkRepository.delete(channelLink.channelLinkId!!)
     }
 
     @Transactional
-    fun enableLink(channelLinkId: UUID) {
-        channelLinkRepository.findById(channelLinkId)
-            ?: throw IllegalStateException("Channel link with id $channelLinkId not found")
+    fun enableLink(channelLinkUUID: UUID) {
+        val channelLink = channelLinkRepository.findByUUID(channelLinkUUID)
+            ?: throw IllegalStateException("Channel link with id $channelLinkUUID not found")
 
-        channelLinkRepository.setEnabled(channelLinkId, true)
+        channelLinkRepository.setEnabled(channelLink.channelLinkId!!, true)
     }
 
     @Transactional
-    fun disableLink(channelLinkId: UUID) {
-        channelLinkRepository.findById(channelLinkId)
-            ?: throw IllegalStateException("Channel link with id $channelLinkId not found")
+    fun disableLink(channelLinkUUID: UUID) {
+        val channelLink = channelLinkRepository.findByUUID(channelLinkUUID)
+            ?: throw IllegalStateException("Channel link with id $channelLinkUUID not found")
 
-        channelLinkRepository.setEnabled(channelLinkId, false)
+        channelLinkRepository.setEnabled(channelLink.channelLinkId!!, false)
     }
 
     private fun validateLinkCompatibility(

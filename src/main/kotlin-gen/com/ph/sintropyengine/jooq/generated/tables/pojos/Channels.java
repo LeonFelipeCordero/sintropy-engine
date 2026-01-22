@@ -19,7 +19,8 @@ public class Channels implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private UUID channelId;
+    private Long channelId;
+    private UUID channelUuid;
     private String name;
     private ChannelType channelType;
     private OffsetDateTime createdAt;
@@ -29,6 +30,7 @@ public class Channels implements Serializable {
 
     public Channels(Channels value) {
         this.channelId = value.channelId;
+        this.channelUuid = value.channelUuid;
         this.name = value.name;
         this.channelType = value.channelType;
         this.createdAt = value.createdAt;
@@ -36,13 +38,15 @@ public class Channels implements Serializable {
     }
 
     public Channels(
-        UUID channelId,
+        Long channelId,
+        UUID channelUuid,
         String name,
         ChannelType channelType,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
     ) {
         this.channelId = channelId;
+        this.channelUuid = channelUuid;
         this.name = name;
         this.channelType = channelType;
         this.createdAt = createdAt;
@@ -52,15 +56,29 @@ public class Channels implements Serializable {
     /**
      * Getter for <code>public.channels.channel_id</code>.
      */
-    public UUID getChannelId() {
+    public Long getChannelId() {
         return this.channelId;
     }
 
     /**
      * Setter for <code>public.channels.channel_id</code>.
      */
-    public void setChannelId(UUID channelId) {
+    public void setChannelId(Long channelId) {
         this.channelId = channelId;
+    }
+
+    /**
+     * Getter for <code>public.channels.channel_uuid</code>.
+     */
+    public UUID getChannelUuid() {
+        return this.channelUuid;
+    }
+
+    /**
+     * Setter for <code>public.channels.channel_uuid</code>.
+     */
+    public void setChannelUuid(UUID channelUuid) {
+        this.channelUuid = channelUuid;
     }
 
     /**
@@ -134,6 +152,12 @@ public class Channels implements Serializable {
         }
         else if (!this.channelId.equals(other.channelId))
             return false;
+        if (this.channelUuid == null) {
+            if (other.channelUuid != null)
+                return false;
+        }
+        else if (!this.channelUuid.equals(other.channelUuid))
+            return false;
         if (this.name == null) {
             if (other.name != null)
                 return false;
@@ -166,6 +190,7 @@ public class Channels implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((this.channelId == null) ? 0 : this.channelId.hashCode());
+        result = prime * result + ((this.channelUuid == null) ? 0 : this.channelUuid.hashCode());
         result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
         result = prime * result + ((this.channelType == null) ? 0 : this.channelType.hashCode());
         result = prime * result + ((this.createdAt == null) ? 0 : this.createdAt.hashCode());
@@ -178,6 +203,7 @@ public class Channels implements Serializable {
         StringBuilder sb = new StringBuilder("Channels (");
 
         sb.append(channelId);
+        sb.append(", ").append(channelUuid);
         sb.append(", ").append(name);
         sb.append(", ").append(channelType);
         sb.append(", ").append(createdAt);

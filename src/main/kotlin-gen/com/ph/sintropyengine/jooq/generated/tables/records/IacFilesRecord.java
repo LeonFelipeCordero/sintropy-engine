@@ -24,71 +24,85 @@ public class IacFilesRecord extends UpdatableRecordImpl<IacFilesRecord> {
     /**
      * Setter for <code>public.iac_files.file_id</code>.
      */
-    public void setFileId(UUID value) {
+    public void setFileId(Long value) {
         set(0, value);
     }
 
     /**
      * Getter for <code>public.iac_files.file_id</code>.
      */
-    public UUID getFileId() {
-        return (UUID) get(0);
+    public Long getFileId() {
+        return (Long) get(0);
+    }
+
+    /**
+     * Setter for <code>public.iac_files.file_uuid</code>.
+     */
+    public void setFileUuid(UUID value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>public.iac_files.file_uuid</code>.
+     */
+    public UUID getFileUuid() {
+        return (UUID) get(1);
     }
 
     /**
      * Setter for <code>public.iac_files.file_name</code>.
      */
     public void setFileName(String value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>public.iac_files.file_name</code>.
      */
     public String getFileName() {
-        return (String) get(1);
+        return (String) get(2);
     }
 
     /**
      * Setter for <code>public.iac_files.hash</code>.
      */
     public void setHash(String value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.iac_files.hash</code>.
      */
     public String getHash() {
-        return (String) get(2);
+        return (String) get(3);
     }
 
     /**
      * Setter for <code>public.iac_files.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>public.iac_files.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(3);
+        return (OffsetDateTime) get(4);
     }
 
     /**
      * Setter for <code>public.iac_files.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>public.iac_files.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(4);
+        return (OffsetDateTime) get(5);
     }
 
     // -------------------------------------------------------------------------
@@ -96,7 +110,7 @@ public class IacFilesRecord extends UpdatableRecordImpl<IacFilesRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<UUID> key() {
+    public Record1<Long> key() {
         return (Record1) super.key();
     }
 
@@ -114,10 +128,11 @@ public class IacFilesRecord extends UpdatableRecordImpl<IacFilesRecord> {
     /**
      * Create a detached, initialised IacFilesRecord
      */
-    public IacFilesRecord(UUID fileId, String fileName, String hash, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public IacFilesRecord(Long fileId, UUID fileUuid, String fileName, String hash, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(IacFiles.IAC_FILES);
 
         setFileId(fileId);
+        setFileUuid(fileUuid);
         setFileName(fileName);
         setHash(hash);
         setCreatedAt(createdAt);
@@ -133,6 +148,7 @@ public class IacFilesRecord extends UpdatableRecordImpl<IacFilesRecord> {
 
         if (value != null) {
             setFileId(value.getFileId());
+            setFileUuid(value.getFileUuid());
             setFileName(value.getFileName());
             setHash(value.getHash());
             setCreatedAt(value.getCreatedAt());

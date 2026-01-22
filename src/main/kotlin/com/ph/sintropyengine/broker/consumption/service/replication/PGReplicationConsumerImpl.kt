@@ -135,12 +135,15 @@ class PGReplicationConsumerImpl private constructor(
 
 private fun Map<String, String>.toMessage(): Message =
     Message(
-        messageId = UUID.fromString(this["message_id"]),
+        messageId = this["message_id"]?.toLong() ?: throw IllegalArgumentException("message_id missing in message streaming"),
+        messageUuid = UUID.fromString(this["message_uuid"]),
         timestamp =
             this["timestamp"]?.let { OffsetDateTime.parse(it.replace(' ', 'T')) }
                 ?: throw IllegalStateException("Timestamp missing in message streaming"),
-        channelId = UUID.fromString(this["channel_id"]),
-        producerId = UUID.fromString(this["producer_id"]),
+        channelId = this["channel_id"]?.toLong()
+            ?: throw IllegalStateException("Channel ID missing in message streaming"),
+        producerId = this["producer_id"]?.toLong()
+            ?: throw IllegalStateException("Producer ID missing in message streaming"),
         routingKey = this["routing_key"] ?: throw IllegalStateException("routing_key missing in message streaming"),
         message = JSONB.jsonb(this["message"] ?: throw IllegalStateException("message missing in message streaming")),
         headers = JSONB.jsonb(this["headers"] ?: throw IllegalStateException("headers missing in message streaming")),

@@ -27,6 +27,7 @@ import java.util.UUID;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.Name;
@@ -71,7 +72,12 @@ public class Channels extends TableImpl<ChannelsRecord> {
     /**
      * The column <code>public.channels.channel_id</code>.
      */
-    public final TableField<ChannelsRecord, UUID> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<ChannelsRecord, Long> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+    /**
+     * The column <code>public.channels.channel_uuid</code>.
+     */
+    public final TableField<ChannelsRecord, UUID> CHANNEL_UUID = createField(DSL.name("channel_uuid"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.channels.name</code>.
@@ -166,8 +172,18 @@ public class Channels extends TableImpl<ChannelsRecord> {
     }
 
     @Override
+    public Identity<ChannelsRecord, Long> getIdentity() {
+        return (Identity<ChannelsRecord, Long>) super.getIdentity();
+    }
+
+    @Override
     public UniqueKey<ChannelsRecord> getPrimaryKey() {
         return Keys.CHANNELS_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<ChannelsRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.CHANNELS_CHANNEL_UUID_KEY);
     }
 
     private transient ChannelCircuitBreakersPath _channelCircuitBreakers;

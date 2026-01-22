@@ -139,7 +139,7 @@ class CircuitBreakerApiTest : IntegrationTestBase() {
                 .body("channelName", equalTo(channel.name))
                 .body("routingKey", equalTo(channel.routingKeys.first()))
                 .body("state", equalTo("OPEN"))
-                .body("failedMessageId", equalTo(message.messageId.toString()))
+                .body("failedMessageId", equalTo(message.messageUuid.toString()))
                 .body("openedAt", notNullValue())
         }
 

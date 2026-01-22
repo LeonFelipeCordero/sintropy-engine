@@ -17,7 +17,7 @@ fun ChannelLink.toResponse(
     targetChannelName: String,
 ): ChannelLinkResponse =
     ChannelLinkResponse(
-        channelLinkId = channelLinkId!!,
+        channelLinkId = channelLinkUuid!!,
         sourceChannelName = sourceChannelName,
         targetChannelName = targetChannelName,
         sourceRoutingKey = sourceRoutingKey,

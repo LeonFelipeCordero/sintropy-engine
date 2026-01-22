@@ -24,71 +24,85 @@ public class ProducersRecord extends UpdatableRecordImpl<ProducersRecord> {
     /**
      * Setter for <code>public.producers.producer_id</code>.
      */
-    public void setProducerId(UUID value) {
+    public void setProducerId(Long value) {
         set(0, value);
     }
 
     /**
      * Getter for <code>public.producers.producer_id</code>.
      */
-    public UUID getProducerId() {
-        return (UUID) get(0);
+    public Long getProducerId() {
+        return (Long) get(0);
+    }
+
+    /**
+     * Setter for <code>public.producers.producer_uuid</code>.
+     */
+    public void setProducerUuid(UUID value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>public.producers.producer_uuid</code>.
+     */
+    public UUID getProducerUuid() {
+        return (UUID) get(1);
     }
 
     /**
      * Setter for <code>public.producers.name</code>.
      */
     public void setName(String value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>public.producers.name</code>.
      */
     public String getName() {
-        return (String) get(1);
+        return (String) get(2);
     }
 
     /**
      * Setter for <code>public.producers.channel_id</code>.
      */
-    public void setChannelId(UUID value) {
-        set(2, value);
+    public void setChannelId(Long value) {
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.producers.channel_id</code>.
      */
-    public UUID getChannelId() {
-        return (UUID) get(2);
+    public Long getChannelId() {
+        return (Long) get(3);
     }
 
     /**
      * Setter for <code>public.producers.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>public.producers.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(3);
+        return (OffsetDateTime) get(4);
     }
 
     /**
      * Setter for <code>public.producers.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>public.producers.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(4);
+        return (OffsetDateTime) get(5);
     }
 
     // -------------------------------------------------------------------------
@@ -96,7 +110,7 @@ public class ProducersRecord extends UpdatableRecordImpl<ProducersRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<UUID> key() {
+    public Record1<Long> key() {
         return (Record1) super.key();
     }
 
@@ -114,10 +128,11 @@ public class ProducersRecord extends UpdatableRecordImpl<ProducersRecord> {
     /**
      * Create a detached, initialised ProducersRecord
      */
-    public ProducersRecord(UUID producerId, String name, UUID channelId, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public ProducersRecord(Long producerId, UUID producerUuid, String name, Long channelId, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(Producers.PRODUCERS);
 
         setProducerId(producerId);
+        setProducerUuid(producerUuid);
         setName(name);
         setChannelId(channelId);
         setCreatedAt(createdAt);
@@ -133,6 +148,7 @@ public class ProducersRecord extends UpdatableRecordImpl<ProducersRecord> {
 
         if (value != null) {
             setProducerId(value.getProducerId());
+            setProducerUuid(value.getProducerUuid());
             setName(value.getName());
             setChannelId(value.getChannelId());
             setCreatedAt(value.getCreatedAt());

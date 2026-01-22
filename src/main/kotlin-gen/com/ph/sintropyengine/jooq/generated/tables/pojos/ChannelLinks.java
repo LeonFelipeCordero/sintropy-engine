@@ -17,9 +17,10 @@ public class ChannelLinks implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private UUID channelLinkId;
-    private UUID sourceChannelId;
-    private UUID targetChannelId;
+    private Long channelLinkId;
+    private UUID channelLinkUuid;
+    private Long sourceChannelId;
+    private Long targetChannelId;
     private String sourceRoutingKey;
     private String targetRoutingKey;
     private OffsetDateTime createdAt;
@@ -30,6 +31,7 @@ public class ChannelLinks implements Serializable {
 
     public ChannelLinks(ChannelLinks value) {
         this.channelLinkId = value.channelLinkId;
+        this.channelLinkUuid = value.channelLinkUuid;
         this.sourceChannelId = value.sourceChannelId;
         this.targetChannelId = value.targetChannelId;
         this.sourceRoutingKey = value.sourceRoutingKey;
@@ -40,9 +42,10 @@ public class ChannelLinks implements Serializable {
     }
 
     public ChannelLinks(
-        UUID channelLinkId,
-        UUID sourceChannelId,
-        UUID targetChannelId,
+        Long channelLinkId,
+        UUID channelLinkUuid,
+        Long sourceChannelId,
+        Long targetChannelId,
         String sourceRoutingKey,
         String targetRoutingKey,
         OffsetDateTime createdAt,
@@ -50,6 +53,7 @@ public class ChannelLinks implements Serializable {
         Boolean enabled
     ) {
         this.channelLinkId = channelLinkId;
+        this.channelLinkUuid = channelLinkUuid;
         this.sourceChannelId = sourceChannelId;
         this.targetChannelId = targetChannelId;
         this.sourceRoutingKey = sourceRoutingKey;
@@ -62,42 +66,56 @@ public class ChannelLinks implements Serializable {
     /**
      * Getter for <code>public.channel_links.channel_link_id</code>.
      */
-    public UUID getChannelLinkId() {
+    public Long getChannelLinkId() {
         return this.channelLinkId;
     }
 
     /**
      * Setter for <code>public.channel_links.channel_link_id</code>.
      */
-    public void setChannelLinkId(UUID channelLinkId) {
+    public void setChannelLinkId(Long channelLinkId) {
         this.channelLinkId = channelLinkId;
+    }
+
+    /**
+     * Getter for <code>public.channel_links.channel_link_uuid</code>.
+     */
+    public UUID getChannelLinkUuid() {
+        return this.channelLinkUuid;
+    }
+
+    /**
+     * Setter for <code>public.channel_links.channel_link_uuid</code>.
+     */
+    public void setChannelLinkUuid(UUID channelLinkUuid) {
+        this.channelLinkUuid = channelLinkUuid;
     }
 
     /**
      * Getter for <code>public.channel_links.source_channel_id</code>.
      */
-    public UUID getSourceChannelId() {
+    public Long getSourceChannelId() {
         return this.sourceChannelId;
     }
 
     /**
      * Setter for <code>public.channel_links.source_channel_id</code>.
      */
-    public void setSourceChannelId(UUID sourceChannelId) {
+    public void setSourceChannelId(Long sourceChannelId) {
         this.sourceChannelId = sourceChannelId;
     }
 
     /**
      * Getter for <code>public.channel_links.target_channel_id</code>.
      */
-    public UUID getTargetChannelId() {
+    public Long getTargetChannelId() {
         return this.targetChannelId;
     }
 
     /**
      * Setter for <code>public.channel_links.target_channel_id</code>.
      */
-    public void setTargetChannelId(UUID targetChannelId) {
+    public void setTargetChannelId(Long targetChannelId) {
         this.targetChannelId = targetChannelId;
     }
 
@@ -186,6 +204,12 @@ public class ChannelLinks implements Serializable {
         }
         else if (!this.channelLinkId.equals(other.channelLinkId))
             return false;
+        if (this.channelLinkUuid == null) {
+            if (other.channelLinkUuid != null)
+                return false;
+        }
+        else if (!this.channelLinkUuid.equals(other.channelLinkUuid))
+            return false;
         if (this.sourceChannelId == null) {
             if (other.sourceChannelId != null)
                 return false;
@@ -236,6 +260,7 @@ public class ChannelLinks implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((this.channelLinkId == null) ? 0 : this.channelLinkId.hashCode());
+        result = prime * result + ((this.channelLinkUuid == null) ? 0 : this.channelLinkUuid.hashCode());
         result = prime * result + ((this.sourceChannelId == null) ? 0 : this.sourceChannelId.hashCode());
         result = prime * result + ((this.targetChannelId == null) ? 0 : this.targetChannelId.hashCode());
         result = prime * result + ((this.sourceRoutingKey == null) ? 0 : this.sourceRoutingKey.hashCode());
@@ -251,6 +276,7 @@ public class ChannelLinks implements Serializable {
         StringBuilder sb = new StringBuilder("ChannelLinks (");
 
         sb.append(channelLinkId);
+        sb.append(", ").append(channelLinkUuid);
         sb.append(", ").append(sourceChannelId);
         sb.append(", ").append(targetChannelId);
         sb.append(", ").append(sourceRoutingKey);

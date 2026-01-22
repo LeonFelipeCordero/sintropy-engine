@@ -120,7 +120,25 @@ open class IntegrationTestBase {
 
     /**
      * Publishes a messages to the target channel from the target producer
-     * The new message entry have a unique ID
+     * Use this method for channels with the circuit open
+     */
+    protected fun publishMessageForOpenCircuit(
+        channel: Channel,
+        producer: Producer,
+        routingKey: String = channel.routingKeys.first(),
+    ): Message? =
+        producerService.publishMessage(
+            Fixtures.createMessagePreStore(
+                channel.name,
+                producer.name,
+                routingKey,
+            ),
+        )
+
+    /**
+     * Publishes a messages to the target channel from the target producer
+     * The new message entry have a unique ID,
+     * do not used this method for channels with the circuit open
      */
     protected fun publishMessage(
         channel: Channel,
@@ -133,11 +151,12 @@ open class IntegrationTestBase {
                 producer.name,
                 routingKey,
             ),
-        )
+        )!!
 
     /**
      * Publishes a messages to freshly created channels from freshly created producers
      * Each new entry created have a unique ID
+     * do not used this method for channels with the circuit open
      */
     protected fun publishMessage(consumptionType: ConsumptionType = STANDARD): Message {
         val (channel, producer) = createChannelWithProducer(consumptionType = consumptionType)
@@ -148,7 +167,7 @@ open class IntegrationTestBase {
                 producer.name,
                 channel.routingKeys.first(),
             ),
-        )
+        )!!
     }
 
     protected fun launchProducers(testData: TestData) {
@@ -187,7 +206,7 @@ open class IntegrationTestBase {
     }
 
     protected suspend fun launchConsumers(
-        channelId: UUID,
+        channelId: Long,
         routingKey: String,
         channel: kotlinx.coroutines.channels.Channel<Message>,
         pollingQueue: PollingQueue,

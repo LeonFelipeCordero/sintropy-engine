@@ -82,7 +82,7 @@ class ProducerApi(
     fun publishMessage(request: PublishMessageRequest): Response {
         logger.debug {
             "Publishing message [channel=${request.channelName}, producer=${request.producerName}, " +
-                "routingKey=${request.routingKey}]"
+                    "routingKey=${request.routingKey}]"
         }
 
         val publishedMessage = producerService.publishMessage(request.toMessagePreStore())
@@ -94,13 +94,13 @@ class ProducerApi(
         )
 
         logger.info {
-            "Message published [messageId=${publishedMessage.messageId}, channel=${request.channelName}, " +
-                "routingKey=${request.routingKey}, producer=${request.producerName}]"
+            "Message published [messageId=${publishedMessage?.messageId}, channel=${request.channelName}, " +
+                    "routingKey=${request.routingKey}, producer=${request.producerName}]"
         }
 
         return Response
             .status(Response.Status.CREATED)
-            .entity(publishedMessage.toResponse(request.channelName, request.producerName))
+            .entity(publishedMessage?.toResponse(request.channelName, request.producerName))
             .build()
     }
 }

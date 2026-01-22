@@ -25,71 +25,85 @@ public class ChannelsRecord extends UpdatableRecordImpl<ChannelsRecord> {
     /**
      * Setter for <code>public.channels.channel_id</code>.
      */
-    public void setChannelId(UUID value) {
+    public void setChannelId(Long value) {
         set(0, value);
     }
 
     /**
      * Getter for <code>public.channels.channel_id</code>.
      */
-    public UUID getChannelId() {
-        return (UUID) get(0);
+    public Long getChannelId() {
+        return (Long) get(0);
+    }
+
+    /**
+     * Setter for <code>public.channels.channel_uuid</code>.
+     */
+    public void setChannelUuid(UUID value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>public.channels.channel_uuid</code>.
+     */
+    public UUID getChannelUuid() {
+        return (UUID) get(1);
     }
 
     /**
      * Setter for <code>public.channels.name</code>.
      */
     public void setName(String value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>public.channels.name</code>.
      */
     public String getName() {
-        return (String) get(1);
+        return (String) get(2);
     }
 
     /**
      * Setter for <code>public.channels.channel_type</code>.
      */
     public void setChannelType(ChannelType value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.channels.channel_type</code>.
      */
     public ChannelType getChannelType() {
-        return (ChannelType) get(2);
+        return (ChannelType) get(3);
     }
 
     /**
      * Setter for <code>public.channels.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>public.channels.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(3);
+        return (OffsetDateTime) get(4);
     }
 
     /**
      * Setter for <code>public.channels.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>public.channels.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(4);
+        return (OffsetDateTime) get(5);
     }
 
     // -------------------------------------------------------------------------
@@ -97,7 +111,7 @@ public class ChannelsRecord extends UpdatableRecordImpl<ChannelsRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<UUID> key() {
+    public Record1<Long> key() {
         return (Record1) super.key();
     }
 
@@ -115,10 +129,11 @@ public class ChannelsRecord extends UpdatableRecordImpl<ChannelsRecord> {
     /**
      * Create a detached, initialised ChannelsRecord
      */
-    public ChannelsRecord(UUID channelId, String name, ChannelType channelType, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public ChannelsRecord(Long channelId, UUID channelUuid, String name, ChannelType channelType, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(Channels.CHANNELS);
 
         setChannelId(channelId);
+        setChannelUuid(channelUuid);
         setName(name);
         setChannelType(channelType);
         setCreatedAt(createdAt);
@@ -134,6 +149,7 @@ public class ChannelsRecord extends UpdatableRecordImpl<ChannelsRecord> {
 
         if (value != null) {
             setChannelId(value.getChannelId());
+            setChannelUuid(value.getChannelUuid());
             setName(value.getName());
             setChannelType(value.getChannelType());
             setCreatedAt(value.getCreatedAt());
