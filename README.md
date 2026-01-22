@@ -85,8 +85,7 @@ You can then execute your native executable with: `./build/sintropy-engine-1.0-S
 
 Contributions are welcome! If you would like to contribute to the project, please follow these steps:
 
-1.  Fork the repository.
-2.  Create a new branch for your feature or bug fix.
-3.  Make your changes and commit them with a descriptive message.
-4.  Push your changes to your fork.
-5.  Create a pull request to the main repository.
+1.  Create a new branch for your feature or bug fix.
+2.  Make your changes and commit them with a descriptive message.
+3.  Push your changes to your branch.
+4.  Create a pull request to the main repository.
