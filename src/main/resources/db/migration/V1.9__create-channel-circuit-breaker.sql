@@ -7,7 +7,7 @@ CREATE CAST (VARCHAR AS circuit_state) WITH INOUT AS IMPLICIT;
 
 CREATE TABLE channel_circuit_breakers
 (
-    circuit_id        UUID PRIMARY KEY       DEFAULT gen_random_uuid(),
+    circuit_id        UUID PRIMARY KEY       DEFAULT uuidv7(),
     channel_id        UUID          NOT NULL REFERENCES channels (channel_id) ON DELETE CASCADE,
     routing_key       VARCHAR(128)  NOT NULL,
     state             circuit_state NOT NULL DEFAULT 'CLOSED',

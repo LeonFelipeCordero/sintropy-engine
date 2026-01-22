@@ -1,6 +1,6 @@
 create table producers
 (
-    producer_id uuid         not null default gen_random_uuid() primary key,
+    producer_id uuid         not null default uuidv7() primary key,
     name        varchar(128) not null,
     channel_id  uuid         not null references channels (channel_id),
 

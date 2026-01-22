@@ -58,7 +58,7 @@ public class IacFiles extends TableImpl<IacFilesRecord> {
     /**
      * The column <code>public.iac_files.file_id</code>.
      */
-    public final TableField<IacFilesRecord, UUID> FILE_ID = createField(DSL.name("file_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<IacFilesRecord, UUID> FILE_ID = createField(DSL.name("file_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("uuidv7()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.iac_files.file_name</code>.

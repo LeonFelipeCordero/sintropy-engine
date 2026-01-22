@@ -64,7 +64,7 @@ public class ChannelCircuitBreakers extends TableImpl<ChannelCircuitBreakersReco
     /**
      * The column <code>public.channel_circuit_breakers.circuit_id</code>.
      */
-    public final TableField<ChannelCircuitBreakersRecord, UUID> CIRCUIT_ID = createField(DSL.name("circuit_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<ChannelCircuitBreakersRecord, UUID> CIRCUIT_ID = createField(DSL.name("circuit_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("uuidv7()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.channel_circuit_breakers.channel_id</code>.

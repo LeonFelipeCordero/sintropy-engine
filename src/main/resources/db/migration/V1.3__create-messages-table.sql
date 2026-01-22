@@ -3,7 +3,7 @@ create cast (varchar as message_status_type) with inout as implicit;
 
 create table messages
 (
-    message_id        uuid                not null default gen_random_uuid(),
+    message_id        uuid                not null default uuidv7(),
     origin_message_id uuid,
     timestamp         timestamptz         not null default now(),
     channel_id        uuid                not null references channels (channel_id),

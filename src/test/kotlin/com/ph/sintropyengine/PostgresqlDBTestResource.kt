@@ -8,7 +8,7 @@ import java.io.File
 
 private val customerImage: ImageFromDockerfile =
     ImageFromDockerfile("development-postgres")
-        .withDockerfile(File("development/postgres17-wal2json/Dockerfile").toPath())
+        .withDockerfile(File("development/postgres18-wal2json/Dockerfile").toPath())
 
 private val container: PostgreSQLContainer<*> =
     PostgreSQLContainer(

@@ -65,12 +65,12 @@ public class DeadLetterQueue extends TableImpl<DeadLetterQueueRecord> {
     /**
      * The column <code>public.dead_letter_queue.dlq_entry_id</code>.
      */
-    public final TableField<DeadLetterQueueRecord, UUID> DLQ_ENTRY_ID = createField(DSL.name("dlq_entry_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<DeadLetterQueueRecord, UUID> DLQ_ENTRY_ID = createField(DSL.name("dlq_entry_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("uuidv7()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.dead_letter_queue.message_id</code>.
      */
-    public final TableField<DeadLetterQueueRecord, UUID> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("gen_random_uuid()"), SQLDataType.UUID)), this, "");
+    public final TableField<DeadLetterQueueRecord, UUID> MESSAGE_ID = createField(DSL.name("message_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("uuidv7()"), SQLDataType.UUID)), this, "");
 
     /**
      * The column <code>public.dead_letter_queue.timestamp</code>.

@@ -1,5 +1,5 @@
 CREATE TABLE channel_links (
-    channel_link_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    channel_link_id UUID PRIMARY KEY DEFAULT uuidv7(),
     source_channel_id UUID NOT NULL REFERENCES channels(channel_id) ON DELETE CASCADE,
     target_channel_id UUID NOT NULL REFERENCES channels(channel_id) ON DELETE CASCADE,
     source_routing_key VARCHAR(255) NOT NULL,

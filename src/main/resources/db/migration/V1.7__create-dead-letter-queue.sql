@@ -1,8 +1,8 @@
 -- Dead Letter Queue table
 CREATE TABLE dead_letter_queue
 (
-    dlq_entry_id      UUID PRIMARY KEY      DEFAULT gen_random_uuid(),
-    message_id        UUID         NOT NULL DEFAULT gen_random_uuid(),
+    dlq_entry_id      UUID PRIMARY KEY      DEFAULT uuidv7(),
+    message_id        UUID         NOT NULL DEFAULT uuidv7(),
     timestamp         TIMESTAMPTZ  NOT NULL DEFAULT now(),
     channel_id        UUID         NOT NULL REFERENCES channels (channel_id),
     producer_id       UUID         NOT NULL REFERENCES producers (producer_id),
