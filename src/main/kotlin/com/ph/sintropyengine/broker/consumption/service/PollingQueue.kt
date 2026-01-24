@@ -26,6 +26,18 @@ interface PollingQueue {
     }
 
     @Transactional
+    fun markAsFailedBulk(messageIds: List<UUID>): BulkOperationResult {
+        if (messageIds.isEmpty()) {
+            return BulkOperationResult(processed = emptyList())
+        }
+
+        val failedMessages = messageRepository.markAsFailedBulk(messageIds).map { it.messageId }
+
+        logger.debug { "marked [$failedMessages] as failed in bulk" }
+        return BulkOperationResult(processed = failedMessages)
+    }
+
+    @Transactional
     fun dequeue(messageId: UUID) {
         messageRepository.findById(messageId)?.also {
             if (it.status == MessageStatus.READY) {
@@ -37,4 +49,27 @@ interface PollingQueue {
             logger.debug { "dequeue message $messageId" }
         } ?: throw IllegalStateException("Message with id $messageId not found")
     }
+
+    @Transactional
+    fun dequeueBulk(messageIds: List<UUID>): BulkOperationResult {
+        if (messageIds.isEmpty()) {
+            return BulkOperationResult(processed = emptyList())
+        }
+
+        val existingMessages = messageRepository.findByIds(messageIds)
+
+        val messagesInReady = existingMessages.filter { it.status == MessageStatus.READY }
+        if (messagesInReady.isNotEmpty()) {
+            throw IllegalStateException("Some Messages [${messagesInReady.map { it.messageId }}] are still in status READY")
+        }
+
+        val dequeueBulk = messageRepository.dequeueBulk(messageIds).map { it.messageId }
+
+        logger.debug { "dequeued [$dequeueBulk]" }
+        return BulkOperationResult(processed = dequeueBulk)
+    }
 }
+
+data class BulkOperationResult(
+    val processed: List<UUID>,
+)

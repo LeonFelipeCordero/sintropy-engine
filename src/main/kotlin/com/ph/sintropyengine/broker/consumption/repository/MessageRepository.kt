@@ -116,12 +116,34 @@ class MessageRepository(
             .execute()
     }
 
+    fun markAsFailedBulk(messageIds: List<UUID>): List<Message> =
+        context
+            .update(Tables.MESSAGES)
+            .set(Tables.MESSAGES.STATUS, MessageStatusType.FAILED)
+            .set(Tables.MESSAGES.UPDATED_AT, OffsetDateTime.now())
+            .where(Tables.MESSAGES.MESSAGE_ID.`in`(messageIds))
+            .returning()
+            .fetchInto(Message::class.java)
+
     fun dequeue(messageId: UUID) {
         context
             .delete(Tables.MESSAGES)
             .where(Tables.MESSAGES.MESSAGE_ID.eq(messageId))
             .execute()
     }
+
+    fun dequeueBulk(messageIds: List<UUID>): List<Message> =
+        context
+            .delete(Tables.MESSAGES)
+            .where(Tables.MESSAGES.MESSAGE_ID.`in`(messageIds))
+            .returning()
+            .fetchInto(Message::class.java)
+
+    fun findByIds(messageIds: List<UUID>): List<Message> =
+        context
+            .selectFrom(Tables.MESSAGES)
+            .where(Tables.MESSAGES.MESSAGE_ID.`in`(messageIds))
+            .fetchInto(Message::class.java)
 
     fun reinsertFromDlq(dlqEntry: DeadLetterMessage): Message =
         context

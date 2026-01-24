@@ -2,9 +2,9 @@ package com.ph.sintropyengine.broker.consumption.api
 
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType
 import com.ph.sintropyengine.broker.channel.service.ChannelService
-import com.ph.sintropyengine.broker.consumption.api.response.MessageResponse
 import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
+import com.ph.sintropyengine.broker.consumption.service.BulkOperationResult
 import com.ph.sintropyengine.broker.consumption.service.PollingFifoQueue
 import com.ph.sintropyengine.broker.consumption.service.PollingStandardQueue
 import com.ph.sintropyengine.broker.producer.service.ProducerService
@@ -33,12 +33,6 @@ class QueueApi(
     private val observabilityService: ObservabilityService,
     private val messageRepository: MessageRepository,
 ) {
-    data class PollRequest(
-        val channelName: String,
-        val routingKey: String,
-        val pollingCount: Int,
-    )
-
     @POST
     @Path("/poll")
     fun poll(request: PollRequest): Response {
@@ -126,5 +120,51 @@ class QueueApi(
         )
 
         return Response.noContent().build()
+    }
+
+    @POST
+    @Path("/messages/failed/bulk")
+    fun markAsFailedBulk(request: BulkMessageIdsRequest): Response {
+        if (request.messageIds.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Message IDs list cannot be empty").build()
+        }
+
+        logger.debug { "Bulk mark as failed request received [count=${request.messageIds.size}]" }
+
+        val result = pollingStandardQueue.markAsFailedBulk(request.messageIds)
+
+        return Response.ok(BulkOperationResponse.from(result)).build()
+    }
+
+    @POST
+    @Path("/messages/dequeue/bulk")
+    fun dequeueBulk(request: BulkMessageIdsRequest): Response {
+        if (request.messageIds.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Message IDs list cannot be empty").build()
+        }
+
+        logger.debug { "Bulk dequeue request received [count=${request.messageIds.size}]" }
+
+        val result = pollingStandardQueue.dequeueBulk(request.messageIds)
+
+        return Response.ok(BulkOperationResponse.from(result)).build()
+    }
+}
+
+data class PollRequest(
+    val channelName: String,
+    val routingKey: String,
+    val pollingCount: Int,
+)
+
+data class BulkMessageIdsRequest(
+    val messageIds: List<UUID>,
+)
+
+data class BulkOperationResponse(
+    val processed: List<UUID>,
+) {
+    companion object {
+        fun from(result: BulkOperationResult) = BulkOperationResponse(processed = result.processed)
     }
 }

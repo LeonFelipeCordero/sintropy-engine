@@ -76,7 +76,7 @@ class ProducerApi(
             producerName = request.producerName,
         )
 
-        logger.info {
+        logger.debug {
             "Message published [messageId=${publishedMessage.messageId}, channel=${request.channelName}, " +
                 "routingKey=${request.routingKey}, producer=${request.producerName}]"
         }

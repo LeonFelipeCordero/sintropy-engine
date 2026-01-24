@@ -1,5 +1,6 @@
 package com.ph.sintropyengine.broker.consumption.service
 
+import com.arjuna.ats.internal.jdbc.drivers.modifiers.list
 import com.ph.sintropyengine.Fixtures
 import com.ph.sintropyengine.IntegrationTestBase
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType
@@ -452,4 +453,199 @@ class PollingStandardQueueTest : IntegrationTestBase() {
                     .isEqualTo(allMessageLog.filter { it.routing() == key }.sortedBy { it.timestamp })
             }
         }
+
+    @Test
+    fun `should mark multiple messages as failed in bulk`() {
+        val (channel, producer) = createChannelWithProducer()
+        val message1 = publishMessage(channel, producer)
+        val message2 = publishMessage(channel, producer)
+        val message3 = publishMessage(channel, producer)
+
+        pollingQueue.poll(channel.channelId!!, channel.routingKeys.first(), 3)
+
+        val result = pollingQueue.markAsFailedBulk(listOf(message1.messageId, message2.messageId, message3.messageId))
+
+        assertThat(result.processed).isEqualTo(listOf(message1.messageId, message2.messageId, message3.messageId))
+
+        val messages = messageRepository.findAll()
+        assertThat(messages).isEmpty()
+
+        val dlqMessages = dlqRepository.findAllByChannelIdAndRoutingKey(channel.channelId, channel.routingKeys.first())
+        assertThat(dlqMessages).hasSize(3)
+    }
+
+    @Test
+    fun `should return not found IDs when marking non-existent messages as failed in bulk`() {
+        val (channel, producer) = createChannelWithProducer()
+        val message1 = publishMessage(channel, producer)
+        val nonExistentId = UUID.randomUUID()
+
+        pollingQueue.poll(channel.channelId!!, channel.routingKeys.first(), 1)
+
+        val result = pollingQueue.markAsFailedBulk(listOf(message1.messageId, nonExistentId))
+
+        assertThat(result.processed).isEqualTo(listOf(message1.messageId))
+    }
+
+    @Test
+    fun `should return empty result when marking empty list as failed in bulk`() {
+        val result = pollingQueue.markAsFailedBulk(emptyList())
+
+        assertThat(result.processed).isEqualTo(emptyList<UUID>())
+    }
+
+    @Test
+    fun `should return all not found when all messages do not exist for mark as failed bulk`() {
+        val nonExistentId1 = UUID.randomUUID()
+        val nonExistentId2 = UUID.randomUUID()
+
+        val result = pollingQueue.markAsFailedBulk(listOf(nonExistentId1, nonExistentId2))
+
+        assertThat(result.processed).isEqualTo(emptyList<UUID>())
+    }
+
+    @Test
+    fun `should mark messages from different channels as failed in bulk`() {
+        val (channel1, producer1) = createChannelWithProducer()
+        val (channel2, producer2) = createChannelWithProducer()
+        val message1 = publishMessage(channel1, producer1)
+        val message2 = publishMessage(channel2, producer2)
+
+        pollingQueue.poll(channel1.channelId!!, channel1.routingKeys.first(), 1)
+        pollingQueue.poll(channel2.channelId!!, channel2.routingKeys.first(), 1)
+
+        val result = pollingQueue.markAsFailedBulk(listOf(message1.messageId, message2.messageId))
+
+        assertThat(result.processed).isEqualTo(listOf(message1.messageId, message2.messageId))
+
+        val dlq1 = dlqRepository.findAllByChannelIdAndRoutingKey(channel1.channelId, channel1.routingKeys.first())
+        val dlq2 = dlqRepository.findAllByChannelIdAndRoutingKey(channel2.channelId, channel2.routingKeys.first())
+        assertThat(dlq1).hasSize(1)
+        assertThat(dlq2).hasSize(1)
+    }
+
+    @Test
+    fun `should dequeue multiple messages in bulk`() {
+        val (channel, producer) = createChannelWithProducer()
+        val message1 = publishMessage(channel, producer)
+        val message2 = publishMessage(channel, producer)
+        val message3 = publishMessage(channel, producer)
+
+        pollingQueue.poll(channel.channelId!!, channel.routingKeys.first(), 3)
+
+        val result = pollingQueue.dequeueBulk(listOf(message1.messageId, message2.messageId, message3.messageId))
+
+        assertThat(result.processed).isEqualTo(listOf(message1.messageId, message2.messageId, message3.messageId))
+
+        val messages = messageRepository.findAll()
+        assertThat(messages).isEmpty()
+
+        val messageLogs = messageRepository.findAllMessageLog()
+        assertThat(messageLogs).hasSize(3)
+        assertThat(messageLogs.all { it.processed }).isTrue
+    }
+
+    @Test
+    fun `should return not found IDs when dequeuing non-existent messages in bulk`() {
+        val (channel, producer) = createChannelWithProducer()
+        val message1 = publishMessage(channel, producer)
+        val nonExistentId = UUID.randomUUID()
+
+        pollingQueue.poll(channel.channelId!!, channel.routingKeys.first(), 1)
+
+        val result = pollingQueue.dequeueBulk(listOf(message1.messageId, nonExistentId))
+
+        assertThat(result.processed).isEqualTo(listOf(message1.messageId))
+    }
+
+    @Test
+    fun `should return empty result when dequeuing empty list in bulk`() {
+        val result = pollingQueue.dequeueBulk(emptyList())
+
+        assertThat(result.processed).isEqualTo(emptyList<UUID>())
+    }
+
+    @Test
+    fun `should return all not found when all messages do not exist for dequeue bulk`() {
+        val nonExistentId1 = UUID.randomUUID()
+        val nonExistentId2 = UUID.randomUUID()
+
+        val result = pollingQueue.dequeueBulk(listOf(nonExistentId1, nonExistentId2))
+
+        assertThat(result.processed).isEqualTo(emptyList<UUID>())
+    }
+
+    @Test
+    fun `should not dequeue any messages when all are in READY status in bulk`() {
+        val (channel, producer) = createChannelWithProducer()
+        val message1 = publishMessage(channel, producer)
+        val message2 = publishMessage(channel, producer)
+
+        assertThatExceptionOfType(IllegalStateException::class.java)
+            .isThrownBy {
+                pollingQueue.dequeueBulk(listOf(message1.messageId, message2.messageId))
+            }.withMessageContaining("Some Messages", "are still in status READY")
+
+        val messages = messageRepository.findAll()
+        assertThat(messages).hasSize(2)
+    }
+
+    @Test
+    fun `should dequeue messages from different channels in bulk`() {
+        val (channel1, producer1) = createChannelWithProducer()
+        val (channel2, producer2) = createChannelWithProducer()
+        val message1 = publishMessage(channel1, producer1)
+        val message2 = publishMessage(channel2, producer2)
+
+        pollingQueue.poll(channel1.channelId!!, channel1.routingKeys.first(), 1)
+        pollingQueue.poll(channel2.channelId!!, channel2.routingKeys.first(), 1)
+
+        val result = pollingQueue.dequeueBulk(listOf(message1.messageId, message2.messageId))
+
+        assertThat(result.processed).isEqualTo(listOf(message1.messageId, message2.messageId))
+
+        val messages = messageRepository.findAll()
+        assertThat(messages).isEmpty()
+    }
+
+    @Test
+    fun `should handle mixed scenarios in bulk mark as failed - found and not found`() {
+        val (channel, producer) = createChannelWithProducer()
+        val message1 = publishMessage(channel, producer)
+        val message2 = publishMessage(channel, producer)
+        val nonExistentId = UUID.randomUUID()
+
+        pollingQueue.poll(channel.channelId!!, channel.routingKeys.first(), 2)
+
+        val result = pollingQueue.markAsFailedBulk(listOf(message1.messageId, message2.messageId, nonExistentId))
+
+        assertThat(result.processed).isEqualTo(listOf(message1.messageId, message2.messageId))
+    }
+
+    @Test
+    fun `should correctly process bulk dequeue with duplicate message IDs`() {
+        val (channel, producer) = createChannelWithProducer()
+        val message = publishMessage(channel, producer)
+
+        pollingQueue.poll(channel.channelId!!, channel.routingKeys.first(), 1)
+
+        val result = pollingQueue.dequeueBulk(listOf(message.messageId, message.messageId))
+
+        assertThat(result.processed).isEqualTo(listOf(message.messageId))
+
+        val messages = messageRepository.findAll()
+        assertThat(messages).isEmpty()
+    }
+
+    @Test
+    fun `should correctly process bulk mark as failed with duplicate message IDs`() {
+        val (channel, producer) = createChannelWithProducer()
+        val message = publishMessage(channel, producer)
+
+        pollingQueue.poll(channel.channelId!!, channel.routingKeys.first(), 1)
+
+        val result = pollingQueue.markAsFailedBulk(listOf(message.messageId, message.messageId))
+
+        assertThat(result.processed).isEqualTo(listOf(message.messageId))
+    }
 }
