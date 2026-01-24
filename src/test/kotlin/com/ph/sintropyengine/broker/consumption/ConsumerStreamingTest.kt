@@ -97,7 +97,7 @@ class ConsumerStreamingTest : IntegrationTestBase() {
     fun `should receive notifications on every message`() =
         runTest {
             val latch = CountDownLatch(5)
-            val producer = createProducer(channel)
+            val producer = createProducer()
 
             val receivedMessages = mutableListOf<MessageResponse>()
             val sentMessages = mutableListOf<Message>()
@@ -137,7 +137,7 @@ class ConsumerStreamingTest : IntegrationTestBase() {
     fun `should get a message and it should not be in message table and should be processed in message log`() =
         runTest {
             val latch = CountDownLatch(5)
-            val producer = createProducer(channel)
+            val producer = createProducer()
 
             val receivedMessages = mutableListOf<MessageResponse>()
             val sentMessages = mutableListOf<Message>()

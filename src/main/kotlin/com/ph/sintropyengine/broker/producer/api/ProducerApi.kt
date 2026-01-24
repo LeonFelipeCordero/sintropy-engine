@@ -1,6 +1,5 @@
 package com.ph.sintropyengine.broker.producer.api
 
-import com.ph.sintropyengine.broker.channel.service.ChannelService
 import com.ph.sintropyengine.broker.consumption.api.response.toResponse
 import com.ph.sintropyengine.broker.consumption.model.MessagePreStore
 import com.ph.sintropyengine.broker.producer.api.response.toResponse
@@ -24,17 +23,16 @@ private val logger = KotlinLogging.logger {}
 @Consumes(MediaType.APPLICATION_JSON)
 class ProducerApi(
     private val producerService: ProducerService,
-    private val channelService: ChannelService,
     private val observabilityService: ObservabilityService,
 ) {
     @POST
     fun createProducer(request: CreateProducerRequest): Response {
-        logger.info { "Creating producer [name=${request.name}, channel=${request.channelName}]" }
-        val producer = producerService.createProducer(request.name, request.channelName)
-        logger.info { "Producer created [name=${request.name}, channel=${request.channelName}, id=${producer.producerId}]" }
+        logger.info { "Creating producer [name=${request.name}" }
+        val producer = producerService.createProducer(request.name)
+        logger.info { "Producer created [name=${request.name}, id=${producer.producerId}]" }
         return Response
             .status(Response.Status.CREATED)
-            .entity(producer.toResponse(request.channelName))
+            .entity(producer.toResponse())
             .build()
     }
 
@@ -45,25 +43,10 @@ class ProducerApi(
     ): Response {
         val producer = producerService.findByName(name)
         return if (producer != null) {
-            val channel =
-                channelService.findById(producer.channelId)
-                    ?: throw IllegalStateException("Channel not found")
-            Response.ok(producer.toResponse(channel.name)).build()
+            Response.ok(producer.toResponse()).build()
         } else {
             Response.status(Response.Status.NOT_FOUND).build()
         }
-    }
-
-    @GET
-    @Path("/channel/{channelName}")
-    fun findByChannel(
-        @PathParam("channelName") channelName: String,
-    ): Response {
-        channelService.findByName(channelName)
-            ?: return Response.status(Response.Status.NOT_FOUND).entity("Channel not found").build()
-        val producers = producerService.findByChannel(channelName)
-        val responses = producers.map { it.toResponse(channelName) }
-        return Response.ok(responses).build()
     }
 
     @DELETE
@@ -107,7 +90,6 @@ class ProducerApi(
 
 data class CreateProducerRequest(
     val name: String,
-    val channelName: String,
 )
 
 data class PublishMessageRequest(

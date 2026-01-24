@@ -44,7 +44,7 @@ class MessageRecoveryTest : IntegrationTestBase() {
         clean()
 
         channel = createChannel()
-        producer = createProducer(channel)
+        producer = createProducer()
         recoveryUri = URI.create("ws://localhost:8081/ws/recovery/${channel.name}/${Fixtures.DEFAULT_ROUTING_KEY}")
     }
 

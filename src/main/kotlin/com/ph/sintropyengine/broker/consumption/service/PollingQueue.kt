@@ -34,7 +34,7 @@ interface PollingQueue {
 
             messageRepository.dequeue(messageId)
 
-            logger.info { "dequeue message $messageId" }
+            logger.debug { "dequeue message $messageId" }
         } ?: throw IllegalStateException("Message with id $messageId not found")
     }
 }

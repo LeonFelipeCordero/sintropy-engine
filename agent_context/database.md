@@ -2,16 +2,17 @@
 
 ## Purpose
 
-This document defines the database schema, triggers, indexes, and migrations for Sintropy Engine. PostgreSQL 17+ with `wal2json` plugin is required.
+This document defines the database schema, triggers, indexes, and migrations for Sintropy Engine. PostgreSQL 18+ with `wal2json` plugin is required.
 
 ## Invariants
 
 - All tables have `created_at` and `updated_at` timestamptz columns (default `now()`)
-- UUIDs are generated via `gen_random_uuid()` for all primary keys
+- UUIDs are generated via `uuidv7()` for all primary keys (time-sortable UUIDs)
 - Foreign keys use `ON DELETE CASCADE` for routing_keys, channel_links, channel_circuit_breakers
 - Enum types have implicit VARCHAR cast for JOOQ compatibility
 - Triggers execute in order: BEFORE triggers first, then AFTER triggers
 - message_log entries are never deleted by the application (event sourcing)
+- Producers are independent entities - not linked to channels at the database level
 
 ## Constraints
 
@@ -30,18 +31,17 @@ This document defines the database schema, triggers, indexes, and migrations for
 ├─────────────────┤     ├─────────────────┤     ├─────────────────┤
 │ channel_id (PK) │◄────│ channel_id (FK) │     │ channel_id (PK) │
 │ name (unique)   │     │ routing_key     │     │ consumption_type│
-│ channel_type    │     │ (composite PK)  │     └────────┬────────┘
-└────────┬────────┘     └─────────────────┘              │
-         │                                               │
-         │              ┌─────────────────┐              │
-         └──────────────│   producers     │◄─────────────┘
-                        ├─────────────────┤
-                        │ producer_id (PK)│
-                        │ name (unique)   │
-                        │ channel_id (FK) │
-                        └────────┬────────┘
-                                 │
-         ┌───────────────────────┼───────────────────────┐
+│ channel_type    │     │ (composite PK)  │     └─────────────────┘
+└────────┬────────┘     └─────────────────┘
+         │
+         │              ┌─────────────────┐
+         │              │   producers     │
+         │              ├─────────────────┤
+         │              │ producer_id (PK)│
+         │              │ name (unique)   │
+         │              └────────┬────────┘
+         │                       │
+         ├───────────────────────┼───────────────────────┐
          │                       │                       │
          ▼                       ▼                       ▼
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -112,16 +112,15 @@ CREATE TABLE queues (
 ```
 
 ### producers
+Producers are independent entities not linked to any specific channel. The channel is specified at message publish time.
 ```sql
 CREATE TABLE producers (
-    producer_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    producer_id UUID PRIMARY KEY DEFAULT uuidv7(),
     name        VARCHAR(128) NOT NULL,
-    channel_id  UUID NOT NULL REFERENCES channels (channel_id),
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE UNIQUE INDEX producers_name_idx ON producers (name);
-CREATE INDEX producers_channel_id_idx ON producers (channel_id);
 ```
 
 ### messages

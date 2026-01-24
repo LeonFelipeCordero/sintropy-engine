@@ -6,7 +6,7 @@ This document defines the core business rules, domain workflows, validation logi
 
 ## Invariants
 
-- A producer can only publish to the channel it is linked to
+- A producer can publish to any channel (producers are not linked to specific channels)
 - A message must have a valid routing key that exists on its channel
 - Circuit breakers only apply to FIFO channels and streams (not STANDARD queues)
 - Messages with `origin_message_id` set are routed copies and do not trigger further routing
@@ -22,8 +22,7 @@ This document defines the core business rules, domain workflows, validation logi
 ## Constraints
 
 - Producer must exist before publishing messages
-- Channel must exist before creating a producer
-- Routing key must exist on channel before publishing to that key
+- Channel and routing key must exist before publishing to that channel/key combination
 - Circuit must be CLOSED to publish to a FIFO channel (otherwise goes to DLQ)
 
 ---
@@ -83,15 +82,15 @@ STREAM                →    Any                    =    YES
 
 ### Producer Rules
 - Producer name must be unique across the system
-- Producer is permanently linked to one channel
-- Producer can only publish to its linked channel
+- Producers are independent entities not linked to any specific channel
+- A producer can publish messages to any channel
 - Deleting a producer does not delete its messages
 
 ### Message Publishing Workflow
 
 ```
 1. Validate producer exists
-2. Validate producer is linked to target channel
+2. Validate channel exists
 3. Validate routing key exists on channel
 4. Check circuit breaker state (FIFO/Stream only)
    └─ If OPEN: Insert directly to DLQ, return with status=FAILED
@@ -251,8 +250,7 @@ CLOSED ──[message fails (FIFO/Stream)]──▶ OPEN
   ],
   "producers": [
     {
-      "name": "producer-name",
-      "channelName": "channel-name"
+      "name": "producer-name"
     }
   ],
   "channelLinks": [

@@ -19,7 +19,6 @@ public class Producers implements Serializable {
 
     private UUID producerId;
     private String name;
-    private UUID channelId;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
@@ -28,7 +27,6 @@ public class Producers implements Serializable {
     public Producers(Producers value) {
         this.producerId = value.producerId;
         this.name = value.name;
-        this.channelId = value.channelId;
         this.createdAt = value.createdAt;
         this.updatedAt = value.updatedAt;
     }
@@ -36,13 +34,11 @@ public class Producers implements Serializable {
     public Producers(
         UUID producerId,
         String name,
-        UUID channelId,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
     ) {
         this.producerId = producerId;
         this.name = name;
-        this.channelId = channelId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -73,20 +69,6 @@ public class Producers implements Serializable {
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * Getter for <code>public.producers.channel_id</code>.
-     */
-    public UUID getChannelId() {
-        return this.channelId;
-    }
-
-    /**
-     * Setter for <code>public.producers.channel_id</code>.
-     */
-    public void setChannelId(UUID channelId) {
-        this.channelId = channelId;
     }
 
     /**
@@ -138,12 +120,6 @@ public class Producers implements Serializable {
         }
         else if (!this.name.equals(other.name))
             return false;
-        if (this.channelId == null) {
-            if (other.channelId != null)
-                return false;
-        }
-        else if (!this.channelId.equals(other.channelId))
-            return false;
         if (this.createdAt == null) {
             if (other.createdAt != null)
                 return false;
@@ -165,7 +141,6 @@ public class Producers implements Serializable {
         int result = 1;
         result = prime * result + ((this.producerId == null) ? 0 : this.producerId.hashCode());
         result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
-        result = prime * result + ((this.channelId == null) ? 0 : this.channelId.hashCode());
         result = prime * result + ((this.createdAt == null) ? 0 : this.createdAt.hashCode());
         result = prime * result + ((this.updatedAt == null) ? 0 : this.updatedAt.hashCode());
         return result;
@@ -177,7 +152,6 @@ public class Producers implements Serializable {
 
         sb.append(producerId);
         sb.append(", ").append(name);
-        sb.append(", ").append(channelId);
         sb.append(", ").append(createdAt);
         sb.append(", ").append(updatedAt);
 

@@ -5,9 +5,12 @@ import com.ph.sintropyengine.broker.channel.model.ChannelType
 import com.ph.sintropyengine.broker.channel.model.ConsumptionType
 import com.ph.sintropyengine.broker.channel.repository.ChannelRepository
 import com.ph.sintropyengine.broker.shared.utils.validForName
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 import java.util.UUID
+
+private val logger = KotlinLogging.logger {}
 
 @ApplicationScoped
 class ChannelService(
@@ -34,6 +37,9 @@ class ChannelService(
                 routingKeys = routingKeys.toMutableList(),
                 consumptionType = consumptionType,
             )
+
+        logger.info { "Created channel ${channel.logging()}" }
+
         return channelRepository.save(channel)
     }
 

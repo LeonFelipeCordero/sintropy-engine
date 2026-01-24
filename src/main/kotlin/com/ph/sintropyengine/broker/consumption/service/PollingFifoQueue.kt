@@ -25,7 +25,7 @@ class PollingFifoQueue(
                 .pollFromFifoChannelByRoutingKey(channelId, routingKey, pollingCount)
                 .sortedBy { it.timestamp }
 
-        logger.info { "polled [${messages.size}] messages for [${routing(channelId, routingKey)}]" }
+        logger.debug { "polled [${messages.size}] messages for [${routing(channelId, routingKey)}]" }
 
         return messages
     }

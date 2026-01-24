@@ -22,7 +22,7 @@ class ProducerServiceTest : IntegrationTestBase() {
     @Test
     fun `should create producer`() {
         val channel = createChannel()
-        val producer = producerService.createProducer(channel.name, channel.name)
+        val producer = producerService.createProducer(channel.name)
         val fetchedProducer = producerService.findById(producer.producerId!!)
         Assertions.assertThat(producer).usingRecursiveComparison().isEqualTo(fetchedProducer)
     }
@@ -68,24 +68,6 @@ class ProducerServiceTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `should fail if producer is not linked to channel`() {
-        val (channel1, producer1) = createChannelWithProducer()
-        val channel2 = createChannel()
-
-        Assertions
-            .assertThatExceptionOfType(IllegalStateException::class.java)
-            .isThrownBy {
-                producerService.publishMessage(
-                    Fixtures.createMessagePreStore(
-                        channelName = channel2.name,
-                        producerName = producer1.name,
-                        routingKey = channel2.routingKeys.first(),
-                    ),
-                )
-            }.withMessageContaining("is not linked to channel")
-    }
-
-    @Test
     fun `should create a message and it trigger and insert in message log`() {
         val (channel, producer) = createChannelWithProducer()
 
@@ -118,7 +100,7 @@ class ProducerServiceTest : IntegrationTestBase() {
 
         assertThatExceptionOfType(IllegalArgumentException::class.java)
             .isThrownBy {
-                producerService.createProducer("producer name", channel.name)
+                producerService.createProducer("producer name")
             }.withMessage("Producer name must not contain white spaces")
     }
 }

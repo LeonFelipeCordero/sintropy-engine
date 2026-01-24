@@ -42,8 +42,9 @@ class DeadLetterQueueService(
             dlqRepository.findByMessageId(messageId)
                 ?: throw IllegalStateException("Message with id $messageId not found in dead letter queue")
 
-        val channel = channelService.findById(dlqEntry.channelId)
-            ?: throw IllegalStateException("Channel with id ${dlqEntry.channelId} not found")
+        val channel =
+            channelService.findById(dlqEntry.channelId)
+                ?: throw IllegalStateException("Channel with id ${dlqEntry.channelId} not found")
 
         dlqRepository.delete(dlqEntry.dlqEntryId)
         val recovered = messageRepository.reinsertFromDlq(dlqEntry)

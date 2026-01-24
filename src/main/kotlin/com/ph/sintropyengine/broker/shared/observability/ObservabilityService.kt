@@ -32,7 +32,11 @@ class ObservabilityService(
         }
     }
 
-    fun recordMessagePublished(channelName: String, routingKey: String, producerName: String) {
+    fun recordMessagePublished(
+        channelName: String,
+        routingKey: String,
+        producerName: String,
+    ) {
         getOrCreateCounter(
             "sintropy.messages.published.total",
             "Total number of messages published",
@@ -40,7 +44,10 @@ class ObservabilityService(
         ).increment()
     }
 
-    fun recordMessageStreamed(channelName: String, routingKey: String) {
+    fun recordMessageStreamed(
+        channelName: String,
+        routingKey: String,
+    ) {
         getOrCreateCounter(
             "sintropy.messages.streamed.total",
             "Total number of messages streamed via WebSocket",
@@ -48,7 +55,12 @@ class ObservabilityService(
         ).increment()
     }
 
-    fun recordMessagesPolled(channelName: String, routingKey: String, consumptionType: String, count: Int) {
+    fun recordMessagesPolled(
+        channelName: String,
+        routingKey: String,
+        consumptionType: String,
+        count: Int,
+    ) {
         getOrCreateCounter(
             "sintropy.messages.polled.total",
             "Total number of messages polled from queues",
@@ -56,7 +68,10 @@ class ObservabilityService(
         ).increment(count.toDouble())
     }
 
-    fun recordMessageDequeued(channelName: String, routingKey: String) {
+    fun recordMessageDequeued(
+        channelName: String,
+        routingKey: String,
+    ) {
         getOrCreateCounter(
             "sintropy.messages.dequeued.total",
             "Total number of messages successfully dequeued",
@@ -64,7 +79,10 @@ class ObservabilityService(
         ).increment()
     }
 
-    fun recordMessageFailed(channelName: String, routingKey: String) {
+    fun recordMessageFailed(
+        channelName: String,
+        routingKey: String,
+    ) {
         getOrCreateCounter(
             "sintropy.messages.failed.total",
             "Total number of messages marked as failed",
@@ -72,7 +90,10 @@ class ObservabilityService(
         ).increment()
     }
 
-    fun recordCircuitClosed(channelName: String, routingKey: String) {
+    fun recordCircuitClosed(
+        channelName: String,
+        routingKey: String,
+    ) {
         getOrCreateCounter(
             "sintropy.circuit_breaker.closed.total",
             "Total number of times circuit breakers have been closed",
@@ -85,7 +106,11 @@ class ObservabilityService(
         openCircuitsGauge.set(count)
     }
 
-    fun recordMessageRecoveredFromDlq(channelName: String, routingKey: String, count: Int = 1) {
+    fun recordMessageRecoveredFromDlq(
+        channelName: String,
+        routingKey: String,
+        count: Int = 1,
+    ) {
         getOrCreateCounter(
             "sintropy.dlq.messages.recovered.total",
             "Total number of messages recovered from the dead letter queue",
@@ -93,7 +118,10 @@ class ObservabilityService(
         ).increment(count.toDouble())
     }
 
-    fun recordWebSocketConnected(channelName: String, routingKey: String) {
+    fun recordWebSocketConnected(
+        channelName: String,
+        routingKey: String,
+    ) {
         getOrCreateCounter(
             "sintropy.websocket.connections.total",
             "Total number of WebSocket connections established",
@@ -101,7 +129,10 @@ class ObservabilityService(
         ).increment()
     }
 
-    fun recordWebSocketDisconnected(channelName: String, routingKey: String) {
+    fun recordWebSocketDisconnected(
+        channelName: String,
+        routingKey: String,
+    ) {
         getOrCreateCounter(
             "sintropy.websocket.disconnections.total",
             "Total number of WebSocket disconnections",

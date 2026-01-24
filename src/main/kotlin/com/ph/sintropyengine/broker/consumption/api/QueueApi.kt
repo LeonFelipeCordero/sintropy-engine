@@ -42,11 +42,6 @@ class QueueApi(
     @POST
     @Path("/poll")
     fun poll(request: PollRequest): Response {
-        logger.debug {
-            "Poll request received [channel=${request.channelName}, routingKey=${request.routingKey}, " +
-                "pollingCount=${request.pollingCount}]"
-        }
-
         val channel =
             channelService.findByName(request.channelName)
                 ?: return Response.status(Response.Status.NOT_FOUND).entity("Channel not found").build()
@@ -74,11 +69,6 @@ class QueueApi(
             count = messages.size,
         )
 
-        logger.info {
-            "Polled ${messages.size} messages [channel=${request.channelName}, routingKey=${request.routingKey}, " +
-                "consumptionType=${consumptionType.name}]"
-        }
-
         val producerIds = messages.map { it.producerId }.toSet()
         val producersById = producerService.findByIds(producerIds)
         val responses =
@@ -97,8 +87,9 @@ class QueueApi(
     fun markAsFailed(
         @PathParam("messageId") messageId: UUID,
     ): Response {
-        val message = messageRepository.findById(messageId)
-            ?: return Response.status(Response.Status.NOT_FOUND).entity("Message not found").build()
+        val message =
+            messageRepository.findById(messageId)
+                ?: return Response.status(Response.Status.NOT_FOUND).entity("Message not found").build()
 
         val channel = channelService.findById(message.channelId)
 
@@ -119,8 +110,9 @@ class QueueApi(
     fun dequeue(
         @PathParam("messageId") messageId: UUID,
     ): Response {
-        val message = messageRepository.findById(messageId)
-            ?: return Response.status(Response.Status.NOT_FOUND).entity("Message not found").build()
+        val message =
+            messageRepository.findById(messageId)
+                ?: return Response.status(Response.Status.NOT_FOUND).entity("Message not found").build()
 
         val channel = channelService.findById(message.channelId)
 

@@ -35,15 +35,7 @@ object Fixtures {
             consumptionType = consumptionType,
         )
 
-    fun createProducer(
-        channelId: UUID,
-        producerId: UUID? = null,
-    ): Producer =
-        Producer(
-            producerId = producerId,
-            name = UUID.randomUUID().toString(),
-            channelId = channelId,
-        )
+    fun createProducer(producerId: UUID? = null): Producer = Producer(producerId = producerId, name = UUID.randomUUID().toString())
 
     fun createMessage(
         channelId: UUID,

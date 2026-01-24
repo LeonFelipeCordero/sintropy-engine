@@ -36,6 +36,8 @@ data class Channel(
         routingKeysCircuitState
             .find { it.routingKey == routingKey }
             ?.circuitState == CircuitState.OPEN
+
+    fun logging(): String = """"[$name|${channelType.name}|$routingKeys|${consumptionType?.name ?: ""}]"""
 }
 
 enum class ChannelType {

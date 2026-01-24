@@ -63,13 +63,7 @@ class IaCServiceTest : IntegrationTestBase() {
                                 routingKeys = listOf("key1"),
                             ),
                         ),
-                    producers =
-                        listOf(
-                            ProducerIaC(
-                                name = "test-producer",
-                                channelName = "test-channel",
-                            ),
-                        ),
+                    producers = listOf(ProducerIaC(name = "test-producer")),
                     channelLinks = emptyList(),
                 )
 
@@ -139,10 +133,7 @@ class IaCServiceTest : IntegrationTestBase() {
                             ),
                         ),
                     producers =
-                        listOf(
-                            ProducerIaC(name = "order-service", channelName = "orders"),
-                            ProducerIaC(name = "notification-service", channelName = "notifications"),
-                        ),
+                        listOf(ProducerIaC(name = "order-service"), ProducerIaC(name = "notification-service")),
                     channelLinks =
                         listOf(
                             ChannelLinkIaC(
@@ -196,7 +187,7 @@ class IaCServiceTest : IntegrationTestBase() {
                     routingKeys = listOf("key1"),
                     consumptionType = com.ph.sintropyengine.broker.channel.model.ConsumptionType.STANDARD,
                 )
-            producerService.createProducer("old-producer", "test-channel")
+            producerService.createProducer("old-producer")
 
             val iac =
                 IaC(
@@ -383,7 +374,7 @@ class IaCServiceTest : IntegrationTestBase() {
                 routingKeys = listOf("key1"),
                 consumptionType = com.ph.sintropyengine.broker.channel.model.ConsumptionType.STANDARD,
             )
-            val existingProducer = producerService.createProducer("existing-producer", "test-channel")
+            val existingProducer = producerService.createProducer("existing-producer")
             val originalId = existingProducer.producerId
 
             val iac =
@@ -397,10 +388,7 @@ class IaCServiceTest : IntegrationTestBase() {
                                 routingKeys = listOf("key1"),
                             ),
                         ),
-                    producers =
-                        listOf(
-                            ProducerIaC(name = "existing-producer", channelName = "test-channel"),
-                        ),
+                    producers = listOf(ProducerIaC(name = "existing-producer")),
                     channelLinks = emptyList(),
                 )
 
@@ -419,7 +407,7 @@ class IaCServiceTest : IntegrationTestBase() {
                 routingKeys = listOf("key1"),
                 consumptionType = com.ph.sintropyengine.broker.channel.model.ConsumptionType.STANDARD,
             )
-            producerService.createProducer("existing-producer", "test-channel")
+            producerService.createProducer("existing-producer")
 
             val iac =
                 IaC(
@@ -434,8 +422,8 @@ class IaCServiceTest : IntegrationTestBase() {
                         ),
                     producers =
                         listOf(
-                            ProducerIaC(name = "existing-producer", channelName = "test-channel"),
-                            ProducerIaC(name = "new-producer", channelName = "test-channel"),
+                            ProducerIaC(name = "existing-producer"),
+                            ProducerIaC(name = "new-producer"),
                         ),
                     channelLinks = emptyList(),
                 )
@@ -455,8 +443,8 @@ class IaCServiceTest : IntegrationTestBase() {
                 routingKeys = listOf("key1"),
                 consumptionType = com.ph.sintropyengine.broker.channel.model.ConsumptionType.STANDARD,
             )
-            producerService.createProducer("keep-producer", "test-channel")
-            producerService.createProducer("delete-producer", "test-channel")
+            producerService.createProducer("keep-producer")
+            producerService.createProducer("delete-producer")
 
             val iac =
                 IaC(
@@ -471,8 +459,8 @@ class IaCServiceTest : IntegrationTestBase() {
                         ),
                     producers =
                         listOf(
-                            ProducerIaC(name = "keep-producer", channelName = "test-channel"),
-                            ProducerIaC(name = "new-producer", channelName = "test-channel"),
+                            ProducerIaC(name = "keep-producer"),
+                            ProducerIaC(name = "new-producer"),
                         ),
                     channelLinks = emptyList(),
                 )
@@ -493,7 +481,7 @@ class IaCServiceTest : IntegrationTestBase() {
                 routingKeys = listOf("key1"),
                 consumptionType = com.ph.sintropyengine.broker.channel.model.ConsumptionType.STANDARD,
             )
-            producerService.createProducer("orphan-producer", "channel-to-delete")
+            producerService.createProducer("orphan-producer")
 
             val iac =
                 IaC(
@@ -791,8 +779,7 @@ class IaCServiceTest : IntegrationTestBase() {
                     ],
                     "producers": [
                         {
-                            "name": "file-producer",
-                            "channelName": "file-channel"
+                            "name": "file-producer"
                         }
                     ],
                     "channelLinks": []
@@ -977,7 +964,7 @@ class IaCServiceTest : IntegrationTestBase() {
                         }
                     ],
                     "producers": [
-                        {"name": "order-producer", "channelName": "orders"}
+                        {"name": "order-producer"}
                     ],
                     "channelLinks": [
                         {
@@ -1031,7 +1018,7 @@ class IaCServiceTest : IntegrationTestBase() {
                 """
                 {
                     "channels": [{"name": "to-delete", "channelType": "QUEUE", "consumptionType": "STANDARD", "routingKeys": ["k1"]}],
-                    "producers": [{"name": "producer-to-delete", "channelName": "to-delete"}],
+                    "producers": [{"name": "producer-to-delete"}],
                     "channelLinks": []
                 }
                 """.trimIndent()

@@ -110,11 +110,11 @@ open class IntegrationTestBase {
             ),
         )
 
-    protected fun createProducer(channel: Channel): Producer = producerRepository.save(Fixtures.createProducer(channel.channelId!!))
+    protected fun createProducer(): Producer = producerRepository.save(Fixtures.createProducer())
 
     protected fun createChannelWithProducer(consumptionType: ConsumptionType = STANDARD): Pair<Channel, Producer> {
         val channel = createChannel(consumptionType = consumptionType)
-        val producer = createProducer(channel)
+        val producer = createProducer()
         return Pair(channel, producer)
     }
 

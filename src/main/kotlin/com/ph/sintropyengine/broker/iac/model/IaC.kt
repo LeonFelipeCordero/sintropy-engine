@@ -15,7 +15,6 @@ data class ChannelIaC(
 
 data class ProducerIaC(
     val name: String,
-    val channelName: String,
 )
 
 data class ChannelLinkIaC(

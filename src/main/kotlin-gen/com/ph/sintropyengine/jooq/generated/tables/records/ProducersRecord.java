@@ -50,45 +50,31 @@ public class ProducersRecord extends UpdatableRecordImpl<ProducersRecord> {
     }
 
     /**
-     * Setter for <code>public.producers.channel_id</code>.
-     */
-    public void setChannelId(UUID value) {
-        set(2, value);
-    }
-
-    /**
-     * Getter for <code>public.producers.channel_id</code>.
-     */
-    public UUID getChannelId() {
-        return (UUID) get(2);
-    }
-
-    /**
      * Setter for <code>public.producers.created_at</code>.
      */
     public void setCreatedAt(OffsetDateTime value) {
-        set(3, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>public.producers.created_at</code>.
      */
     public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(3);
+        return (OffsetDateTime) get(2);
     }
 
     /**
      * Setter for <code>public.producers.updated_at</code>.
      */
     public void setUpdatedAt(OffsetDateTime value) {
-        set(4, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.producers.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(4);
+        return (OffsetDateTime) get(3);
     }
 
     // -------------------------------------------------------------------------
@@ -114,12 +100,11 @@ public class ProducersRecord extends UpdatableRecordImpl<ProducersRecord> {
     /**
      * Create a detached, initialised ProducersRecord
      */
-    public ProducersRecord(UUID producerId, String name, UUID channelId, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public ProducersRecord(UUID producerId, String name, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(Producers.PRODUCERS);
 
         setProducerId(producerId);
         setName(name);
-        setChannelId(channelId);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
         resetChangedOnNotNull();
@@ -134,7 +119,6 @@ public class ProducersRecord extends UpdatableRecordImpl<ProducersRecord> {
         if (value != null) {
             setProducerId(value.getProducerId());
             setName(value.getName());
-            setChannelId(value.getChannelId());
             setCreatedAt(value.getCreatedAt());
             setUpdatedAt(value.getUpdatedAt());
             resetChangedOnNotNull();

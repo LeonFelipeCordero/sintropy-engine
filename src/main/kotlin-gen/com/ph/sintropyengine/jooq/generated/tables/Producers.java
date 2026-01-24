@@ -7,7 +7,6 @@ package com.ph.sintropyengine.jooq.generated.tables;
 import com.ph.sintropyengine.jooq.generated.Indexes;
 import com.ph.sintropyengine.jooq.generated.Keys;
 import com.ph.sintropyengine.jooq.generated.Public;
-import com.ph.sintropyengine.jooq.generated.tables.Channels.ChannelsPath;
 import com.ph.sintropyengine.jooq.generated.tables.DeadLetterQueue.DeadLetterQueuePath;
 import com.ph.sintropyengine.jooq.generated.tables.MessageLog.MessageLogPath;
 import com.ph.sintropyengine.jooq.generated.tables.Messages.MessagesPath;
@@ -72,11 +71,6 @@ public class Producers extends TableImpl<ProducersRecord> {
      * The column <code>public.producers.name</code>.
      */
     public final TableField<ProducersRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(128).nullable(false), this, "");
-
-    /**
-     * The column <code>public.producers.channel_id</code>.
-     */
-    public final TableField<ProducersRecord, UUID> CHANNEL_ID = createField(DSL.name("channel_id"), SQLDataType.UUID.nullable(false), this, "");
 
     /**
      * The column <code>public.producers.created_at</code>.
@@ -157,29 +151,12 @@ public class Producers extends TableImpl<ProducersRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.PRODUCERS_CHANNEL_ID_IDX, Indexes.PRODUCERS_NAME_IDX);
+        return Arrays.asList(Indexes.PRODUCERS_NAME_IDX);
     }
 
     @Override
     public UniqueKey<ProducersRecord> getPrimaryKey() {
         return Keys.PRODUCERS_PKEY;
-    }
-
-    @Override
-    public List<ForeignKey<ProducersRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.PRODUCERS__PRODUCERS_CHANNEL_ID_FKEY);
-    }
-
-    private transient ChannelsPath _channels;
-
-    /**
-     * Get the implicit join path to the <code>public.channels</code> table.
-     */
-    public ChannelsPath channels() {
-        if (_channels == null)
-            _channels = new ChannelsPath(this, Keys.PRODUCERS__PRODUCERS_CHANNEL_ID_FKEY, null);
-
-        return _channels;
     }
 
     private transient DeadLetterQueuePath _deadLetterQueue;

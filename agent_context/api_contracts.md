@@ -195,21 +195,19 @@ Disables a channel link (stops message routing).
 ## Producer Domain
 
 ### POST /producers
-Creates a new producer linked to a channel.
+Creates a new producer. Producers are independent entities not linked to any specific channel.
 
 **Request:**
 ```json
 {
-  "name": "string",
-  "channelName": "string"
+  "name": "string"
 }
 ```
 
 **Response (201):**
 ```json
 {
-  "name": "string",
-  "channelName": "string"
+  "name": "string"
 }
 ```
 
@@ -221,20 +219,11 @@ Returns producer by name.
 **Response (200):**
 ```json
 {
-  "name": "string",
-  "channelName": "string"
+  "name": "string"
 }
 ```
 
 **Response (404):** Producer not found
-
----
-
-### GET /producers/channel/{channelName}
-Returns all producers for a channel.
-
-**Response (200):** Array of ProducerResponse
-**Response (404):** Channel not found
 
 ---
 
@@ -278,7 +267,8 @@ Publishes a message to a channel.
 ```
 
 **Constraints:**
-- Producer must be linked to the specified channel
+- Producer must exist
+- Channel and routing key must exist
 - If circuit is OPEN (FIFO channels), message goes directly to DLQ with status FAILED
 
 ---

@@ -401,7 +401,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
         fun `should route message to linked channel`() {
             val source = createStandardQueueChannel()
             val target = createStandardQueueChannel()
-            val producer = createProducer(source)
+            val producer = createProducer()
 
             createChannelLink(source, target)
 
@@ -422,7 +422,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
             val source = createStandardQueueChannel()
             val target1 = createStandardQueueChannel()
             val target2 = createStandardQueueChannel()
-            val producer = createProducer(source)
+            val producer = createProducer()
 
             createChannelLink(source, target1)
             createChannelLink(source, target2)
@@ -443,7 +443,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
         fun `should not route when link is disabled`() {
             val source = createStandardQueueChannel()
             val target = createStandardQueueChannel()
-            val producer = createProducer(source)
+            val producer = createProducer()
 
             val link = createChannelLink(source, target)
             channelLinkRepository.setEnabled(link.channelLinkId!!, false)
@@ -459,7 +459,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
         fun `should not route already routed messages - prevent infinite loops`() {
             val channel1 = createStandardQueueChannel()
             val channel2 = createStandardQueueChannel()
-            val producer = createProducer(channel1)
+            val producer = createProducer()
 
             // Create bidirectional links
             createChannelLink(channel1, channel2)
@@ -477,7 +477,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
         fun `should route with correct target routing key`() {
             val source = createStandardQueueChannel()
             val target = createStandardQueueChannel()
-            val producer = createProducer(source)
+            val producer = createProducer()
 
             val targetRoutingKey = target.routingKeys.first()
             createChannelLink(source, target, source.routingKeys.first(), targetRoutingKey)
@@ -492,7 +492,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
         fun `should preserve message content when routing`() {
             val source = createStandardQueueChannel()
             val target = createStandardQueueChannel()
-            val producer = createProducer(source)
+            val producer = createProducer()
 
             createChannelLink(source, target)
 
@@ -507,7 +507,7 @@ class ChannelLinkServiceTest : IntegrationTestBase() {
         fun `should also log routed messages to message_log`() {
             val source = createStandardQueueChannel()
             val target = createStandardQueueChannel()
-            val producer = createProducer(source)
+            val producer = createProducer()
 
             createChannelLink(source, target)
 

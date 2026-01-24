@@ -22,16 +22,10 @@ class ProducerService(
     private val deadLetterQueueRepository: DeadLetterQueueRepository,
 ) {
     @Transactional
-    fun createProducer(
-        name: String,
-        channelName: String,
-    ): Producer {
+    fun createProducer(name: String): Producer {
         require(name.validForName()) { "Producer name must not contain white spaces" }
 
-        val channel =
-            channelService.findByName(channelName) ?: throw IllegalStateException("Channel $channelName not found")
-
-        val producer = Producer(name = name, channelId = channel.channelId!!)
+        val producer = Producer(name = name)
         return producerRepository.save(producer)
     }
 
@@ -43,23 +37,13 @@ class ProducerService(
 
     fun findAll(): List<Producer> = producerRepository.findAll()
 
-    fun findByChannel(channelName: String): List<Producer> =
-        channelService.findByName(channelName)?.let {
-            producerRepository.findByChannel(channelName)
-        } ?: throw IllegalStateException("Channel $channelName not found")
-
-    @Transactional
-    fun deleteProducer(producerId: UUID) =
-        producerRepository.findById(producerId)?.let {
-            producerRepository.delete(producerId)
-        } ?: throw IllegalStateException("Producer $producerId not found")
-
     @Transactional
     fun deleteByName(name: String) =
         producerRepository.findByName(name)?.let {
             producerRepository.deleteByName(name)
         } ?: throw IllegalStateException("Producer $name not found")
 
+    // TODO: Move this to a message service
     @Transactional
     fun publishMessage(messagePreStore: MessagePreStore): Message {
         val channel =
@@ -69,14 +53,8 @@ class ProducerService(
             producerRepository.findByName(messagePreStore.producerName)
                 ?: throw IllegalStateException("Producer ${messagePreStore.producerName} not found")
 
-        if (producer.channelId != channel.channelId) {
-            throw IllegalStateException(
-                "Producer ${messagePreStore.producerName} is not linked to channel ${messagePreStore.channelName}",
-            )
-        }
-
         if (!channel.canWriteMessage(messagePreStore.routingKey)) {
-            val dlqMessage = deadLetterQueueRepository.save(messagePreStore, channel.channelId, producer.producerId!!)
+            val dlqMessage = deadLetterQueueRepository.save(messagePreStore, channel.channelId!!, producer.producerId!!)
 
             return Message(
                 messageId = dlqMessage.messageId,
@@ -92,6 +70,6 @@ class ProducerService(
             )
         }
 
-        return messageRepository.save(messagePreStore, channel.channelId, producer.producerId!!)
+        return messageRepository.save(messagePreStore, channel.channelId!!, producer.producerId!!)
     }
 }

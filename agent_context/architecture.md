@@ -24,7 +24,7 @@ This document governs the system architecture, component structure, and design p
 
 ## Constraints
 
-- PostgreSQL 17+ required with `wal2json` plugin for logical replication
+- PostgreSQL 18+ required with `wal2json` plugin for logical replication
 - Maximum 4 delivery attempts for STANDARD queue messages
 - 15-minute timeout between delivery attempts for IN_FLIGHT messages
 - Channel names must be unique (enforced by unique index)
@@ -67,7 +67,7 @@ This document governs the system architecture, component structure, and design p
 │   └──────────────┘                                                   │
 │                                                                      │
 ├─────────────────────────────────────────────────────────────────────┤
-│                         PostgreSQL 17+                               │
+│                         PostgreSQL 18+                               │
 │   ┌────────────────────────────────────────────────────────────┐    │
 │   │  Tables  │  Triggers  │  Publications  │  Advisory Locks   │    │
 │   └────────────────────────────────────────────────────────────┘    │
@@ -187,7 +187,7 @@ AND (status = 'READY' OR
 | Quarkus | 3.x | Application framework |
 | Kotlin | 2.2.20 | Primary language |
 | JOOQ | 3.19.26 | Type-safe SQL, code generation |
-| PostgreSQL | 17+ | Database with logical replication |
+| PostgreSQL | 18+ | Database with logical replication, uuidv7() support |
 | wal2json | - | PostgreSQL plugin for WAL streaming |
 | Flyway | - | Database migrations |
 | TestContainers | - | Integration testing |

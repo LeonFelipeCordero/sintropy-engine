@@ -39,11 +39,11 @@ class CircuitBreakerApiTest : IntegrationTestBase() {
         @Test
         fun `GET open - should return all open circuits`() {
             val channel1 = createFifoQueueChannel()
-            val producer1 = createProducer(channel1)
+            val producer1 = createProducer()
             val message1 = publishMessage(channel1, producer1)
 
             val channel2 = createFifoQueueChannel()
-            val producer2 = createProducer(channel2)
+            val producer2 = createProducer()
             val message2 = publishMessage(channel2, producer2)
 
             pollingFifoQueue.poll(channel1.channelId!!, channel1.routingKeys.first())
@@ -80,7 +80,7 @@ class CircuitBreakerApiTest : IntegrationTestBase() {
         @Test
         fun `GET channels - should return circuits for channel`() {
             val channel = createFifoQueueChannel()
-            val producer = createProducer(channel)
+            val producer = createProducer()
             val message = publishMessage(channel, producer)
 
             pollingFifoQueue.poll(channel.channelId!!, channel.routingKeys.first())
@@ -125,7 +125,7 @@ class CircuitBreakerApiTest : IntegrationTestBase() {
         @Test
         fun `GET circuit breaker - should return circuit when exists`() {
             val channel = createFifoQueueChannel()
-            val producer = createProducer(channel)
+            val producer = createProducer()
             val message = publishMessage(channel, producer)
 
             pollingFifoQueue.poll(channel.channelId!!, channel.routingKeys.first())
@@ -181,7 +181,7 @@ class CircuitBreakerApiTest : IntegrationTestBase() {
         @Test
         fun `GET state - should return OPEN when circuit is open`() {
             val channel = createFifoQueueChannel()
-            val producer = createProducer(channel)
+            val producer = createProducer()
             val message = publishMessage(channel, producer)
 
             pollingFifoQueue.poll(channel.channelId!!, channel.routingKeys.first())
@@ -221,7 +221,7 @@ class CircuitBreakerApiTest : IntegrationTestBase() {
         @Test
         fun `POST close - should close circuit without recovery`() {
             val channel = createFifoQueueChannel()
-            val producer = createProducer(channel)
+            val producer = createProducer()
             val message = publishMessage(channel, producer)
 
             pollingFifoQueue.poll(channel.channelId!!, channel.routingKeys.first())
@@ -247,7 +247,7 @@ class CircuitBreakerApiTest : IntegrationTestBase() {
         @Test
         fun `POST close - should close circuit with recovery`() {
             val channel = createFifoQueueChannel()
-            val producer = createProducer(channel)
+            val producer = createProducer()
             val message1 = publishMessage(channel, producer)
             val message2 = publishMessage(channel, producer)
 

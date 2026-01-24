@@ -28,6 +28,7 @@ class CircuitBreakerService(
         observabilityService.setOpenCircuitsCount(openCircuits.size)
         logger.info { "Initialized circuit breaker metrics: ${openCircuits.size} circuits currently open" }
     }
+
     fun getCircuitState(
         channelName: String,
         routingKey: String,

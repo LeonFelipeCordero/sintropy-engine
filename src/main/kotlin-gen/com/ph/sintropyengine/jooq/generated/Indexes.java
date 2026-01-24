@@ -39,6 +39,5 @@ public class Indexes {
     public static final Index IDX_CIRCUIT_BREAKERS_STATE = Internal.createIndex(DSL.name("idx_circuit_breakers_state"), ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS, new OrderField[] { ChannelCircuitBreakers.CHANNEL_CIRCUIT_BREAKERS.STATE }, false);
     public static final Index MESSAGES_ORIGIN_MESSAGE_IDX = Internal.createIndex(DSL.name("messages_origin_message_idx"), Messages.MESSAGES, new OrderField[] { Messages.MESSAGES.ORIGIN_MESSAGE_ID }, false);
     public static final Index MESSAGES_POLLING_IDX = Internal.createIndex(DSL.name("messages_polling_idx"), Messages.MESSAGES, new OrderField[] { Messages.MESSAGES.CHANNEL_ID, Messages.MESSAGES.ROUTING_KEY, Messages.MESSAGES.STATUS, Messages.MESSAGES.LAST_DELIVERED, Messages.MESSAGES.DELIVERED_TIMES }, false);
-    public static final Index PRODUCERS_CHANNEL_ID_IDX = Internal.createIndex(DSL.name("producers_channel_id_idx"), Producers.PRODUCERS, new OrderField[] { Producers.PRODUCERS.CHANNEL_ID }, false);
     public static final Index PRODUCERS_NAME_IDX = Internal.createIndex(DSL.name("producers_name_idx"), Producers.PRODUCERS, new OrderField[] { Producers.PRODUCERS.NAME }, true);
 }

@@ -200,7 +200,7 @@ class DeadLetterQueueServiceTest : IntegrationTestBase() {
                 channelRepository.save(
                     Fixtures.createChannel(routingKeys = mutableListOf("key1", "key2")),
                 )
-            val producer = createProducer(channel)
+            val producer = createProducer()
 
             val message1 = publishMessage(channel, producer, "key1")
             val message2 = publishMessage(channel, producer, "key2")

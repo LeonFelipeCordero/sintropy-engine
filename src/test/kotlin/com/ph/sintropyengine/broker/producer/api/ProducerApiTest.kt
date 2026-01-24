@@ -21,13 +21,7 @@ class ProducerApiTest : IntegrationTestBase() {
 
     @Test
     fun `POST producers - should create producer successfully`() {
-        val channel = createChannel()
-
-        val request =
-            mapOf(
-                "name" to "test-producer",
-                "channelName" to channel.name,
-            )
+        val request = mapOf("name" to "test-producer")
 
         given()
             .contentType(ContentType.JSON)
@@ -37,30 +31,11 @@ class ProducerApiTest : IntegrationTestBase() {
             .then()
             .statusCode(201)
             .body("name", equalTo("test-producer"))
-            .body("channelName", equalTo(channel.name))
-    }
-
-    @Test
-    fun `POST producers - should fail when channel does not exist`() {
-        val request =
-            mapOf(
-                "name" to "orphan-producer",
-                "channelName" to "non-existent-channel",
-            )
-
-        given()
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/producers")
-            .then()
-            .statusCode(500)
     }
 
     @Test
     fun `GET producers by id - should return producer when exists`() {
-        val channel = createChannel()
-        val producer = createProducer(channel)
+        val producer = createProducer()
 
         given()
             .`when`()
@@ -68,7 +43,6 @@ class ProducerApiTest : IntegrationTestBase() {
             .then()
             .statusCode(200)
             .body("name", equalTo(producer.name))
-            .body("channelName", equalTo(channel.name))
     }
 
     @Test
@@ -83,32 +57,6 @@ class ProducerApiTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `GET producers by channel - should return producers for channel`() {
-        val channel = createChannel()
-        val producer1 = createProducer(channel)
-        val producer2 = createProducer(channel)
-
-        given()
-            .`when`()
-            .get("/producers/channel/${channel.name}")
-            .then()
-            .statusCode(200)
-            .body("$", hasSize<Any>(2))
-    }
-
-    @Test
-    fun `GET producers by channel - should return empty list when no producers`() {
-        val channel = createChannel()
-
-        given()
-            .`when`()
-            .get("/producers/channel/${channel.name}")
-            .then()
-            .statusCode(200)
-            .body("$", hasSize<Any>(0))
-    }
-
-    @Test
     fun `GET producers by channel - should return 404 when channel does not exist`() {
         given()
             .`when`()
@@ -120,7 +68,7 @@ class ProducerApiTest : IntegrationTestBase() {
     @Test
     fun `DELETE producers - should delete producer successfully`() {
         val channel = createChannel()
-        val producer = createProducer(channel)
+        val producer = createProducer()
 
         given()
             .`when`()
@@ -149,7 +97,7 @@ class ProducerApiTest : IntegrationTestBase() {
     @Test
     fun `POST messages - should publish message successfully`() {
         val channel = createChannel()
-        val producer = createProducer(channel)
+        val producer = createProducer()
 
         val request =
             mapOf(
@@ -176,7 +124,7 @@ class ProducerApiTest : IntegrationTestBase() {
     @Test
     fun `POST messages - should fail when channel does not exist`() {
         val channel = createChannel()
-        val producer = createProducer(channel)
+        val producer = createProducer()
 
         val request =
             mapOf(
@@ -221,7 +169,7 @@ class ProducerApiTest : IntegrationTestBase() {
     @Test
     fun `POST messages - should fail when routing key does not exist in channel`() {
         val channel = createChannel()
-        val producer = createProducer(channel)
+        val producer = createProducer()
 
         val request =
             mapOf(
@@ -244,7 +192,7 @@ class ProducerApiTest : IntegrationTestBase() {
     @Test
     fun `POST messages - should publish multiple messages to same channel`() {
         val channel = createChannel()
-        val producer = createProducer(channel)
+        val producer = createProducer()
 
         val request =
             mapOf(
@@ -276,17 +224,8 @@ class ProducerApiTest : IntegrationTestBase() {
     fun `POST producers - should create multiple producers for same channel`() {
         val channel = createChannel()
 
-        val request1 =
-            mapOf(
-                "name" to "producer-one",
-                "channelName" to channel.name,
-            )
-
-        val request2 =
-            mapOf(
-                "name" to "producer-two",
-                "channelName" to channel.name,
-            )
+        val request1 = mapOf("name" to "producer-one")
+        val request2 = mapOf("name" to "producer-two")
 
         given()
             .contentType(ContentType.JSON)
@@ -303,12 +242,5 @@ class ProducerApiTest : IntegrationTestBase() {
             .post("/producers")
             .then()
             .statusCode(201)
-
-        given()
-            .`when`()
-            .get("/producers/channel/${channel.name}")
-            .then()
-            .statusCode(200)
-            .body("$", hasSize<Any>(2))
     }
 }

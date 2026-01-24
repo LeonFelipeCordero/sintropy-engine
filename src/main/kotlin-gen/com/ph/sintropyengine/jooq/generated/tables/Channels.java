@@ -13,7 +13,6 @@ import com.ph.sintropyengine.jooq.generated.tables.ChannelLinks.ChannelLinksPath
 import com.ph.sintropyengine.jooq.generated.tables.DeadLetterQueue.DeadLetterQueuePath;
 import com.ph.sintropyengine.jooq.generated.tables.MessageLog.MessageLogPath;
 import com.ph.sintropyengine.jooq.generated.tables.Messages.MessagesPath;
-import com.ph.sintropyengine.jooq.generated.tables.Producers.ProducersPath;
 import com.ph.sintropyengine.jooq.generated.tables.Queues.QueuesPath;
 import com.ph.sintropyengine.jooq.generated.tables.RoutingKeys.RoutingKeysPath;
 import com.ph.sintropyengine.jooq.generated.tables.records.ChannelsRecord;
@@ -248,19 +247,6 @@ public class Channels extends TableImpl<ChannelsRecord> {
             _messages = new MessagesPath(this, null, Keys.MESSAGES__MESSAGES_CHANNEL_ID_FKEY.getInverseKey());
 
         return _messages;
-    }
-
-    private transient ProducersPath _producers;
-
-    /**
-     * Get the implicit to-many join path to the <code>public.producers</code>
-     * table
-     */
-    public ProducersPath producers() {
-        if (_producers == null)
-            _producers = new ProducersPath(this, null, Keys.PRODUCERS__PRODUCERS_CHANNEL_ID_FKEY.getInverseKey());
-
-        return _producers;
     }
 
     private transient QueuesPath _queues;

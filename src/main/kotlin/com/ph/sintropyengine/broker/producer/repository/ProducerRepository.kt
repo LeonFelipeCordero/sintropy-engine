@@ -15,8 +15,7 @@ class ProducerRepository(
             .insertInto(
                 Tables.PRODUCERS,
                 Tables.PRODUCERS.NAME,
-                Tables.PRODUCERS.CHANNEL_ID,
-            ).values(producer.name, producer.channelId)
+            ).values(producer.name)
             .returning()
             .fetchOneInto(Producer::class.java)
             ?: throw IllegalStateException("Something went wrong creating a new Producer")
@@ -39,15 +38,6 @@ class ProducerRepository(
             .selectFrom(Tables.PRODUCERS)
             .where(Tables.PRODUCERS.NAME.eq(name))
             .fetchOneInto(Producer::class.java)
-
-    fun findByChannel(channelName: String): List<Producer> =
-        context
-            .select(Tables.PRODUCERS.asterisk())
-            .from(Tables.PRODUCERS)
-            .leftJoin(Tables.CHANNELS)
-            .on(Tables.PRODUCERS.CHANNEL_ID.eq(Tables.CHANNELS.CHANNEL_ID))
-            .where(Tables.CHANNELS.NAME.eq(channelName))
-            .fetchInto(Producer::class.java)
 
     fun findAll(): List<Producer> =
         context

@@ -181,7 +181,6 @@ class IaCService(
         val producer =
             producerService.createProducer(
                 name = producerIaC.name,
-                channelName = producerIaC.channelName,
             )
         logger.info { "Created producer ${producer.name} with id ${producer.producerId}" }
     }
