@@ -54,20 +54,20 @@ class ConnectionRouter(
         mutex.withLock {
             val routing = connectionsTable[connectionId]
             if (routing == null) {
-                logger.debug { "Connection not found in connections table: $connectionId" }
+                logger.info { "Connection not found in connections table: $connectionId" }
                 return@withLock null
             }
 
             val connections = routingTable[routing]
             if (connections == null) {
-                logger.debug { "Connection not found routing table: $routing" }
+                logger.info { "Connection not found routing table: $routing" }
                 return@withLock null
             }
 
             routingTable[routing]!!.removeIf { it == connectionId }
             connectionsTable.remove(connectionId)
             val metadata = connectionMetadata.remove(connectionId)
-            logger.debug { "Removed connection from routing table: $connectionId" }
+            logger.info { "Removed connection from routing table: $connectionId" }
             metadata
         }
 

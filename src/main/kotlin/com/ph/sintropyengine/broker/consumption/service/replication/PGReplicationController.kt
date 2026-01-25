@@ -79,7 +79,7 @@ class PGReplicationController(
                         observabilityService.recordMessageStreamed(channel.name, message.routingKey)
                     }
 
-                    logger.info {
+                    logger.debug {
                         "Streamed message ${message.messageId} to $clientCount clients " +
                             "[channel=${channel.name}, routingKey=${message.routingKey}, producer=${producer.name}]"
                     }

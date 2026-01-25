@@ -34,6 +34,8 @@ class MessageStreamingApi {
 
     @OnClose
     suspend fun onClose(webSocketConnection: WebSocketConnection) {
+        logger.info { "Closing connection [connectionId=${webSocketConnection.id()}]" }
+
         val routingTarget = connectionRouter.remove(webSocketConnection.id())
         routingTarget?.let {
             observabilityService.recordWebSocketDisconnected(it.channelName, it.routingKey)
