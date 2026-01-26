@@ -20,6 +20,7 @@ dependencies {
     implementation(enforcedPlatform("$quarkusPlatformGroupId:$quarkusPlatformArtifactId:$quarkusPlatformVersion"))
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-opentelemetry")
+    implementation("io.opentelemetry:opentelemetry-exporter-sender-okhttp")
     implementation("io.quarkiverse.micrometer.registry:quarkus-micrometer-registry-otlp:3.4.1")
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-logging-json")

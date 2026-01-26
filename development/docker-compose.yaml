@@ -15,20 +15,18 @@ services:
     volumes:
       - postgres:$HOME/postgres/pgdata/data
 
-  # LGTM Stack (Loki, Grafana, Tempo, Mimir) for observability
-  # https://grafana.com/docs/opentelemetry/docker-lgtm/
-  lgtm:
-    image: grafana/otel-lgtm:latest
+  sintropy-engine:
+    image: ghcr.io/leonfelipecordero/sintropy-engine:latest
+    restart: always
     networks:
       - app
     ports:
-      - "3000:3000"   # Grafana UI
-      - "4317:4317"   # OTLP gRPC
-      - "4318:4318"   # OTLP HTTP
+      - "8080:8080"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - lgtm-data:/data
+      - QUARKUS_PROFILE=dev
+      - MONITORING_HOST=lgtm
+    depends_on:
+      - postgres
 
 networks:
   app:
@@ -36,4 +34,3 @@ networks:
 
 volumes:
   postgres:
-  lgtm-data:

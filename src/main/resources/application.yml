@@ -9,7 +9,6 @@ quarkus:
       format: '%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
       json:
         enabled: false
-#      format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] (%t) %s%e%n' -- this is how prod will be
     level: INFO
   datasource:
     username: postgres
@@ -30,22 +29,31 @@ quarkus:
     info-version: ${quarkus.application.version}
     info-description: Message broker supporting QUEUE and STREAM channel types
 
-  # OpenTelemetry configuration
   otel:
+    service:
+      name: ${quarkus.application.name}
+    resource:
+      attributes:
+        - service.name=${quarkus.application.name}
+        - service.version=${quarkus.application.version}
+    logs:
+      enabled: true
     exporter:
       otlp:
         endpoint: http://localhost:4317
         traces:
           endpoint: http://localhost:4317
-    logs:
-      exporter: none
+        logs:
+          endpoint: http://localhost:4317
 
-  # Micrometer OTLP metrics configuration
   micrometer:
     export:
       otlp:
         enabled: true
         url: http://localhost:4318/v1/metrics
+        resource-attributes:
+          - service.name=${quarkus.application.name}
+          - service.version=${quarkus.application.version}
     binder:
       http-server:
         enabled: true
@@ -55,6 +63,30 @@ quarkus:
 syen:
   feature-flags:
     with-full-replication: false
+
+"%dev":
+  syen:
+    feature-flags:
+      with-full-replication: true
+  quarkus:
+    log:
+      console:
+        format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] (%t) %s%e%n'
+    datasource:
+      jdbc:
+        url: jdbc:postgresql://postgres:5432/postgres
+    micrometer:
+      export:
+        otlp:
+          url: http://${MONITORING_HOST}:4318/v1/metrics
+    otel:
+      exporter:
+        otlp:
+          endpoint: http://${MONITORING_HOST}:4317
+          traces:
+            endpoint: http://${MONITORING_HOST}:4317
+          logs:
+            endpoint: http://${MONITORING_HOST}:4317
 
 "%test":
   quarkus:

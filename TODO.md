@@ -1,0 +1,2 @@
+1. Use a recovery mode get lost messages from DB. Store every message id,and when started start from there
+2. Use internal steam to replicate over channels and connections to get more things in memory and speed things up

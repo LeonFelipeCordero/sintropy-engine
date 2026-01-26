@@ -8,11 +8,16 @@ import com.ph.sintropyengine.broker.consumption.repository.DeadLetterQueueReposi
 import com.ph.sintropyengine.broker.consumption.repository.MessageRepository
 import com.ph.sintropyengine.broker.producer.model.Producer
 import com.ph.sintropyengine.broker.producer.repository.ProducerRepository
+import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import com.ph.sintropyengine.broker.shared.utils.validForName
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 import java.lang.IllegalStateException
 import java.util.UUID
+
+
+private val logger = KotlinLogging.logger {}
 
 @ApplicationScoped
 class ProducerService(
@@ -54,6 +59,7 @@ class ProducerService(
                 ?: throw IllegalStateException("Producer ${messagePreStore.producerName} not found")
 
         if (!channel.canWriteMessage(messagePreStore.routingKey)) {
+            logger.warn { "Routing message to DLQ due to circuit open in ${messagePreStore.routing()}" }
             val dlqMessage = deadLetterQueueRepository.save(messagePreStore, channel.channelId!!, producer.producerId!!)
 
             return Message(
@@ -70,6 +76,7 @@ class ProducerService(
             )
         }
 
+        logger.info { "Publishing message to ${messagePreStore.routing()}" }
         return messageRepository.save(messagePreStore, channel.channelId!!, producer.producerId!!)
     }
 }
