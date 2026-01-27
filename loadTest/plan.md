@@ -213,14 +213,14 @@ loadTest/
 ├── plan.md                 # This plan
 ├── config.js               # All configurable parameters
 ├── setup.js                # Channel, producer, route creation
-├── scenarios/
-│   ├── writers.js          # Message publishing scenarios
-│   ├── pollers.js          # Queue polling scenarios
-│   └── websockets.js       # WebSocket consumer scenarios
+├── main.js                 # Main test orchestration
 ├── lib/
 │   ├── api.js              # API helper functions
 │   └── generators.js       # Message payload generators
-└── main.js                 # Main test orchestration
+└── scenarios/
+    ├── writers.js          # Message publishing scenarios
+    ├── pollers.js          # Queue polling scenarios
+    └── websockets.js       # WebSocket consumer scenarios
 ```
 
 ## Decisions Made
@@ -228,7 +228,7 @@ loadTest/
 - **Payload sizes**: Mixed distribution (50% small, 35% medium, 15% large)
 - **WS streams routing**: Yes, also route to queues (dual delivery)
 - **Circuit breaker testing**: No - focus on throughput, acknowledge all messages
-- **Cleanup**: Auto-cleanup after test completion
+- **Cleanup**: Manual cleanup via `./development/truncate-tables.sh`
 
 ---
 
@@ -299,7 +299,6 @@ Each channel will have a single routing key matching the channel name pattern:
 6. [x] Create `scenarios/pollers.js` for queue polling
 7. [x] Create `scenarios/websockets.js` for WebSocket consumers
 8. [x] Create `main.js` to orchestrate all scenarios
-9. [x] Create `teardown.js` for cleanup (delete channels)
 
 ---
 

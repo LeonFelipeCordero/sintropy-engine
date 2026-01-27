@@ -8,7 +8,6 @@
 
 import { config } from './config.js';
 import { runSetup } from './setup.js';
-import { runTeardown } from './teardown.js';
 import { writeMessages, publishDuration, publishSuccess, publishFailure } from './scenarios/writers.js';
 import { pollQueues, pollDuration, messagesPolled, messagesAcked, pollErrors } from './scenarios/pollers.js';
 import { wsConsumer1, wsConsumer3, wsConsumer6, wsMessagesReceived, wsConnectionErrors } from './scenarios/websockets.js';
@@ -126,13 +125,8 @@ export function setup() {
 // Teardown function - runs once after test
 export function teardown(data) {
   console.log('='.repeat(60));
-  console.log('Test Complete - Starting Cleanup');
-  console.log('='.repeat(60));
-
-  runTeardown();
-
-  console.log('='.repeat(60));
-  console.log('Cleanup Complete');
+  console.log('Test Complete');
+  console.log('To clean up data, run: ./development/truncate-tables.sh');
   console.log('='.repeat(60));
 }
 

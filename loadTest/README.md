@@ -154,7 +154,6 @@ loadTest/
 ├── plan.md                # Test plan documentation
 ├── config.js              # All configurable parameters
 ├── setup.js               # Channel, producer, route creation
-├── teardown.js            # Cleanup after tests
 ├── main.js                # Main test orchestration
 ├── lib/
 │   ├── api.js             # API helper functions
@@ -163,6 +162,14 @@ loadTest/
     ├── writers.js         # Message publishing scenario
     ├── pollers.js         # Queue polling scenario
     └── websockets.js      # WebSocket consumer scenario
+```
+
+## Cleanup
+
+After running tests, use the truncate script to clean up database tables:
+
+```bash
+./development/truncate-tables.sh
 ```
 
 ## Troubleshooting

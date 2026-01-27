@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Timer
 import jakarta.enterprise.context.ApplicationScoped
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.function.Supplier
 
 @ApplicationScoped
 class ObservabilityService(
