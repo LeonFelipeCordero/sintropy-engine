@@ -25,7 +25,7 @@ class PollingStandardQueue(
                 .pollFromStandardChannelByRoutingKey(channelId, routingKey, pollingCount)
                 .sortedBy { it.timestamp }
 
-        logger.debug { "polled ${messages.size} messages for [${routing(channelId, routingKey)}]" }
+        logger.info { "polled ${messages.size} messages for [${routing(channelId, routingKey)}]" }
 
         return messages
     }
