@@ -9,19 +9,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 docker-compose -f development/docker-compose.yaml up -d
 
 # Run in dev mode with live coding
-./gradlew quarkusDev -Dapi.version=1.44
+./gradlew quarkusDev
 
 # Run all tests
 ./gradlew test -Dapi.version=1.44
 
 # Run a single test class
-./gradlew test --tests "com.ph.sintropyengine.broker.channel.service.ChannelServiceTest"
+./gradlew test --tests "com.ph.sintropyengine.broker.channel.service.ChannelServiceTest" -Dapi.version=1.44
 
 # Run a single test method
-./gradlew test --tests "com.ph.sintropyengine.broker.channel.service.ChannelServiceTest.should create a channel"
+./gradlew test --tests "com.ph.sintropyengine.broker.channel.service.ChannelServiceTest.should create a channel" -Dapi.version=1.44
 
 # Build the application
-./gradlew build
+./gradlew build -Dapi.version=1.44
 ```
 
 ## Architecture
@@ -66,7 +66,7 @@ Located in `src/main/resources/db/migration/`:
 - **V1.5**: `channel_links` table - enables message routing between channels
 - **V1.6**: Trigger `route_message_after_insert` - automatically copies messages to linked target channels
 - **V1.7**: `dead_letter_queue` table. Trigger `auto_delete_on_failed` - when message status changes to FAILED, copies
-  to DLQ, deletes from messages and message_log
+  to DLQ, deletes from messages, and message_log
 - **V1.8**: `iac_files` table - tracks Infrastructure as Code file hashes for change detection
 - **V1.9**: `channel_circuit_breakers` table with `circuit_state` enum (CLOSED/OPEN). Triggers: auto-create/delete
   circuit breakers with routing keys, `open_circuit_on_failed_delete` - for FIFO channels, opens circuit and moves all
@@ -95,19 +95,20 @@ context
 ## SQL Conventions
 
 - Index naming: `table_field1_field2_idx`
+- Foreign keys naming: `table_a_table_b_field_fk`
 - All tables have `created_at` and `updated_at` timestamps
 - JSONB columns use `JSONB.jsonb(string)` for insertion
 
 ## Testing
 
-- Tests extend `IntegrationTestBase` which provides helper methods and cleanup
+- Tests extend `IntegrationTestBase`, which provides helper methods and cleanup
 - Uses TestContainers with real PostgreSQL instances
-- Test database runs on a random port to avoid conflicts
-- When you need a producer with channel use createChannelWithProducer, pass the consumption type
+- When you need a producer witha  channel, use createChannelWithProducer, pass the consumption type. There are other helper functions
+- Don't create objects on your own, Fixtures.kt have builders, if the one you need is not there, add it.
 
-## Kotlin APIs
+## REST APIs
 
-- When building an API response for an optional object follow a pattern like this one
+- When building an API response for an optional object, follow a pattern like this one
 
 ```kotlin
 return circuitBreakerService.getCircuitBreaker(channelName, routingKey)
@@ -116,20 +117,39 @@ return circuitBreakerService.getCircuitBreaker(channelName, routingKey)
      ?: return Response.status(Response.Status.NOT_FOUND).entity("Message not found").build()
 ```
 
-- When getting a channel, if the routing key is available use ChannelService.findByNameAndRoutingKeyStrict(channelName:
+- When getting a channel, if the routing key is available, use ChannelService.findByNameAndRoutingKeyStrict(channelName:
   String, routingKey: String)
+- When logging something, check if you can use any of the routing() functions available in the shared package
 
 ## Code standards
 
-- Use guard clauses with early returns or early error over nested if statement
+- Use guard clauses with early returns or early error over nested if and/or loops
+```kotlin
+// DONT'T:
+if (channel != null) {
+  if(channel.containsRoutikingKey(routingKey)) {
+    // work to do
+  } else {
+    throw Exception("...")
+  |
+} else {
+  throw Exception ("...")
+}
+
+// INSTEAD DO:
+if (channel == null) {
+  throw Exception ("...")
+}
+
+if(!channel.containsRoutikingKey(routingKey)) {
+  throw Exception("...")
+}
+
+// work to do
+```
 - Elvis operator ?: over if(obj == null)
 - Use domain exceptions over standard ones
 
-## Documentation
-
-- Every new feature should be added to the agent_context. Choose the file that fits the best
-
 ## Code review
-
-- When asked to do code review, write your findings in ./review.md by overriding all existing content in the file.
+- When asked to do a code review, write your findings in ./review.md by overriding all existing content in the file.
 
