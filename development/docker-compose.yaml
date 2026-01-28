@@ -25,6 +25,7 @@ services:
     environment:
       - QUARKUS_PROFILE=dev
       - MONITORING_HOST=lgtm
+      - DB_URL=jdbc:postgresql://postgres:5432/postgres
     depends_on:
       - postgres
 
