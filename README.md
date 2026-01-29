@@ -24,6 +24,7 @@ To start the local database, run the following command:
 ```
 
 ## Build schema and jooq code
+
 ```shell script
 ./gradlew clean build -x test
 ./gradlew flywayMigrate

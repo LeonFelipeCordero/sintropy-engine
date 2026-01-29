@@ -16,6 +16,7 @@ quarkus:
     db-kind: postgresql
     jdbc:
       url: jdbc:postgresql://localhost:5432/postgres
+      telemetry: true
   flyway:
     migrate-at-start: true
   jooq:
@@ -38,6 +39,8 @@ quarkus:
         - service.version=${quarkus.application.version}
     logs:
       enabled: true
+    instrument:
+      jdbc: true
     exporter:
       otlp:
         endpoint: http://localhost:4317

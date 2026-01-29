@@ -11,6 +11,7 @@ import com.ph.sintropyengine.broker.producer.repository.ProducerRepository
 import com.ph.sintropyengine.broker.shared.utils.Patterns.routing
 import com.ph.sintropyengine.broker.shared.utils.validForName
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 import java.lang.IllegalStateException
@@ -49,6 +50,7 @@ class ProducerService(
         } ?: throw IllegalStateException("Producer $name not found")
 
     // TODO: Move this to a message service
+    @WithSpan("ProducerService.publishMessage")
     @Transactional
     fun publishMessage(messagePreStore: MessagePreStore): Message {
         val channel =

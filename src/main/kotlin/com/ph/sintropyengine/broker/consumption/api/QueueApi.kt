@@ -48,11 +48,7 @@ class QueueApi(
                 }
 
                 ConsumptionType.STANDARD -> {
-                    pollingStandardQueue.poll(
-                        channel.channelId!!,
-                        request.routingKey,
-                        request.pollingCount,
-                    )
+                    pollingStandardQueue.poll(channel.channelId!!, request.routingKey, request.pollingCount)
                 }
             }
 

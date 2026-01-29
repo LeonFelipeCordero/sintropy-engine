@@ -34,7 +34,7 @@ service:
       processors: [batch]
       exporters: [otlphttp/traces]
     metrics:
-      receivers: [otlp, prometheus]
+      receivers: [otlp, prometheus.yaml]
       processors: [batch]
       exporters: [otlphttp/metrics]
     logs:

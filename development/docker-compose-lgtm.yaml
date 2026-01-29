@@ -13,7 +13,10 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - lgtm-data:/data
-      - ./monitoring/otel-collector-config.yaml:/otel-lgtm/otelcol-config.yaml
+      - ./monitoring/prometheus.yaml:/otel-lgtm/prometheus.yaml
+      - ./monitoring/sintropy-engine-dashboard.josn:/otel-lgmt/sintropy-engine-dashboard.json
+      - ./monitoring/postgres-dashboard.josn:/otel-lgmt/postgres-dashboard.json
+      - ./monitoring/grafana-dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/grafana-dashboards.yaml
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:latest
@@ -23,7 +26,9 @@ services:
     ports:
       - "9187:9187"
     environment:
-      - DATA_SOURCE_NAME=postgresql://postgres:postgres@${POSTGRES_HOST}:5432/postgres?sslmode=disable
+      - DATA_SOURCE_URI=192.168.178.36:5432/postgres?sslmode=disable
+      - DATA_SOURCE_USER=postgres
+      - DATA_SOURCE_PASS=postgres
 
 networks:
   app:

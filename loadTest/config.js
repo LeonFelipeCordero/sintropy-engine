@@ -2,6 +2,8 @@
 
 export const config = {
   // API settings
+  // baseUrl: __ENV.BASE_URL || 'http://192.168.178.36:8080',
+  // wsUrl: __ENV.WS_URL || 'ws://192.168.178.36:8080',
   baseUrl: __ENV.BASE_URL || 'http://localhost:8080',
   wsUrl: __ENV.WS_URL || 'ws://localhost:8080',
 

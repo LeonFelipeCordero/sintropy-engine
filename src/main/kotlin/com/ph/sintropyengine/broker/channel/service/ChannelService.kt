@@ -6,6 +6,8 @@ import com.ph.sintropyengine.broker.channel.model.ConsumptionType
 import com.ph.sintropyengine.broker.channel.repository.ChannelRepository
 import com.ph.sintropyengine.broker.shared.utils.validForName
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.opentelemetry.instrumentation.annotations.SpanAttribute
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 import java.util.UUID
@@ -16,10 +18,11 @@ private val logger = KotlinLogging.logger {}
 class ChannelService(
     private val channelRepository: ChannelRepository,
 ) {
+    @WithSpan("ChannelService.createChannel")
     @Transactional
     fun createChannel(
-        name: String,
-        channelType: ChannelType,
+        @SpanAttribute("channel.name") name: String,
+        @SpanAttribute("channel.type") channelType: ChannelType,
         routingKeys: List<String>,
         consumptionType: ConsumptionType? = null,
     ): Channel {
@@ -47,11 +50,13 @@ class ChannelService(
 
     fun findByIds(ids: Set<UUID>): Map<UUID, Channel> = channelRepository.findByIds(ids)
 
-    fun findByName(name: String): Channel? = channelRepository.findByName(name)
+    @WithSpan("ChannelService.findByName")
+    fun findByName(@SpanAttribute("channel.name") name: String): Channel? = channelRepository.findByName(name)
 
+    @WithSpan("ChannelService.findByNameAndRoutingKey")
     fun findByNameAndRoutingKeyStrict(
-        name: String,
-        routingKey: String,
+        @SpanAttribute("channel.name") name: String,
+        @SpanAttribute("routing.key") routingKey: String,
     ): Channel =
         channelRepository.findByNameAndRoutingKey(name, routingKey)
             ?: throw IllegalStateException("Channel with name $name and routing key $routingKey not found")
