@@ -27,7 +27,7 @@ jobs:
         run: ./gradlew build -x test -x jooqCodegen
 
       - name: Run tests
-        run: ./gradlew test
+        run: ./gradlew test -Dapi.version=1.44
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
