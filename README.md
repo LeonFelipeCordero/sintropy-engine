@@ -3,6 +3,17 @@
 Sintropy Engine is a message broker built with Quarkus and Kotlin. It provides a reliable and scalable platform for
 asynchronous communication between services.
 
+## Features
+
+- **Two channel types:**
+  - **Queue** — supports both STANDARD (competing consumers) and FIFO (ordered, exactly-once) consumption modes
+  - **Stream** — real-time message delivery over WebSocket connections
+- **Channel linking** — route messages between channels automatically, enabling fan-out and pipeline patterns
+- **Dead Letter Queue (DLQ)** — failed messages are automatically moved to a DLQ for inspection and reprocessing
+- **Circuit breaker** — for FIFO channels, a failed message opens the circuit and routes remaining messages to the DLQ, preventing out-of-order processing
+- **PostgreSQL-native** — uses PostgreSQL logical replication (`wal2json`) to stream message inserts to WebSocket consumers in real-time, and advisory locks to guarantee single-consumer message processing
+- **Infrastructure as Code** — define channels, routing keys, and producers declaratively through IaC file definitions
+
 ## Prerequisites
 
 To build and run this project, you will need the following tools:
@@ -26,7 +37,7 @@ To start the local database, run the following command:
 ## Build schema and jooq code
 
 ```shell script
-./gradlew clean build -x test
+./gradlew clean build -x test -Dapi.version=1.44
 ./gradlew flywayMigrate
 ./gradlew jooqCodegen
 ```
@@ -54,7 +65,7 @@ To run the test suite, use the following command:
 The application can be packaged using:
 
 ```shell script
-./gradlew build
+./gradlew build -Dapi.version=1.44
 ```
 
 ## Contributing
