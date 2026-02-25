@@ -49,8 +49,8 @@ dependencies {
 
     testImplementation("io.mockk:mockk:1.14.6")
     testImplementation("org.testcontainers:testcontainers:2.0.3")
-    testImplementation("org.testcontainers:postgresql:1.21.4")
-    testImplementation("org.testcontainers:junit-jupiter:1.21.4")
+    testImplementation("org.testcontainers:postgresql:2.0.3")
+    testImplementation("org.testcontainers:junit-jupiter:2.0.3")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
     testImplementation("io.rest-assured:kotlin-extensions")
